@@ -1,0 +1,2661 @@
+﻿<!doctype html>
+<html lang="de">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="In diesem Thema erfahren Sie, wie Sie mithilfe der CMS-API Videos von einem Video Cloud-Konto an ein anderes weitergeben.">
+  
+  <title>Medienfreigabe</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">  
+  <link data-react-helmet="true" rel="preload" as="font" href="https://files.brightcove.com/fonts/balto/baltoweb-ultra.eot" type="font/eot">
+  <link data-react-helmet="true" rel="preload" as="font" href="https://files.brightcove.com/fonts/balto/baltoweb-ultra.woff" type="font/woff">
+  <link data-react-helmet="true" rel="preload" as="font" href="https://files.brightcove.com/fonts/balto/baltoweb-super.eot" type="font/eot">
+  <link data-react-helmet="true" rel="preload" as="font" href="https://files.brightcove.com/fonts/balto/baltoweb-super.woff" type="font/woff">
+  <link data-react-helmet="true" rel="preload" as="font" href="https://files.brightcove.com/fonts/balto/baltoweb-black.eot" type="font/eot">
+  <link data-react-helmet="true" rel="preload" as="font" href="https://files.brightcove.com/fonts/balto/baltoweb-black.woff" type="font/woff">
+  <link data-react-helmet="true" rel="preload" as="font" href="https://files.brightcove.com/fonts/balto/baltoweb-bold.eot" type="font/eot">
+  <link data-react-helmet="true" rel="preload" as="font" href="https://files.brightcove.com/fonts/balto/baltoweb-bold.woff" type="font/woff">
+  <link data-react-helmet="true" rel="preload" as="font" href="https://files.brightcove.com/fonts/balto/baltoweb-medium.eot" type="font/eot">
+  <link data-react-helmet="true" rel="preload" as="font" href="https://files.brightcove.com/fonts/balto/baltoweb-medium.woff" type="font/woff">
+  <link data-react-helmet="true" rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500&amp;display=swap">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://support.brightcove.com/site-assets/css/site/prism.css">
+  <link rel="stylesheet" href="https://support.brightcove.com/site-assets/css/site/styles.css">
+  <link rel="stylesheet" href="https://support.brightcove.com/site-assets/css/site/landing-page.css">
+  <link rel="stylesheet" href="https://support.brightcove.com/site-assets/css/site/tabs.css">
+  <link rel="stylesheet" href="/assets/css/local.css">
+  <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/381443caa8.js" crossorigin="anonymous"></script>
+  <script src="https://support.brightcove.com/site-assets/js/site/google-analytics.js"></script>
+  <script src="/assets/js/sajari-head.js"></script>
+</head>
+
+<body class="body">
+
+<header>
+  <div class="div-header">
+    <a href="/"><img class="product-logo" src="https://support.brightcove.com/site-assets/images/site/product-logos/Video_Cloud_Logo.svg" alt="Produkt-Logo" style="max-height: 100px;max-width: 232px;"/></a>
+<!-- GTranslate: https://gtranslate.io/ -->
+<select onchange="doGTranslate(this);"><option value="">Sprache wählen</option><option value="en|en" translate="No">English</option><option value="en|zh-TW" translate="No">繁體中文</option><option value="en|fr" translate="No">Français</option><option value="en|de" translate="No">Deutsche</option><option value="en|ja" translate="No">日本語</option><option value="en|ko" translate="No">한국어</option><option value="en|es" translate="No">Español</option></select>
+
+<script>
+/* <![CDATA[ */
+function doGTranslate(lang_pair) {if(lang_pair.value)lang_pair=lang_pair.value;if(lang_pair=='')return;var lang=lang_pair.split('|')[1];var plang=location.hostname.split('.')[0];if(plang.length !=2 && plang.toLowerCase() != 'zh-cn' && plang.toLowerCase() != 'zh-tw')plang='en';location.href=location.protocol+'//'+(lang == 'en' ? '' : lang+'.')+location.hostname.replace('www.', '').replace(RegExp('^' + plang + '\\.'), '')+location.pathname+location.search;}
+/* ]]> */
+</script>
+
+    <select id="site_select" class="bcls-select" style="margin-right: 1rem;">
+      <option value="">Weitere Brightcove Docs</option>
+      
+        
+          <option value="https://support.brightcove.com">Dokumentation Home</option>
+        
+      
+        
+          <option value="https://audience.support.brightcove.com">Brightcove Publikum</option>
+        
+      
+        
+          <option value="https://beacon.support.brightcove.com">Brightcove Leuchtfeuer</option>
+        
+      
+        
+          <option value="https://campaign.support.brightcove.com">Brightcove Kampagne</option>
+        
+      
+        
+          <option value="https://engage.support.brightcove.com">Brightcove Engage</option>
+        
+      
+        
+          <option value="https://live.support.brightcove.com">Brightcove Live</option>
+        
+      
+        
+          <option value="https://gallery.support.brightcove.com">Brightcove Gallery</option>
+        
+      
+        
+          <option value="https://ssai.support.brightcove.com">Brightcove SSAI</option>
+        
+      
+        
+          <option value="https://social.support.brightcove.com">Brightcove Social</option>
+        
+      
+        
+          <option value="https://studio.support.brightcove.com">Video Cloud Studio</option>
+        
+      
+        
+          <option value="https://player.support.brightcove.com">Brightcove Spieler-Entwicklung</option>
+        
+      
+        
+          <option value="https://apis.support.brightcove.com">APIs für Video Cloud-Plattform</option>
+        
+      
+        
+          <option value="https://sdks.support.brightcove.com">Videocloud-Geräte-SDKs</option>
+        
+      
+        
+          <option value="https://integrations.support.brightcove.com">Integrationen und CMS-Konnektoren</option>
+        
+      
+        
+          <option value="https://general.support.brightcove.com">Video Cloud — Allgemeine Informationen</option>
+        
+      
+        
+          <option value="https://zencoder.support.brightcove.com">Zencoder</option>
+        
+      
+    </select>
+
+
+    <span class="secondary-nav"><a href="https://supportportal.brightcove.com/s/login/?"><img src="https://support.brightcove.com/site-assets/images/site/support.png" alt="Support"/> Kontaktieren Sie Support</a> <span style="vertical-align: top;margin-left:1em;margin-right:1em;">|</span> <a href="https://status.brightcove.com/"><img src="https://support.brightcove.com/site-assets/images/site/status.png" alt="Systemstatus"/> Systemstatus</a></span> <br/>
+    
+  </div>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb arr-right">
+      
+      <li class="breadcrumb-item"><a href="/">Nach Hause</a></li>
+      
+      
+      
+      <li class="breadcrumb-item"><a href="/cms/managing-videos/">Verwalten von Videos/Assets</a></li>
+      
+      <li class="breadcrumb-item active" aria-current="page">Medienfreigabe</li>
+    </ol>
+  </nav>
+</header>
+<div class="container">
+    <div class="row">
+      <div class="col-sm-3 left-side-bar">
+        <nav class="sidenav" id="side_nav">
+          
+            
+            <h5><a href="/index.html">Nach Hause</a></h5>
+            
+          
+            
+              <h5 class="submenu-header"><a href="/getting-started/index.html">Erste Schritte <strong>+</strong></a></h5>
+              <ul class="sidenav-submenu" style="display:none;">
+                
+                  
+                    <li><a href="/getting-started/getting-started-brightcove-apis.html">Übersicht: Plattform APIs</a></li>
+                  
+                
+                  
+                    <li><a href="/getting-started/authentication-brightcove-api-requests.html">Authentifizierung für API-Anfragen</a></li>
+                  
+                
+                  
+                    <li><a href="/getting-started/concepts-testing-tools-brightcove-apis.html">Tools für Brightcove-APIs testen</a></li>
+                  
+                
+                  
+                    <li><a href="/getting-started/learning-guide-using-rest-apis.html">Leitfaden zum Lernen: Verwenden der REST APIs</a></li>
+                  
+                
+              </ul>
+            
+          
+            
+              <h5 class="submenu-header"><a href="/general/index.html">Allgemeine Informationen <strong>+</strong></a></h5>
+              <ul class="sidenav-submenu" style="display:none;">
+                
+                  
+                    <li><a href="/general/all-api-references.html">Alle API-Referenzen</a></li>
+                  
+                
+                  
+                    <li><a href="/general/overview-context-aware-encoding.html">Überblick über Context Aware Codierung</a></li>
+                  
+                
+                  
+                    <li><a href="/general/managing-api-authentication-credentials.html">Verwalten von Anmeldedaten für API-</a></li>
+                  
+                
+                  
+                    <li><a href="/general/integrating-your-cms-video-cloud.html">Integrieren Sie Ihr CMS mit Video Cloud</a></li>
+                  
+                
+                  
+                    <li><a href="/general/platform-api-code-samples.html">Plattform-API-Co</a></li>
+                  
+                
+                  
+                    <li><a href="/general/video-cloud-api-training-videos.html">Schulungsvideos zur Plattform</a></li>
+                  
+                
+                  
+                    <li><a href="/general/concepts-api-tester.html">Online-API-Tester</a></li>
+                  
+                
+                  
+                    <li><a href="/general/use-insomnia-api-requests.html">Verwenden Sie Insomnia für API-Anfragen</a></li>
+                  
+                
+                  
+                    <li><a href="/general/use-postman-api-requests.html">Verwenden Sie Postman für API-Anfragen</a></li>
+                  
+                
+                  
+                    <li><a href="/general/audio-content.html">Audio-Inhalte</a></li>
+                  
+                
+                  
+                    <li><a href="/general/known-issues.html">Platform APIs Bekannte Probleme</a></li>
+                  
+                
+              </ul>
+            
+          
+            
+              <h5 class="submenu-header"><a href="/analytics/index.html">Analytics-API <strong>+</strong></a></h5>
+              <ul class="sidenav-submenu" style="display:none;">
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/analytics/getting-started/index.html">Erste Schritte <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/analytics/getting-started/overview-analytics-api-v1.html">Übersicht: Analytics-API</a></li>
+                        
+                        <li><a href="/analytics/getting-started/analytics-api-explorer.html">Analytics-API Explorer</a></li>
+                        
+                        <li><a href="/analytics/getting-started/overview-video-data-endpoint.html">Übersicht: Videodaten-Endpunkt</a></li>
+                        
+                        <li><a href="/analytics/getting-started/analytics-api-overview-dimensions-fields-and-parameters.html">Übersicht: Dimensionen, Felder und Parameter</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/analytics/general/index.html">Allgemeine Informationen <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/analytics/general/faq-analytics-api.html">FAQ: Analytics-API</a></li>
+                        
+                        <li><a href="/analytics/general/analytics-api-glossary.html">Analytics-API-Glossar</a></li>
+                        
+                        <li><a href="/analytics/general/analytics-api-unique-users.html">Eindeutige Benutzer</a></li>
+                        
+                        <li><a href="/analytics/general/live-metrics.html">Live-Metriken</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/analytics/references/index.html">Referenzen <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/analytics/references/reference.html">Analytics-API Referenz</a></li>
+                        
+                        <li><a href="/analytics/references/analytics-api-release-notes.html">Anmerkungen zur</a></li>
+                        
+                        <li><a href="/analytics/references/known-issues.html">Bekannte Probleme</a></li>
+                        
+                        <li><a href="/analytics/references/analytics-api-error-reference.html">Error-Referenz</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/analytics/dimension-guides/index.html">Anleitungen für Dimensionen <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-account.html">Dimension: <code>Konto</code></a></li>
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-browsertype.html">Dimension: <code>browser_type</code></a></li>
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-date.html">Dimension: <code>Datum</code></a></li>
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-datehour.html">Dimension: <code>date_hour</code></a></li>
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-destinationdomain.html">Dimension: <code>destination_domäne</code></a></li>
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-destinationpath.html">Dimension: <code>destination_path</code></a></li>
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-devicemanufacturer.html">Größe: <code>device_manufacturer</code></a></li>
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-devicetype.html">Dimension: <code>device_type</code></a></li>
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-deviceos.html">Dimension: <code>device_os</code></a></li>
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-city.html">Dimension: <code>Stadt</code></a></li>
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-country.html">Dimension: <code>Land</code></a></li>
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-region.html">Dimension: <code>Region</code></a></li>
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-livestream.html">Dimension: <code>live_stream</code></a></li>
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-referrerdomain.html">Dimension: <code>referrer_domain</code></a></li>
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-sourcetype.html">Dimension: <code>source_type</code></a></li>
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-searchterms.html">Dimension: <code>search_terms</code></a></li>
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-socialplatform.html">Dimension: <code>social_platform</code></a></li>
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-player.html">Dimension: <code>Spieler</code></a></li>
+                        
+                        <li><a href="/analytics/dimension-guides/dimension-video.html">Dimension: <code>Video</code></a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/analytics/code-samples/index.html">Codebeispiele <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/analytics/code-samples/analytics-api-sample-concurrent-viewers-live-events.html">Gleichzeitige Zuschauer für Live-Events</a></li>
+                        
+                        <li><a href="/analytics/code-samples/analytics-api-sample-daily-analytics-report-generator.html">Täglicher Analytics-Ber</a></li>
+                        
+                        <li><a href="/analytics/code-samples/analytics-api-sample-destinations-report.html">Bericht zu Zielen</a></li>
+                        
+                        <li><a href="/analytics/code-samples/analytics-api-sample-geographical-analytics-report.html">Bericht über geographische Analysen</a></li>
+                        
+                        <li><a href="/analytics/code-samples/analytics-api-sample-unique-users-day.html">Eindeutige Benutzer nach Tag</a></li>
+                        
+                        <li><a href="/analytics/code-samples/analytics-api-sample-video-engagement-graph.html">Grafik zur Videoeinbindung</a></li>
+                        
+                        <li><a href="/analytics/code-samples/analytics-api-sample-video-report-player-and-day.html">Videobericht nach Spieler und Tag</a></li>
+                        
+                        <li><a href="/analytics/code-samples/analytics-api-sample-video-report-reference-id.html">Videobericht nach Referenz-ID</a></li>
+                        
+                        <li><a href="/analytics/code-samples/analytics-api-sample-video-report-tags.html">Videobericht nach Schlagwörtern</a></li>
+                        
+                        <li><a href="/analytics/code-samples/analyticscms-apis-sample-analytics-playlists.html">Analytics nach Playlisten</a></li>
+                        
+                        <li><a href="/analytics/code-samples/analyticscms-apis-sample-recently-added-videos.html">Kürzlich hinzugefügt Videos</a></li>
+                        
+                        <li><a href="/analytics/code-samples/code-sample-video-analytics-report-country-and-day.html">Video Analytics-Bericht nach Land und Tag</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+              </ul>
+            
+          
+            
+              <h5 class="submenu-header"><a href="/cms/index.html">CMS-API <strong>+</strong></a></h5>
+              <ul class="sidenav-submenu" style="display:none;">
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/cms/getting-started/index.html">Erste Schritte <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/cms/getting-started/overview-cms-api.html">Übersicht: CMS-API</a></li>
+                        
+                        <li><a href="/cms/getting-started/practice-area-cms-api.html">Praxis-Bereich: CMS-API</a></li>
+                        
+                        <li><a href="/cms/getting-started/best-practices-cms-and-playback-apis.html">Best Practices: CMS und Playback-APIs</a></li>
+                        
+                        <li><a href="/cms/getting-started/cms-api-notifications.html">CMS API Benachrichtigungen</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/cms/references/index.html">Referenzen <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/cms/references/reference.html">CMS API Referenz</a></li>
+                        
+                        <li><a href="/cms/references/catalog-apis-cms-api-and-playback-api-release-notes.html">CMS/Playback-APIs - Versions</a></li>
+                        
+                        <li><a href="/cms/references/known-issues.html">Bekannte Probleme</a></li>
+                        
+                        <li><a href="/cms/references/cms-api-video-fields-reference.html">CMS API Video Felder Referenz</a></li>
+                        
+                        <li><a href="/cms/references/cms-api-playlist-fields-reference.html">CMS API Playlist Felder Referenz</a></li>
+                        
+                        <li><a href="/cms/references/cms-api-custom-fields-reference.html">CMS API Benutzerdefinierte Felder Referenz</a></li>
+                        
+                        <li><a href="/cms/references/cms-api-folder-fields-reference.html">CMS API-Ordnerfelder Referenz</a></li>
+                        
+                        <li><a href="/cms/references/cms-api-error-message-reference.html">CMS API Fehlermeldung Referenz</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/cms/searching/index.html">Suche <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/cms/searching/cms-and-playback-apis-video-search-v2.html">CMS-API: Video-Suche v2</a></li>
+                        
+                        <li><a href="/cms/searching/cms-api-playlists-search.html">CMS-API: Playlists Suche</a></li>
+                        
+                        <li><a href="/cms/searching/using-cms-api-page-search-results.html">Ergebnisse der Suche auf Seiten</a></li>
+                        
+                        <li><a href="/cms/searching/cmsplayback-api-videos-search.html">CMS und Playback-APIs: Video-Suche v1</a></li>
+                        
+                        <li><a href="/playback/guides/catalog-search-architecture.html">Katalog-Suche Architektur</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/cms/managing-videos/index.html">Verwalten von Videos/Assets <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/cms/managing-videos/using-cms-api-add-geo-filtering.html">Geo-Filterung hinzufügen</a></li>
+                        
+                        <li><a href="/cms/managing-videos/digital-master-delete-api.html">API zum Löschen eines digitalen Masters</a></li>
+                        
+                        <li><a href="/cms/managing-videos/deleting-videos.html">Videos löschen</a></li>
+                        
+                        <li><a href="/cms/managing-videos/getting-counts-videos-and-playlists.html">Anzahl von Videos und Playlists abrufen</a></li>
+                        
+                        <li><a href="/cms/managing-videos/managing-playlists-using-cms-api.html">Verwalten von Playlists mit der CMS-API</a></li>
+                        
+                        <li><a href="/cms/managing-videos/using-cms-api-managing-clips.html">Verwalten von Clips</a></li>
+                        
+                        <li><a href="/cms/managing-videos/media-sharing-cms-api.html">Teilen von Medien</a></li>
+                        
+                        <li><a href="/cms/managing-videos/multilingual-metadata.html">Mehrsprachige Metadaten</a></li>
+                        
+                        <li><a href="/cms/managing-videos/using-cms-api-retrieve-video-data.html">Videodaten abrufen</a></li>
+                        
+                        <li><a href="/cms/managing-videos/setting-360-degree-video-properties-cms-api.html">Festlegen von 360-Grad-Videoeigenschaften</a></li>
+                        
+                        <li><a href="/cms/managing-videos/using-cms-api-remote-assets.html">Remote-As</a></li>
+                        
+                        <li><a href="/cms/managing-videos/using-cms-api-add-webvtt-captions-text-tracks.html">Hinzufügen von WebVTT-Beschriftungen (Textspuren)</a></li>
+                        
+                        <li><a href="/cms/managing-videos/generate-video-sitemaps.html">Generieren von Video-Sitemaps</a></li>
+                        
+                        <li><a href="/cms/managing-videos/identifying-low-performing-content.html">Identifizieren von Inhalten mit geringer Leistung</a></li>
+                        
+                        <li><a href="/cms/managing-videos/cms-api-working-folders.html">Arbeiten mit Ordnern</a></li>
+                        
+                        <li><a href="/cms/managing-videos/working-with-labels.html">Arbeiten mit Labels</a></li>
+                        
+                        <li><a href="/cms/managing-videos/linking-zencoder-and-video-cloud-video-demand.html">Verknüpfung von Zencoder und Video Cloud</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/cms/code-samples/index.html">Codebeispiele <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-add-multiple-affiliate-accounts-media-sharing.html">Mehrere Affiliate-Konten hinzufügen</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-share-multiple-videos.html">Mehrere Videos teilen</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-media-sharing-report.html">Bericht zum Teilen von Medien</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-shared-media-report.html">Bericht über gemeinsame Medien</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-update-videos.html">Videos aktualisieren</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-add-custom-field-multiple-videos.html">Fügen Sie einem benutzerdefinierten Feld zu mehreren Videos hinzu</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-update-geo-properties.html">Aktualisieren von Geo-Eigenschaften</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-add-cue-points.html">Cue-Points hinzufügen</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-video-report-generator.html">Video-Bericht Generator</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-videos-delivery-type.html">Videos nach Lieferart</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-download-links.html">Download-Links</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-video-sitemap-generator.html">Video-Sitemap-Gener</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-mrss-generator.html">MRSS-Generator</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-mrss-feed-playlist.html">MRSS-Feed von Playlist</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-generate-rss-podcast-feed-itunes.html">RSS Podcast-Feed für iTunes</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-video-renditions-inspector.html">Inspektor für Videowiedergabe-Versionen</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-report-audio-only-content.html">Bericht über Nur-Audio-Inhalte</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-video-schema-builder.html">Videoschema-Builder</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-python-code-get-request.html">Python-Code für eine GET-Anfrage</a></li>
+                        
+                        <li><a href="/cms/code-samples/cms-api-sample-video-search-app.html">App zur Videosuche</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+              </ul>
+            
+          
+            
+              <h5 class="submenu-header"><a href="/xdr/index.html">Geräteübergreifende Lebenslauf (XDR) API <strong>+</strong></a></h5>
+              <ul class="sidenav-submenu" style="display:none;">
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/xdr/getting-started/index.html">Erste Schritte <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/xdr/getting-started/xdr-overview.html">Übersicht: Geräteübergreifender Lebenslauf</a></li>
+                        
+                        <li><a href="/xdr/getting-started/get-playback-position.html">Abrufen der Wiedergabeposition von XDR API</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/xdr/index.html">Reiseführer <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="https://player.support.brightcove.com/playback/xdr-with-bcplayer.html">Geräteübergreifender Lebenslauf mit Brightcove Player</a></li>
+                        
+                        <li><a href="https://sdks.support.brightcove.com/features/cross-device-resume-sdks.html">Geräteübergreifender Lebenslauf mit den Native SDKs</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/xdr/references/index.html">Referenzen <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/xdr/getting-started/xdr-overview.html">API Referenz zur Gerätewiederaufnahme überqueren</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+              </ul>
+            
+          
+            
+              <h5 class="submenu-header"><a href="/data-collection/index.html">API zur Datenerfassung <strong>+</strong></a></h5>
+              <ul class="sidenav-submenu" style="display:none;">
+                
+                  
+                    <li><a href="/data-collection/overview-data-collection-api-v2.html">Übersicht: API zur Datenerfassung</a></li>
+                  
+                
+                  
+                    <li><a href="/data-collection/data-collection-api-sample.html">API-Beispiel für Datenerfassung</a></li>
+                  
+                
+                  
+                    <li><a href="/data-collection/references/reference.html">API Referenz zur Datenerfassung</a></li>
+                  
+                
+              </ul>
+            
+          
+            
+              <h5 class="submenu-header"><a href="/delivery-system/index.html">Liefersystem-API <strong>+</strong></a></h5>
+              <ul class="sidenav-submenu" style="display:none;">
+                
+                  
+                    <li><a href="/delivery-system/overview-delivery-system-api.html">Übersicht: Liefersystem-API</a></li>
+                  
+                
+                  
+                    <li><a href="/delivery-system/step-step-delivery-system-api.html">Schritt für Schritt: Liefersystem-API</a></li>
+                  
+                
+                  
+                    <li><a href="/delivery-system/delivery-system-api-git-overview.html">Git Überblick</a></li>
+                  
+                
+                  
+                    <li><a href="/delivery-system/references/reference.html">Referenz zur API des Bereitstellungssystems</a></li>
+                  
+                
+              </ul>
+            
+          
+            
+              <h5 class="submenu-header"><a href="/dynamic-ingest/index.html">Dynamische Ingest-API <strong>+</strong></a></h5>
+              <ul class="sidenav-submenu" style="display:none;">
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/dynamic-ingest/getting-started/index.html">Erste Schritte <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/dynamic-ingest/getting-started/overview-dynamic-ingest-api-dynamic-delivery.html">Übersicht: Dynamische Ingest-API</a></li>
+                        
+                        <li><a href="/dynamic-ingest/getting-started/quick-start-dynamic-ingest-api.html">Kurzanleitung: Dynamische Ingest-API</a></li>
+                        
+                        <li><a href="/dynamic-ingest/getting-started/source-file-upload-api-dynamic-ingest.html">Quelldatei-Upload-API für dynamisches In</a></li>
+                        
+                        <li><a href="/dynamic-ingest/getting-started/overview-dynamic-delivery.html">Überblick über die dynamische Lieferung</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/dynamic-ingest/general/index.html">Allgemeine Informationen <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/dynamic-ingest/general/dynamic-ingest-api-best-practices.html">Dynamische Ingest-API: Beste Praktiken</a></li>
+                        
+                        <li><a href="/dynamic-ingest/general/notifications-dynamic-delivery-video-cloud.html">Benachrichtigungen für Dynamic Ingest-Prozess</a></li>
+                        
+                        <li><a href="/dynamic-ingest/general/get-status-dynamic-ingest-requests-dynamic-delivery.html">Status von Anforderungen für dynamische Aufnehmen abrufen</a></li>
+                        
+                        <li><a href="/dynamic-ingest/general/fallback-retry-strategy.html">Fallback/Wiederholungsstrategie</a></li>
+                        
+                        <li><a href="/dynamic-ingest/general/using-dynamic-ingest-s3.html">Verwenden von Dynamic Ingest-Funktion mit S3</a></li>
+                        
+                        <li><a href="/dynamic-ingest/general/ugc-strategies.html">UGC-Strategien</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/dynamic-ingest/references/index.html">Referenzen <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/dynamic-ingest/references/reference.html">Dynamische Ingest-API-Referenz</a></li>
+                        
+                        <li><a href="/dynamic-ingest/references/dynamic-ingest-api-release-notes.html">Dynamische Ingest-API - Versions</a></li>
+                        
+                        <li><a href="/dynamic-ingest/references/known-issues.html">Bekannte Probleme</a></li>
+                        
+                        <li><a href="/dynamic-ingest/references/dynamic-ingest-ingest-fields.html">Referenz zu Ingest-Feldern</a></li>
+                        
+                        <li><a href="/dynamic-ingest/references/dynamic-ingest-error-message-reference.html">Referenz für Dynamic Ingest-Fehlermeldung</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/dynamic-ingest/ingest-guides/index.html">Anleitungen aufnehmen <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/dynamic-ingest/ingest-guides/context-aware-encoding.html">Verwenden von Context Aware Codierung</a></li>
+                        
+                        <li><a href="/dynamic-ingest/ingest-guides/dynamic-delivery-ingest-priority-queueing.html">Dynamische Bereitstellung Ingest-Priorität Queueing</a></li>
+                        
+                        <li><a href="/ingest-profiles/guides/archiving-masters.html">Archivierung Masters</a></li>
+                        
+                        <li><a href="/dynamic-ingest/ingest-guides/implementing-multiple-audio-tracks-using-apis.html">Implementierung mehrerer Audiospuren</a></li>
+                        
+                        <li><a href="/dynamic-ingest/ingest-guides/images-and-dynamic-ingest-api.html">Bilder und die Dynamic Ingest-API</a></li>
+                        
+                        <li><a href="/dynamic-ingest/ingest-guides/dynamic-ingest-media-sharing.html">Dynamische Aufnahme mit Medienfreigabe</a></li>
+                        
+                        <li><a href="/dynamic-ingest/ingest-guides/ingesting-content-drm.html">Aufnahme von Inhalten mit DRM</a></li>
+                        
+                        <li><a href="/dynamic-ingest/ingest-guides/ingesting-webvtt-files-text-trackscaptions.html">Aufnahme von WebVTT-Dateien</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/dynamic-ingest/code-samples/index.html">Codebeispiele <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/dynamic-ingest/code-samples/dynamic-ingest-api-tester-dynamic-delivery.html">Dynamischer Ingest-API-Tester</a></li>
+                        
+                        <li><a href="/dynamic-ingest/code-samples/dynamic-ingest-api-sample-ingesting-videos-dynamic-delivery.html">Aufnahme von Videos</a></li>
+                        
+                        <li><a href="/dynamic-ingest/code-samples/dynamic-ingest-api-sample-re-transcoding-videos-dynamic-delivery.html">Re-Transcodieren von Videos</a></li>
+                        
+                        <li><a href="/dynamic-ingest/code-samples/dynamic-ingest-api-sample-replacing-videos-dynamic-delivery.html">Ersetzen von Videos</a></li>
+                        
+                        <li><a href="/dynamic-ingest/code-samples/dynamic-ingest-api-sample-add-scheduled-videos-dynamic-delivery.html">Geplante Videos hinzufügen</a></li>
+                        
+                        <li><a href="/dynamic-ingest/code-samples/dynamic-ingest-api-sample-adding-text-tracks.html">Hinzufügen von Textspuren</a></li>
+                        
+                        <li><a href="/dynamic-ingest/code-samples/dynamic-ingest-api-sample-ingesting-low-priority-videos-dynamic-delivery.html">Aufnehmen von Videos mit niedriger Priorität</a></li>
+                        
+                        <li><a href="/dynamic-ingest/code-samples/dynamic-ingest-api-sample-python-code.html">Python-Code</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+              </ul>
+            
+          
+            
+              <h5 class="submenu-header"><a href="/ingest-profiles/index.html">API Profile aufnehmen <strong>+</strong></a></h5>
+              <ul class="sidenav-submenu" style="display:none;">
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/ingest-profiles/getting-started/index.html">Erste Schritte <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/ingest-profiles/getting-started/overview-ingest-profiles-api-dynamic-delivery-context-aware-encoding.html">Übersicht: Profile-API aufnehmen</a></li>
+                        
+                        <li><a href="/ingest-profiles/getting-started/practice-area-ingest-profiles-api-dynamic-delivery.html">Praxis-Bereich: Profile-API aufnehmen</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/ingest-profiles/guides/index.html">Reiseführer <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/ingest-profiles/guides/archiving-masters.html">Archivierung Masters</a></li>
+                        
+                        <li><a href="/ingest-profiles/guides/hevc-video.html">HEVC-Video</a></li>
+                        
+                        <li><a href="/ingest-profiles/guides/cae-fast-publish.html">CAE schnell veröffentlichen</a></li>
+                        
+                        <li><a href="/general/audio-content.html">Audio-Inhalte</a></li>
+                        
+                        <li><a href="/ingest-profiles/guides/mp4s-dynamic-delivery.html">MP4s in dynamischer Lieferung</a></li>
+                        
+                        <li><a href="https://studio.support.brightcove.com/admin/ingest-profiles-best-practices.html">Beste Praktiken</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/ingest-profiles/references/index.html">Referenzen <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/ingest-profiles/references/reference.html">API Referenz für Ingest-Profile</a></li>
+                        
+                        <li><a href="/ingest-profiles/references/ingest-profiles-api-fields-reference-dynamic-delivery-and-context-aware-encoding.html">Referenz zu Feldern aufnehmen</a></li>
+                        
+                        <li><a href="/ingest-profiles/references/standard-ingest-profiles-dynamic-delivery-and-context-aware-encoding.html">Standard-Ingest-Profile</a></li>
+                        
+                        <li><a href="/ingest-profiles/references/standard-live-ingest-profiles.html">Standard-Live-Ingest-Profile</a></li>
+                        
+                        <li><a href="/ingest-profiles/references/fields-custom-live-ingest-profiles.html">Felder für benutzerdefinierte Live-Aufgaufzeichnungsprofile</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/ingest-profiles/code-samples/index.html">Codebeispiele <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/ingest-profiles/code-samples/ingest-profiles-api-sample-create-custom-dynamic-delivery-profile.html">Benutzerdefiniertes dynamisches Lieferprofil erstellen</a></li>
+                        
+                        <li><a href="/ingest-profiles/code-samples/ingest-profiles-api-sample-create-custom-context-aware-encoding-profile.html">Benutzerdefiniertes CAE-Profil erstellen</a></li>
+                        
+                        <li><a href="/ingest-profiles/code-samples/ingest-profiles-api-sample-add-profile-multiple-accounts.html">Profil zu mehreren Konten hinzufügen</a></li>
+                        
+                        <li><a href="/ingest-profiles/code-samples/ingest-profiles-api-sample-get-all-profiles-account.html">Alle Profile für ein Konto abrufen</a></li>
+                        
+                        <li><a href="/ingest-profiles/code-samples/ingest-profiles-api-sample-set-default-profile-dynamic-delivery.html">Standardprofil festlegen</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+              </ul>
+            
+          
+            
+              <h5 class="submenu-header"><a href="/oauth/index.html">OAuth API <strong>+</strong></a></h5>
+              <ul class="sidenav-submenu" style="display:none;">
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/oauth/getting-started/index.html">Erste Schritte <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/oauth/getting-started/overview-oauth-api-v4.html">Übersicht: OAuth API</a></li>
+                        
+                        <li><a href="/oauth/getting-started/quick-start-oauth.html">Kurzanleitung: OAuth API</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/oauth/guides/index.html">Reiseführer <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/oauth/guides/oauth-create-client-credentials-using-curl.html">Client-Anmeldedaten erstellen: cURL</a></li>
+                        
+                        <li><a href="/oauth/guides/oauth-create-client-credentials-using-postman.html">Erstellen von Client-Anmeldedaten: Briefträger</a></li>
+                        
+                        <li><a href="/oauth/guides/getting-access-tokens.html">Zugriffstoken abrufen</a></li>
+                        
+                        <li><a href="/oauth/guides/api-operations-client-credentials-requests.html">API-Vorgänge für Client-Anmeldedaten</a></li>
+                        
+                        <li><a href="/oauth/guides/get-your-bc-token.html">Erhalte dein BC_TOKEN</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/oauth/references/index.html">Referenzen <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/oauth/references/reference.html">OAuth API Referenz</a></li>
+                        
+                        <li><a href="/oauth/references/oauth-api-error-message-reference.html">OAuth API - Fehlermeldung Referenz</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/oauth/code-samples/index.html">Codebeispiele <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/oauth/code-samples/oauth-api-sample-create-client-credentials.html">Client-Anmeldedaten erstellen</a></li>
+                        
+                        <li><a href="/oauth/code-samples/oauth-api-sample-get-access-token.html">Holen Sie sich ein Zugriffstoken</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+              </ul>
+            
+          
+            
+              <h5 class="submenu-header"><a href="/playback/index.html">Wiedergabe-API <strong>+</strong></a></h5>
+              <ul class="sidenav-submenu" style="display:none;">
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/playback/getting-started/index.html">Erste Schritte <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/playback/getting-started/overview-playback-api.html">Übersicht: Wiedergabe-API</a></li>
+                        
+                        <li><a href="/playback/getting-started/quick-start-playback-api.html">Kurzanleitung: Wiedergabe-API</a></li>
+                        
+                        <li><a href="/cms/getting-started/best-practices-cms-and-playback-apis.html">Best Practices: CMS und Playback-APIs</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/playback/guides/index.html">Reiseführer <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/cms/searching/cmsplayback-api-videos-search.html">CMS und Playback-APIs: Video-Suche</a></li>
+                        
+                        <li><a href="/cms/getting-started/best-practices-cms-and-playback-apis.html">Katalog-Suche Architektur</a></li>
+                        
+                        <li><a href="/playback/guides/static-url-delivery.html">Statische URL-Lieferung</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/playback/references/index.html">Referenzen <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/playback/references/reference_v1.html">Wiedergabe-API Referenz</a></li>
+                        
+                        <li><a href="/playback/references/playback-api-video-fields-reference.html">Referenz Videofelder</a></li>
+                        
+                        <li><a href="/playback/references/playback-api-playlist-fields-reference.html">Referenz für Felder der Wiedergabeli</a></li>
+                        
+                        <li><a href="/playback/references/playback-api-error-reference.html">Error-Referenz</a></li>
+                        
+                        <li><a href="/cms/references/catalog-apis-cms-api-and-playback-api-release-notes.html">CMS/Playback-APIs - Versions</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/playback/code-samples/index.html">Codebeispiele <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/playback/code-samples/thumbnail-grid.html">Video-Thumbnail-Raster</a></li>
+                        
+                        <li><a href="/playback/code-samples/playback-api-sample-mrss-generator.html">MRSS-Generator</a></li>
+                        
+                        <li><a href="/playback/code-samples/playback-api-sample-jsonmrss-feed-playlist.html">JSON/MRSS Feed von einer Playlist</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+              </ul>
+            
+          
+            
+              <h5 class="submenu-header"><a href="/player-management/index.html">Spieler-Management-API <strong>+</strong></a></h5>
+              <ul class="sidenav-submenu" style="display:none;">
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/player-management/getting-started/index.html">Erste Schritte <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/player-management/getting-started/overview-player-management-api.html">Übersicht: Spieler-Management-API</a></li>
+                        
+                        <li><a href="/player-management/getting-started/step-step-player-management.html">Schritt für Schritt: Spieler-Management</a></li>
+                        
+                        <li><a href="/player-management/getting-started/training-demand-quick-start-player-management.html">Training on Demand: Schnelleinstieg in die Spielerverwaltung</a></li>
+                        
+                        <li><a href="/player-management/getting-started/oauth-guide.html">OAuth Reiseführer</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/player-management/guides/index.html">Reiseführer <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/player-management/guides/player-configuration-guide.html">Anleitung zur Spieler-Konfiguration</a></li>
+                        
+                        <li><a href="/player-management/guides/plugin-registry.html">Plugin-Registrierung</a></li>
+                        
+                        <li><a href="/player-management/guides/pre-release-player.html">Spieler vor der Veröffentlichung</a></li>
+                        
+                        <li><a href="/player-management/guides/player-repositories.html">Spieler-Repositories</a></li>
+                        
+                        <li><a href="/player-management/guides/guide-embed-apis.html">Einbetten von APIs</a></li>
+                        
+                        <li><a href="/player-management/guides/opting-out-automatic-player-updates.html">Abmelden von automatischen Player-Updates</a></li>
+                        
+                        <li><a href="/player-management/guides/embedding-brightcove-players-cms.html">Einbetten von Brightcove-Spielern in ein CMS</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/player-management/references/index.html">Referenzen <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/player-management/references/reference.html">Spieler-Management-API-Referenz</a></li>
+                        
+                        <li><a href="/player-management/references/player-management-api-release-notes.html">Anmerkungen zur</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/player-management/code-samples/index.html">Codebeispiele <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/player-management/code-samples/setup-player-management-samples.html">Setup für Spielermanagement-Beispiele</a></li>
+                        
+                        <li><a href="/player-management/code-samples/bulk-updating-brightcove-default-player.html">Großaktualisierung des Standardspielers</a></li>
+                        
+                        <li><a href="/player-management/code-samples/player-management-api-sample-create-player.html">Erstelle einen Spieler</a></li>
+                        
+                        <li><a href="/player-management/code-samples/player-management-api-sample-display-players.html">Spieler anzeigen</a></li>
+                        
+                        <li><a href="/player-management/code-samples/player-management-api-sample-delete-players.html">Spieler löschen</a></li>
+                        
+                        <li><a href="/player-management/code-samples/player-management-api-sample-using-lastviewed-data.html">Verwenden von last_view-Daten</a></li>
+                        
+                        <li><a href="/player-management/code-samples/player-management-api-sample-programmatically-update-players.html">Programmatisch Spieler aktualisieren</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+              </ul>
+            
+          
+            
+              <h5 class="submenu-header"><a href="/policy/index.html">Policy-API <strong>+</strong></a></h5>
+              <ul class="sidenav-submenu" style="display:none;">
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/policy/getting-started/index.html">Erste Schritte <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/policy/getting-started/overview-policy-api.html">Übersicht: Richtlinien-</a></li>
+                        
+                        <li><a href="/policy/getting-started/quick-start-policy-api.html">Codebeispiel: Generieren eines Richtlinienschlüssel</a></li>
+                        
+                        <li><a href="/policy/getting-started/policy-keys.html">Richtlinienschlüssel vom Spieler</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/policy/references/index.html">Referenzen <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/policy/references/reference.html">Richtlinie API Referenz</a></li>
+                        
+                        <li><a href="/policy/references/policy-api-release-notes.html">Anmerkungen zur</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+              </ul>
+            
+          
+            
+              <h5 class="submenu-header"><a href="/social-syndication/index.html">API zur sozialen Syndikation <strong>+</strong></a></h5>
+              <ul class="sidenav-submenu" style="display:none;">
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/social-syndication/getting-started/index.html">Erste Schritte <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/social-syndication/getting-started/public-syndication-api-overview.html">Übersicht: API für Syndizierungs-Konfiguration</a></li>
+                        
+                        <li><a href="/social-syndication/getting-started/feed-syndication-api-overview.html">Übersicht: API für Syndikationsfeed</a></li>
+                        
+                        <li><a href="/social-syndication/getting-started/sample-templates-universal-syndication.html">Vorlagen für Universal Syndication</a></li>
+                        
+                        <li><a href="/cms/searching/cms-and-playback-apis-video-search-v2.html">CMS und Playback-APIs: Video-Suche v2</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/social-syndication/references/index.html">Referenzen <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/social-syndication/references/configuration-reference.html">API Referenz zur Syndication-Konfiguration</a></li>
+                        
+                        <li><a href="/social-syndication/references/feed-reference.html">Syndication Feed-API-Referenz</a></li>
+                        
+                        <li><a href="/policy/references/policy-api-release-notes.html">Anmerkungen zur</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+              </ul>
+            
+          
+            
+              <h5 class="submenu-header"><a href="/dynamic-ingest-legacy/index.html">Dynamische Ingest-API-Vermächtnis <strong>+</strong></a></h5>
+              <ul class="sidenav-submenu" style="display:none;">
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/dynamic-ingest-legacy/getting-started/index.html">Erste Schritte <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/dynamic-ingest-legacy/getting-started/overview-dynamic-ingest-api-legacy-ingest.html">Übersicht: Dynamische Ingest-API</a></li>
+                        
+                        <li><a href="/dynamic-ingest-legacy/getting-started/quick-start-dynamic-ingest-api-legacy-ingest.html">Kurzanleitung: Dynamische Ingest-API</a></li>
+                        
+                        <li><a href="/dynamic-ingest-legacy/getting-started/migrating-legacy-ingest-system-dynamic-delivery.html">Umstellung auf Dynamic Delivery</a></li>
+                        
+                        <li><a href="/dynamic-ingest/getting-started/source-file-upload-api-dynamic-ingest.html">Quelldatei-Upload-API für dynamisches In</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/dynamic-ingest-legacy/general/index.html">Allgemeine Informationen <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/dynamic-ingest/general/dynamic-ingest-api-best-practices.html">Dynamische Ingest-API: Beste Praktiken</a></li>
+                        
+                        <li><a href="/dynamic-ingest-legacy/general/dynamic-ingest-notifications-legacy-ingest.html">Dynamische Ingest-Benachrichtigungen</a></li>
+                        
+                        <li><a href="/dynamic-ingest-legacy/general/get-status-dynamic-ingest-requests-legacy-ingest.html">Status von Anfragen abrufen</a></li>
+                        
+                        <li><a href="/dynamic-ingest/general/fallback-retry-strategy.html">Fallback/Wiederholungsstrategie</a></li>
+                        
+                        <li><a href="/dynamic-ingest/general/using-dynamic-ingest-s3.html">Verwenden von Dynamic Ingest-Funktion mit S3</a></li>
+                        
+                        <li><a href="/dynamic-ingest/general/ugc-strategies.html">UGC-Strategien</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/dynamic-ingest-legacy/references/index.html">Referenzen <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/dynamic-ingest/references/reference.html">Dynamische Ingest-API-Referenz</a></li>
+                        
+                        <li><a href="/dynamic-ingest/references/dynamic-ingest-api-release-notes.html">Dynamische Ingest-API - Versions</a></li>
+                        
+                        <li><a href="/dynamic-ingest/references/dynamic-ingest-ingest-fields.html">Referenz zu Ingest-Feldern</a></li>
+                        
+                        <li><a href="/dynamic-ingest/references/dynamic-ingest-error-message-reference.html">Referenz für Dynamic Ingest-Fehlermeldung</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/dynamic-ingest-legacy/ingest-guides/index.html">Anleitungen aufnehmen <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/dynamic-ingest/ingest-guides/images-and-dynamic-ingest-api.html">Bilder und die Dynamic Ingest-API</a></li>
+                        
+                        <li><a href="/dynamic-ingest/ingest-guides/dynamic-ingest-media-sharing.html">Dynamische Aufnahme mit Medienfreigabe</a></li>
+                        
+                        <li><a href="/dynamic-ingest/ingest-guides/ingesting-webvtt-files-text-trackscaptions.html">Aufnahme von WebVTT-Dateien</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/dynamic-ingest-legacy/code-samples/index.html">Codebeispiele <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/dynamic-ingest-legacy/code-samples/dynamic-ingest-api-sample-ingesting-videos-legacy-ingest.html">Aufnahme von Videos</a></li>
+                        
+                        <li><a href="/dynamic-ingest-legacy/code-samples/dynamic-ingest-api-sample-re-transcoding-videos-legacy-ingest.html">Re-Transcodieren von Videos</a></li>
+                        
+                        <li><a href="/dynamic-ingest-legacy/code-samples/dynamic-ingest-api-sample-replacing-videos-legacy-ingest.html">Ersetzen von Videos</a></li>
+                        
+                        <li><a href="/dynamic-ingest-legacy/code-samples/dynamic-ingest-api-sample-add-scheduled-videos-legacy-ingest.html">Geplante Videos hinzufügen</a></li>
+                        
+                        <li><a href="/dynamic-ingest/code-samples/dynamic-ingest-api-sample-adding-text-tracks.html">Hinzufügen von Textspuren</a></li>
+                        
+                        <li><a href="/dynamic-ingest/code-samples/dynamic-ingest-api-sample-python-code.html">Python-Code</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+              </ul>
+            
+          
+            
+              <h5 class="submenu-header"><a href="/ingest-profiles-legacy/index.html">Eingessen-Profile-API Legacy <strong>+</strong></a></h5>
+              <ul class="sidenav-submenu" style="display:none;">
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/ingest-profiles-legacy/getting-started/index.html">Erste Schritte <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/ingest-profiles-legacy/getting-started/overview-ingest-profiles-api-legacy-ingest.html">Übersicht: Profile-API aufnehmen</a></li>
+                        
+                        <li><a href="/ingest-profiles-legacy/getting-started/quick-start-ingest-profiles-api.html">Kurzanleitung: Profile-API aufnehmen</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/ingest-profiles-legacy/guides/index.html">Reiseführer <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/ingest-profiles/guides/archiving-masters.html">Archivierung Masters</a></li>
+                        
+                        <li><a href="/ingest-profiles-legacy/guides/rendition-settings-and-video-quality.html">Wiedergabe-Einstellungen und Videoqualität</a></li>
+                        
+                        <li><a href="/ingest-profiles-legacy/guides/conditional-output.html">Bedingte Ausgabe</a></li>
+                        
+                        <li><a href="/general/audio-content.html">Audio-Inhalte</a></li>
+                        
+                        <li><a href="https://studio.support.brightcove.com/admin/ingest-profiles-best-practices.html">Beste Praktiken</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/ingest-profiles-legacy/references/index.html">Referenzen <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/ingest-profiles/references/reference.html">API Referenz für Ingest-Profile</a></li>
+                        
+                        <li><a href="/ingest-profiles-legacy/references/ingest-profiles-api-fields-reference-legacy-ingest.html">Referenz zu Feldern aufnehmen</a></li>
+                        
+                        <li><a href="/ingest-profiles-legacy/references/standard-ingest-profiles-legacy-transcoding.html">Standard-Ingest-Profile: Legacy-System</a></li>
+                        
+                        <li><a href="/ingest-profiles/references/standard-live-ingest-profiles.html">Standard-Live-Ingest-Profile</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+                  
+                    <li class="submenu-header">
+                      <a href="/ingest-profiles-legacy/code-samples/index.html">Codebeispiele <strong>+</strong></a>
+                      <ul class="sidenav-subsubmenu" style="display:none;">
+                        
+                        <li><a href="/ingest-profiles/code-samples/ingest-profiles-api-sample-add-profile-multiple-accounts.html">Profil zu mehreren Konten hinzufügen</a></li>
+                        
+                        <li><a href="/ingest-profiles/code-samples/ingest-profiles-api-sample-get-all-profiles-account.html">Alle Profile für ein Konto abrufen</a></li>
+                        
+                        <li><a href="/ingest-profiles-legacy/code-samples/ingest-profiles-api-sample-set-default-profile-multiple-accounts-legacy-ingest.html">Festlegen von Standardprofil-mehreren Konten</a></li>
+                        
+                      </ul>
+                    </li>
+                  
+                
+              </ul>
+            
+          
+            
+              <h5 class="submenu-header"><a href="/training/index.html">Schulung <strong>+</strong></a></h5>
+              <ul class="sidenav-submenu" style="display:none;">
+                
+                  
+                    <li><a href="/training/online-training-courses.html">Online-Schulungen</a></li>
+                  
+                
+                  
+                    <li><a href="/training/register-training.html">Registrieren Sie sich für Schulungen mit Kursleiter</a></li>
+                  
+                
+                  
+                    <li><a href="/training/brightcove-university.html">Schulungskurse der Brightcove University</a></li>
+                  
+                
+              </ul>
+            
+          
+            
+              <h5 class="submenu-header"><a href="/support/index.html">unterstützung <strong>+</strong></a></h5>
+              <ul class="sidenav-submenu" style="display:none;">
+                
+                  
+                    <li><a href="/support/brightcove-answer.html">Brightcove Antworten</a></li>
+                  
+                
+                  
+                    <li><a href="/support/viewing-brightcove-system-status-page.html">Anzeigen der Seite „Systemstatus von Brightcove“</a></li>
+                  
+                
+                  
+                    <li><a href="/support/contact-sales.html">Kontakt mit dem Vertrieb</a></li>
+                  
+                
+                  
+                    <li><a href="/support/opening-case-with-brightcove-support.html">Einen Supportfall öffnen</a></li>
+                  
+                
+              </ul>
+            
+          
+      </nav>
+    </div>
+    <div class="col-lg-7" style="background-color: white;color: #333333;margin-top: -1em;margin-bottom: -1em;padding-bottom:1em;">
+  <!-- bootstrap layout -->
+
+<p id="bc_veggie_burger_wrapper" style="display: none;"><img id="bc_veggie_burger" src="/assets/images/feather/menu.svg" alt="Menü „Navigation"/></p>
+
+<!-- search bar -->
+<div id="nav-search-box" style="margin-top: 1rem;"></div>
+<!-- in-page navigation for narrow screens -->
+<details class="centered-inpage-nav" id="centered_inpage_nav">
+  <summary><h6 class="toc">Inhalt der Seite</h6></summary>
+  <nav id="centered_toc"></nav>
+  <ul id="centered_in_page_toc" class="list-none"></ul>
+</details>
+<!-- open in new tab/window -->
+<a id="open_new_tab" href="#" target="_blank" style="display: none;"><img src="/assets/images/feather/external-link.svg" alt="in neuem Tab öffnen" style="margin-top:4em;width: 1.5em;"/></a>
+
+
+
+
+
+
+<h1>Medienfreigabe</h1>
+<article class="bcls-article">
+  <summary>In diesem Thema erfahren Sie, wie Sie mithilfe der CMS-API Videos von einem Video Cloud-Konto an ein anderes weitergeben.</summary>
+    <section class="bcls-section">
+    <h2 id="Introduction">Einführung</h2>
+    
+    <p>Mit der Medienfreigabe in Video Cloud können Publisher Videos untereinander bereitstellen und so Videos zwischen mehreren Konten einfacher verwalten. Zum Beispiel können Verlage ein Hauptkonto für Videoinhalte führen und dann Videos an andere Abteilungen oder Tochtergesellschaften der Organisation weitergeben.</p>
+    
+    <p>Beachten Sie, dass alle Medienfreigabe-Vorgänge auch in Studio durchgeführt werden können. Siehe <a href="https://studio.support.brightcove.com/admin/managing-media-sharing-settings.html">Verwalten von Einstellungen für die Medienfreigabe</a>.</p>
+    
+    <aside class="bcls-aside bcls-aside--information">
+      Beachten Sie auch: 
+      <ul>
+        <li><strong>Die gemeinsame Nutzung von Medien ist nur für Video Cloud Enterprise- und Pro-Kunden mit mehreren Konten verfügbar.</strong> Nehmen Sie Kontakt mit Brightcove auf, um weitere Informationen zu erhalten, wenn Sie Ihr Video Cloud-Konto heraufstufen möchten.</li>
+        <li>CMS API Media Sharing-Vorgänge müssen für den Master und für jedes Affiliate-Konto aktiviert sein. <a href="https://supportportal.brightcove.com/s/login/?language=en_US">Wenden Sie sich an den Brightcove Support</a> , wenn Sharing aktiviert sein muss.</li>
+        <li>Das Teilen von Medien kann in beide Richtungen erfolgen: Jedes Konto kann ein Master und ein Affiliate für den anderen sein.</li>
+      </ul>
+    </aside>
+    
+    <aside class="bcls-aside bcls-aside--information"></aside>
+    </section>
+    
+    <section class="bcls-section">
+    <h2 id="billing">Freigegebene Medien und Fakturierung</h2>
+    
+    <p>Informationen darüber, wie die Abrechnung für freigegebene Medien funktioniert, finden Sie unter <a href="https://studio.support.brightcove.com/media/media-sharing-using-media-module.html#billing">Media Sharing using the Media Module</a>.</p>
+    </section>
+    
+    <section class="bcls-section">
+    <h2 id="Terminology">Terminologie</h2>
+    
+    <p>Beim Medien-Sharing besteht eine Beziehung zwischen einem Master-Konto (das Videos teilt) und einem oder mehreren Affiliate-Konten (die freigegebene Videos erhalten) beteiligt:</p>
+    <!-- table 1 -->
+    
+    <table class="bcls-table">
+      <caption class="bcls-caption--table">Terminologie für die gemeinsame Nutzung von</caption>
+      <thead class="bcls-table__head">
+        <tr>
+          <th>Account</th>
+          <th>Beschreibung</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td>Meister</td>
+          <td>Das Konto, das das Originalvideo erstellt hat.
+          <p>Der Master besitzt den Inhalt und ist verantwortlich für die Einrichtung, Verwaltung und Bereitstellung von Inhalten für Affiliates.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>Partnerunternehmen</td>
+          <td>Das Konto, das das Video erhält.
+          <p>Der Affiliate kann Inhalte akzeptieren, die von einem Master für ihn freigegeben wurden.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>Kanal</td>
+          <td>Eine Pipeline, über die Inhalte von einem Master an eine beliebige Anzahl von Affiliates geteilt werden. Wenn die Medienfreigabe aktiviert ist, wird ein <code translate="No">default</code> Kanal in deinem Konto erstellt.</td>
+        </tr>
+        <tr>
+          <td>Beziehung</td>
+          <td>Beschreibt die Interaktion zwischen einem Master und einem Affiliate.
+          <p>Eine Beziehung besteht aus einem Master zum Teilen von Inhalten, einem Kanal, über den Inhalte geteilt werden, einem Vertrag zur Annahme von Inhalten und einem Affiliate zum Empfangen von Inhalten.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>Vertraglich</td>
+          <td>Beschreibt das Teilen von Beziehungen zwischen einem Master und einem Affiliate.
+          <p>Ein Vertrag wird vom Master erstellt und muss dann akzeptiert werden, damit die Freigabe aktiviert wird. Der Affiliate kann auch angeben, ob geteilte Videos automatisch akzeptiert werden oder einzeln genehmigt werden müssen.</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    </section>
+    
+    <section class="bcls-section">
+    <h2 id="base_URL">Basis-URL</h2>
+    
+    <p>Wie bei allen <span translate="No">CMS API</span> Anfragen lautet die Basis-URL für die unten beschriebenen Vorgänge:</p>
+    
+    <pre>
+      <code class="language-http" translate="No">https://cms.api.brightcove.com/v1</code></pre>
+    
+    <p>Alle unten besprochenen Endpunkte werden bei Anfragen an die Basis-URL angehängt.</p>
+    </section>
+    
+    <section class="bcls-section">
+    <h2 id="authentication">Authentifizierung</h2>
+    
+    <p>Die Authentifizierung für Anfragen erfordert einen Autorisierungs-Header:</p>
+    
+    <pre class="line-numbers">
+          <code class="language-http" translate="No">Authorization: Bearer {access_token}</code></pre>
+    
+    <p>Der <code translate="No">access_token</code> ist ein temporäres OAuth2-Zugriffstoken, das vom Brightcove OAuth Service bezogen werden muss. Weitere Informationen zum Abrufen von Client-Anmeldeinformationen und zum Abrufen von Zugriffstoken finden Sie in der <a href="/oauth/getting-started/overview-oauth-api-v4.html">Brightcove OAuth Overview</a>.</p>
+    
+    <p>Beachten Sie, dass alle Vorgänge rund um <strong>Beziehungen</strong> neue Berechtigungen erforderten:</p>
+    
+    <pre>
+      <code translate="No">video-cloud/video/all
+      video-cloud/sharing-relationships/read
+      video-cloud/sharing-relationships/create
+      video-cloud/sharing-relationships/update
+      video-cloud/sharing-relationships/delete</code></pre>
+    
+    <p>Alternativ können Sie einfach Folgendes verwenden:</p>
+    
+    <pre>
+      <code class="language-json" translate="No">video-cloud/sharing-relationships/all</code></pre>
+    
+    <p>Auf der Seite „Studio API Authentication Admin“ werden zwei Berechtigungen angezeigt:</p>
+    
+    <ul>
+      <li><strong>Sharing Read</strong> (entspricht <code translate="No">video-cloud/sharing-relationships/read</code>)</li>
+      <li><strong>Teilen von Lesen/Schreiben</strong> (entspricht <code translate="No">video-cloud/sharing-relationships/all</code>)</li>
+    </ul>
+    </section>
+    
+    <section class="bcls-section">
+    <h2 id="restrictions_on_sharing">Einschränkungen beim Teilen</h2>
+    
+    <p>Standardmäßig können alle Videos geteilt werden. Sie können jedoch das Teilen verhindern, wenn</p>
+    
+    <ul>
+      <li>Das Affiliate-Konto hat kein benutzerdefiniertes Feld, für das ein Wert im Video im Hauptkonto festgelegt wird</li>
+      <li>Auf dem Hauptkonto ist die Geo-Filterung aktiviert, das Affiliate-Konto jedoch nicht</li>
+    </ul>
+    
+    <h3>Individuelle Feldübereinstimmung</h3>
+    
+    <p>Sie können den benutzerdefinierten Feldvergleich für einen Kanal erzwingen, was bedeutet, dass Videofreigaben fehlschlagen, <strong>wenn das Video Werte für benutzerdefinierte Felder enthält, die nicht im Affiliate-Konto vorhanden sind</strong>. Videos werden weiterhin erfolgreich geteilt, wenn das Video keine Werte für nicht übereinstimmende benutzerdefinierte Felder enthält</p>
+    
+    <p>Standardmäßig wird der benutzerdefinierte Feldvergleich <strong>nicht</strong> durchgesetzt.</p>
+    
+    <p>Wenn eine Videofreigabe aufgrund nicht übereinstimmender benutzerdefinierter Felder fehlschlägt, wird in der Antwort ein Fehler wie dieser angezeigt:</p>
+    
+    <pre class="line-numbers">
+      <code class="language-json" translate="No">{
+        "video_id": "5691312273001",
+        "affiliate_id": "47509719001",
+        "affiliate_video_id": null,
+        "status": "PROCESSING",
+        <span class="bcls-highlight">"error_message": [{"error_code":"MISSING_CUSTOM_FIELDS","error_message":"Affiliate account is missing custom fields: [subject]"}],</span>
+        "shared_at": "2018-01-03T16:29:19.080Z",
+        "updated_at": "2018-01-03T16:29:19.080Z"
+      }</code></pre>
+    
+    <h3>Geo-Filter-Matching</h3>
+    
+    <p>Wenn der Geo-Filter-Abgleich für einen Kanal aktiviert ist, können Videos nicht geteilt werden, wenn das Hauptkonto die Geo-Filterung aktiviert hat und das Affiliate-Konto dies nicht tut.</p>
+    
+    <p>Standardmäßig <strong>wird</strong> der Geo-Filter-Matching durchgesetzt.</p>
+    
+    <p>Der Fehler wird so aussehen:</p>
+    
+    <pre class="line-numbers">
+      <code class="language-json" translate="No">{
+        "video_id": "5691312273001",
+        "affiliate_id": "47509719001",
+        "affiliate_video_id": null,
+        "status": "PROCESSING",
+        <span class="bcls-highlight">"error_message": [{"error_code":"CONFLICT","error_message":"Affiliate account is not configured for geo restriction."}],</span>
+        "shared_at": "2018-01-03T16:29:19.080Z",
+        "updated_at": "2018-01-03T16:29:19.080Z"
+      
+      </code></pre>
+    
+    <p>Siehe <a href="#update_channel">Update-Channel</a> unten, um zu erfahren, wie Sie einen Kanal aktualisieren, um den Custom-Feld und/oder den Geo-Filtering durchzusetzen.</p>
+    </section>
+    
+    <section class="bcls-section">
+    <h2 id="what_is_shared">Was wird geteilt?</h2>
+    
+    <p>In diesem Abschnitt wird erläutert, was geteilt wird und wie nachfolgende Änderungen am Video behandelt werden.</p>
+    
+    <h3>Wenn das Video geteilt wird</h3>
+    
+    <p>Die meisten Felder für Video-Metadaten werden vom Master in das Affiliate-Konto kopiert, wenn das Video geteilt wird. Die bemerkenswerten Ausnahmen sind:</p>
+    
+    <ul>
+      <li><code translate="No">id</code> - Das Video hat eine eigene eindeutige ID im Affiliate-Konto</li>
+      <li>Datumsfelder wie <code translate="No">created_at</code> und <code translate="No">updated_at</code></li>
+    </ul>
+    
+    <p>Alle Video-Assets (Ausgabeformate, Bilder, text_tracks usw.) werden von den Affiliate-Konten zur Wiedergabe verwendet.</p>
+    <!-- <aside class="bcls-aside bcls-aside--information">Note that billing will still be based on the account that the video is played back from, not the account where the assets reside.</aside> -->
+    
+    <h3>Nachdem das Video geteilt wurde</h3>
+    
+    <p>Nachdem das Video geteilt wurde, werden einige Änderungen am Video im Master-Konto automatisch von den Affiliate-Konten geerbt, andere nicht.</p>
+    
+    <h4>Video-Assets</h4>
+    
+    <p><strong>Mit Ausnahme von Bildern</strong> werden Master-Änderungen an den Video-Assets <strong>immer</strong> von Affiliates geerbt. Affiliates <strong>können keine Vermögenswerte wie Ausgabeformate, Manifeste, Textspuren oder den digitalen Master ändern</strong> .</p>
+    
+    <p>Änderungen an Bildern durch den Master werden vom Affiliate geerbt, <strong>es sei denn, der Affiliate hat die Bilder ersetzt</strong>. Sobald ein Affiliate ein Image ändert, wird dieses Image nicht mehr vom Master geerbt.</p>
+    
+    <h4>Videometadaten</h4>
+    
+    <p>Alle Video-Metadaten (wie Name, Beschreibung und Referenz-ID) können vom Affiliate geändert werden, und Änderungen, die am Master-Video vorgenommen wurden, werden <strong>nicht</strong> vom Affiliate vererbt.</p>
+    
+    <h5 id="Resharing_videos">Videos erneut teilen</h5>
+    
+    <p>Beachten Sie jedoch, dass, wenn der Master das Video <strong>erneut teilt</strong> (dies kann nur über die CMS-API und nicht in Studio durchgeführt werden), alle Assets und Metadaten (abgesehen von Daten/Zeitfeldern) an Affiliates weitergegeben werden und alle <strong>Änderungen, die die Partner vorgenommen haben, überschreiben</strong>.</p>
+    
+    <aside class="bcls-aside bcls-aside--information">Beachten Sie, dass es zwei Möglichkeiten zum erneuten Teilen gibt, die unterschiedliche Konsequenzen haben:
+    <dl>
+      <dt>Meistern Sie <em>Un-Shares</em> und <em>teilen Sie das Video erneut</em> </dt>
+      <dd>In diesem Fall wird das zuvor geteilte Video von allen Affiliate-Konten auf der Un-Share-Seite gelöscht. Wenn der Master das Video erneut teilt, wird jedem Affiliate-Konto ein <em>neues</em> <em>Video mit einer neuen</em> eindeutigen ID hinzugefügt, das Metadaten und Vermögenswerte vom Master-Konto wie auf der ursprünglichen Freigabe enthält.</dd>
+      <dt>Master <em>teilt das Video erneut</em> , <strong>ohne</strong> es nicht mehr zu teilen</dt>
+      <dd>In diesem Fall werden alle Metadaten und Bilder aus der Master-Kopie des Videos auf die Affiliate-Version übertragen, wobei Affiliate-Änderungen überschrieben werden, aber die Partner-Video-IDs ändern sich <strong>nicht</strong> .</dd>
+    </dl>
+    </aside>
+    
+    <aside class="bcls-aside bcls-aside--warning">Bevor Sie ein Video erneut teilen, stellen Sie sicher, dass dies das ist, was Sie tun möchten und dass Ihre Affiliates wissen, was passieren wird!</aside>
+    </section>
+    
+    <section class="bcls-section">
+    <h2 id="overview_media_sharing_steps">Überblick über die Schritte zum Teilen von Medien</h2>
+    
+    <h3>Aufbau einer Beziehung</h3>
+    <p>Im Folgenden finden Sie eine Zusammenfassung der Vorgänge zum Einrichten einer Beziehung (klicken Sie auf den Namen des Vorgangs, um weitere Informationen zu erhalten):</p>
+    <!-- table 2 -->
+    
+    <table class="bcls-table">
+      <caption class="bcls-caption--table">Setup-Vorgänge</caption>
+      <thead class="bcls-table__head">
+        <tr>
+          <th colspan="3">Master-Operationen</th>
+        </tr>
+        <tr>
+          <th>Operation (Vorgang)</th>
+          <th>Methode/Endpunkt</th>
+          <th>Beschreibung</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td><a href="#list_channels">Channels auf</a></td>
+          <td><code translate="No">GET</code> <code translate="No">/accounts/ <span class="bcls-input">master_account_id</span>/channels</code></td>
+          <td>Holen Sie sich eine Liste der Kanäle für das Konto</td>
+        </tr>
+        <tr>
+          <td><a href="#Get_channel_details">Details zum Kanal abrufen</a></td>
+          <td><code translate="No">GET</code> <code translate="No">/accounts/ <span class="bcls-input">master_account_id</span>/channels/ <span class="bcls-input">channel_name</span> </code> <sup> <strong> <a href="#note2-1">[2-1]</a> </strong> </sup></td>
+          <td>Details eines Kanals abrufen</td>
+        </tr>
+        <!-- <tr>
+                      <td><a href="#create_channel">Create channel</a></td>
+                      <td>POST <code translate="No">/accounts/<span class="bcls-input">master_account_id</span>/channels/<span class="bcls-input">channel_name</span></code></td>
+                      <td>Creates a new channel for the account</td>
+                  </tr> -->
+        <tr>
+          <td><a href="#update_channel">Update-Kanal</a></td>
+          <td><code translate="No">POST</code> <code translate="No">/accounts/ <span class="bcls-input">master_account_id</span>/channels/ <span class="bcls-input">channel_name</span> </code></td>
+          <td>Channels Einstellungen aktualisieren</td>
+        </tr>
+        <!-- <tr>
+                      <td><a href="#Remove_channel">Remove channel</a></td>
+                      <td>DELETE <code translate="No">/accounts/<span class="bcls-input">master_account_id</span>/channels</code>/<span class="bcls-input">channel_name</span></td>
+                      <td>Removes channel from the account</td>
+                  </tr> -->
+        <tr>
+          <td><a href="#List_channel_affiliates">Channel-Partner auflisten</a></td>
+          <td><code translate="No">GET</code> <code translate="No">/accounts/ <span class="bcls-input">master_account_id</span>/channels/default/members</code></td>
+          <td>Holen Sie sich die Affiliates für einen Channel</td>
+        </tr>
+        <tr>
+          <td><a href="#Add_affiliates">Affiliates hinzufügen</a></td>
+          <td><code translate="No">PUT</code> <code translate="No">/accounts/ <span class="bcls-input">master_account_id</span>/channels/default/members</code></td>
+          <td>Affiliates zu einem Channel hinzufügen</td>
+        </tr>
+        <tr>
+          <td><a href="#Remove_affiliate">Affiliate entfernen</a></td>
+          <td><code translate="No">DELETE</code> <code translate="No">/accounts/ <span class="bcls-input">master_account_id</span>/channels/default/members/ <span class="bcls-input">affiliate_account_id</span> </code></td>
+          <td>Entfernt einen Affiliate aus einem Channel</td>
+        </tr>
+      </tbody>
+      <thead class="bcls-table__head">
+        <tr>
+          <th colspan="3">Affiliate-Operationen</th>
+        </tr>
+        <tr>
+          <th>Operation (Vorgang)</th>
+          <th>Methode/Endpunkt</th>
+          <th>Beschreibung</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td><a href="#List_available_contracts">Verfügbare Verträge auflisten</a></td>
+          <td><code translate="No">GET</code> <code translate="No">/accounts/ <span class="bcls-input">affiliate_account_id</span>/contracts</code></td>
+          <td>Ruft alle Verträge für das Konto bereit</td>
+        </tr>
+        <tr>
+          <td><a href="#Get_specific_contract">Holen Sie sich einen Vertrag für ein bestimmtes Konto</a></td>
+          <td><code translate="No">GET</code> <code translate="No">/accounts/ <span class="bcls-input">affiliate_account_id</span>/contracts/ <span class="bcls-input">master_account_id</span> </code></td>
+          <td>Ruft einen Vertrag, falls vorhanden, von einem bestimmten Konto ab</td>
+        </tr>
+        <tr>
+          <td><a href="#Accept_contract">Genehmigen eines Vertrags</a></td>
+          <td><code translate="No">PATCH</code> <code translate="No">/accounts/ <span class="bcls-input">affiliate_account_id</span>/contracts/ <span class="bcls-input">master_account_id</span> </code></td>
+          <td>Akzeptieren und Konfigurieren von Abnahmebedingungen</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <h4>Hinweise</h4>
+    
+    <ul>
+      <li id="note2-1"><sup><strong>[ 2-1]</strong> </sup> Derzeit gibt es nur einen Channel namens <code translate="No">default</code></li>
+    </ul>
+    
+    <h3>Freigeben von Videos</h3>
+    
+    <p>Video-Sharing-Vorgänge werden vom Master-Konto durchgeführt. Das Affiliate-Konto kann die Freigabe akzeptieren (falls <code translate="No">auto_accept</code> auf festgelegt <code translate="No">false</code> ) und kann geteilte Video-Metadaten und Bilder mithilfe des standardmäßigen <a href="/cms/references/reference.html#api-videoGroup-Update_Video">Update-Video-Vorgangs aktualisieren</a> .</p>
+    
+    <p>Hier sind die Freigabevorgänge, die ausgeführt werden können, sobald eine Beziehung eingerichtet wurde (klicken Sie auf einen Operationsnamen, um weitere Details zu erhalten):</p>
+    <!-- table 3 -->
+    
+    <table class="bcls-table">
+      <caption class="bcls-caption--table">Sharing-Vorgänge</caption>
+      <thead class="bcls-table__head">
+        <tr>
+          <th colspan="3">Master-Operationen</th>
+        </tr>
+        <tr>
+          <th>Operation (Vorgang)</th>
+          <th>Methode/Endpunkt</th>
+          <th>Beschreibung</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td><a href="#List_shares">Auflisten vorhandener Aktien</a></td>
+          <td><code translate="No">GET</code> <code translate="No">/accounts/ <span class="bcls-input">master_account_id</span>/videos/ <span class="bcls-input">video_id</span>/shares</code></td>
+          <td>Holen Sie sich eine Liste der vorhandenen Freigaben für ein Video - dies ist <strong>wichtig</strong> wegen der Folgen des <a href="#Share_video">erneuten Austauschs eines Videos</a> , wenn es bereits geteilt wurde</td>
+        </tr>
+        <tr>
+          <td><a href="#Share_video">Teilen Sie ein Video</a></td>
+          <td><code translate="No">POST</code> <code translate="No">/accounts/ <span class="bcls-input">master_account_id</span>/videos/ <span class="bcls-input">video_id</span>/shares</code></td>
+          <td>Teilen Sie ein Video mit einem oder mehreren verbundenen Unternehmen - beachten Sie, dass dieser Vorgang <a href="#Share_video">es erneut teilt</a> , wenn das Video bereits geteilt wurde - das ist wahrscheinlich <strong>nicht</strong> das, was Sie tun möchten</td>
+        </tr>
+        <tr>
+          <td><a href="#Unshare_video_affiliate">Teilen Sie ein Video für einen Affiliate</a></td>
+          <td><code translate="No">DELETE</code> <code translate="No">/accounts/ <span class="bcls-input">master_account_id</span>/videos/ <span class="bcls-input">video_id</span>/shares</code></td>
+          <td>Un-teilt ein Video für bestimmte Affiliates - beachten Sie, dass das Un-Sharing und Re-Sharing dazu führen, dass das geteilte Video eine neue Video-ID im Affiliate-Konto hat</td>
+        </tr>
+        <!-- <tr>
+                      <td><a href="#Unshare_video">Un-share a video for all Affiliates</a></td>
+                      <td>DELETE <code translate="No">/accounts/<span class="bcls-input">master_account_id</span>/videos/<span class="bcls-input">video_id</span>/shares</code></td>
+                      <td>Un-shares a video for all Affiliates - note that un-sharing and re-sharing will result in the shared video having a new video id in the Affiliate account</td>
+                  </tr> -->
+      </tbody>
+      <thead class="bcls-table__head">
+        <tr>
+          <th colspan="3">Affiliate-Operationen</th>
+        </tr>
+        <tr>
+          <th>Operation (Vorgang)</th>
+          <th>Methode/Endpunkt</th>
+          <th>Beschreibung</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td><a href="#Accept_share">Akzeptiere ein geteiltes Video</a></td>
+          <td><code translate="No">PATCH</code> <code translate="No">/accounts/ <span class="bcls-input">affiliate_account_id</span>/videos/ <span class="bcls-input">video_id</span> </code></td>
+          <td>Akzeptiere ein geteiltes Video (wenn <code translate="No">auto_accept</code> es ausgeschaltet ist)</td>
+        </tr>
+      </tbody>
+    </table>
+    </section>
+    
+    <section class="bcls-section">
+    <h2 id="CMS_API_operations">CMS-API-Anfragen - Einrichtung</h2>
+    
+    <p>In diesem Abschnitt werden die <span translate="No">CMS API</span> Vorgänge aufgeführt, die mit der Einrichtung des Medienfreigabens verbunden</p>
+    
+    <h3>Master-Operationen</h3>
+    
+    <h4 id="list_channels">Liste der Channel (s)</h4>
+    <!-- table 4 -->
+    
+    <table class="bcls-table">
+      <caption class="bcls-caption--table">Channels auf</caption>
+      <tbody class="bcls-table__body">
+        <tr>
+          <th>-Methode</th>
+          <td><code translate="No">GET</code></td>
+        </tr>
+        <tr>
+          <th>Endpunkt</th>
+          <td><code translate="No">/accounts/ <span class="bcls-input">master_account_id</span>/channels</code></td>
+        </tr>
+        <tr>
+          <th>Anfrage Body</th>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <th>Sample-Antwort</th>
+          <td>
+          <pre class="line-numbers">
+      <code class="language-json" translate="No">[
+        {
+          "account_id": "57838016001",
+          "name": "default",
+          "enforce_custom_fields": false,
+          "enforce_geo": false,
+          "account_name": "BrightcoveLearning",
+          "created_at": "2017-08-23T17:11:18.474Z",
+          "updated_at": "2017-08-23T17:11:18.474Z"
+        }
+      ]</code></pre>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <h4 id="Get_channel_details">Details zum Kanal abrufen</h4>
+    <!-- table 5 -->
+    
+    <table class="bcls-table">
+      <caption class="bcls-caption--table">Details zum Kanal abrufen</caption>
+      <tbody class="bcls-table__body">
+        <tr>
+          <th>-Methode</th>
+          <td><code translate="No">GET</code></td>
+        </tr>
+        <tr>
+          <th>Endpunkt</th>
+          <td><code translate="No">https://cms.api.brightcove.com/v1/accounts/ <span class="bcls-input">master_account_id</span>/channels/ <span class="bcls-input">channel_name</span> <sup> <strong> <a href="#note5-1">[5-1]</a> </strong> </sup> </code></td>
+        </tr>
+        <tr>
+          <th>Anfrage Body</th>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <th>Sample-Antwort</th>
+          <td>
+          <pre class="line-numbers">
+      <code class="language-json" translate="No">{
+        "account_id": "57838016001",
+        "name": "default",
+        "enforce_custom_fields": false,
+        "enforce_geo": false,
+        "account_name": "BrightcoveLearning",
+        "created_at": "2017-08-23T17:11:18.474Z",
+        "updated_at": "2017-08-23T17:11:18.474Z"
+      }</code></pre>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <h5>Hinweise</h5>
+    
+    <ul>
+      <li id="note5-1"><sup><strong>[ 5-1]</strong> </sup> Derzeit gibt es nur einen Channel namens <code translate="No">default</code></li>
+    </ul>
+    <!-- table 6 --><!-- <h4 id="create_channel">Create channel</h4>
+      <table class="bcls-table">
+          <caption class="bcls-caption--table">Create Channel</caption>
+          <tbody class="bcls-table__body">
+              <tr>
+                  <th>Method</th>
+                  <td>PUT</td>
+              </tr>
+              <tr>
+                  <th>Endpoint</th>
+                  <td>/accounts/<span class="bcls-input">master_account_id</span>/channels/<span class="bcls-input">channel_name</span></td>
+              </tr>
+              <tr>
+                  <th>Request body</th>
+                  <td>
+      <pre class="line-numbers"><code class="language-json" translate="No">{
+        "account_id": "57838016001",
+        "name": "<span class="bcls-input">channel_name</span>"
+      }</code></pre>
+                  </td>
+              </tr>
+              <tr>
+                  <th>Sample response</th>
+                  <td>
+      <pre class="line-numbers"><code class="language-json" translate="No">{
+        "account_id": "57838016001",
+        "name": "channel_name",
+        "updated_at": "2017-08-23T19:12:24.139Z",
+        "created_at": "2017-08-23T19:12:24.139Z"
+      }</code></pre>
+                  </td>
+              </tr>
+          </tbody>
+      </table> -->
+    
+    <h4 id="update_channel">Update-Kanal</h4>
+    <!-- table 7 -->
+    
+    <table class="bcls-table">
+      <caption class="bcls-caption--table">Channel erstellen</caption>
+      <tbody class="bcls-table__body">
+        <tr>
+          <th>-Methode</th>
+          <td><code translate="No">PATCH</code></td>
+        </tr>
+        <tr>
+          <th>Endpunkt</th>
+          <td><code translate="No">/accounts/ <span class="bcls-input">master_account_id</span>/channels/ <span class="bcls-input">channel_name</span> </code> <sup> <strong> <a href="#note6-1">[ 6-1]</a> </strong> </sup></td>
+        </tr>
+        <tr>
+          <th>Anfrage Body</th>
+          <td>
+          <pre class="line-numbers">
+      <code class="language-json" translate="No">{
+        "enforce_custom_fields" : true,
+        "enforce_geo" : true
+      }</code></pre>
+          </td>
+        </tr>
+        <tr>
+          <th>Sample-Antwort</th>
+          <td>
+          <pre class="line-numbers">
+      <code class="language-json" translate="No">{
+        "account_id": "57838016001",
+        "name": "default",
+        "enforce_custom_fields": true,
+        "enforce_geo": true,
+        "account_name": "BrightcoveLearning",
+        "created_at": "2017-08-23T17:11:18.474Z",
+        "updated_at": "2017-12-30T15:06:27.015Z"
+      }</code></pre>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <h5>Hinweise</h5>
+    
+    <ul>
+      <li id="note6-1"><sup><strong>[ 6-1]</strong> </sup> Momentan gibt es nur einen Channel namens <code translate="No">default</code></li>
+    </ul>
+    <!-- table 8 --><!-- <h4 id="Remove_channel">Remove channel</h4>
+      <table class="bcls-table">
+          <caption class="bcls-caption--table">Remove Channel</caption>
+          <tbody class="bcls-table__body">
+              <tr>
+                  <th>Method</th>
+                  <td>DELETE</td>
+              </tr>
+              <tr>
+                  <th>Endpoint</th>
+                  <td>/accounts/<span class="bcls-input">master_account_id</span>/channels/<span class="bcls-input">channel_name</span></td>
+              </tr>
+              <tr>
+                  <th>Request body</th>
+                  <td>
+      <pre class="line-numbers"><code class="language-json" translate="No">{
+        "account_id": "57838016001",
+        "name": "<span class="bcls-input">channel_name</span>"
+      }</code></pre>
+                  </td>
+              </tr>
+              <tr>
+                  <th>Sample response</th>
+                  <td>204 NO_CONTENT (empty response body)</td>
+              </tr>
+          </tbody>
+      </table>
+      <aside class="bcls-aside bcls-aside--warning">Note that this operation will fail if all affiliates have <strong>not</strong> been removed from the channel.</aside> -->
+    
+    <h4 id="List_channel_affiliates">Liste Affiliates für Channel</h4>
+    <!-- table 9 -->
+    
+    <table class="bcls-table">
+      <caption class="bcls-caption--table">Channel-Partner auflisten</caption>
+      <tbody class="bcls-table__body">
+        <tr>
+          <th>-Methode</th>
+          <td><code translate="No">GET</code></td>
+        </tr>
+        <tr>
+          <th>Endpunkt</th>
+          <td><code translate="No">/accounts/ <span class="bcls-input">master_account_id</span>/channels/default/members</code></td>
+        </tr>
+        <tr>
+          <th>Anfrage Body</th>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <th>Sample-Antwort</th>
+          <td>
+          <pre class="line-numbers">
+      <code class="language-json" translate="No">[
+        {
+          "account_id": "20318290001",
+          <span class="bcls-highlight">"approved": false,</span>
+          "account_name": "Brightcove Training"
+        },
+        {
+          "account_id": "1485884786001",
+          <span class="bcls-highlight">"approved": true,</span>
+          "account_name": "Brightcove Learning Doc Samples"
+        },
+        {
+          "account_id": "1752604059001",
+          "approved": true,
+          "account_name": "BC Training Videos"
+        }
+      ]</code></pre>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <p>Der Wert des <code translate="No">approved</code> Feldes gibt an, ob der Affiliate den Vertrag genehmigt hat oder nicht.</p>
+    
+    <h4 id="Add_affiliates">Affiliate zu Channel hinzufügen</h4>
+    <!-- table 10 -->
+    
+    <table class="bcls-table">
+      <caption class="bcls-caption--table">Affiliate hinzufügen</caption>
+      <tbody class="bcls-table__body">
+        <tr>
+          <th>-Methode</th>
+          <td><code translate="No">PUT</code></td>
+        </tr>
+        <tr>
+          <th>Endpunkt</th>
+          <td><code translate="No">/accounts/ <span class="bcls-input">master_account_id</span>/channels/default/members/ <span class="bcls-input">affiliate_account_id</span> </code></td>
+        </tr>
+        <tr>
+          <th>Anfrage Body</th>
+          <td>
+          <pre class="line-numbers">
+      <code class="language-json" translate="No">{
+        "account_id":"<span class="bcls-input">affiliate_account_id</span>"
+      }</code></pre>
+          </td>
+        </tr>
+        <tr>
+          <th>Sample-Antwort</th>
+          <td>
+          <pre class="line-numbers">
+      <code class="language-json" translate="No">{
+        "account_id": "1485884786001"
+      }</code></pre>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <h4 id="Remove_affiliate">Affiliate aus dem Channel entfernen</h4>
+    <!-- table 11 -->
+    
+    <table class="bcls-table">
+      <caption class="bcls-caption--table">Affiliate entfernen</caption>
+      <tbody class="bcls-table__body">
+        <tr>
+          <th>-Methode</th>
+          <td><code translate="No">DELETE</code></td>
+        </tr>
+        <tr>
+          <th>Endpunkt</th>
+          <td><code translate="No">/accounts/ <span class="bcls-input">master_account_id</span>/channels/default/members/ <span class="bcls-input">affiliate_account_id</span> </code></td>
+        </tr>
+        <tr>
+          <th>Anfrage Body</th>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <th>Sample-Antwort</th>
+          <td><code translate="No">204 NO CONTENT</code> ( leerer Antworttext)</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <h3>Affiliate-Operationen</h3>
+    
+    <h3 id="List_available_contracts">Verfügbare Verträge auflisten</h3>
+    <!-- table 12 -->
+    
+    <table class="bcls-table">
+      <caption class="bcls-caption--table">Auflisten von Ver</caption>
+      <tbody class="bcls-table__body">
+        <tr>
+          <th>-Methode</th>
+          <td><code translate="No">GET</code></td>
+        </tr>
+        <tr>
+          <th>Endpunkt</th>
+          <td><code translate="No">/accounts/ <span class="bcls-input">affiliate_account_id</span>/contracts</code></td>
+        </tr>
+        <tr>
+          <th>Anfrage Body</th>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <th>Sample-Antwort</th>
+          <td>
+          <pre class="line-numbers">
+      <code class="language-json" translate="No">[
+        {
+          "account_id": "1485884786001",
+          "channel": {
+            "account_id": "57838016001",
+            "name": "default"
+          },
+          <span class="bcls-highlight">"approved": false,</span>
+          <span class="bcls-highlight">"auto_accept": false,</span>
+          "approved_at": null,
+          "updated_at": "2017-08-23T17:45:41.556Z",
+          "created_at": "2017-08-23T17:45:41.556Z"
+        }
+      ]</code></pre>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <p>Die beiden wesentlichen Bereiche der Antwort sind:</p>
+    
+    <ul>
+      <li><code translate="No">approved</code> - Wenn der Vertrag auf „true“ festgelegt ist, wird er vom Affiliate akzeptiert</li>
+      <li><code translate="No">auto-accept</code> - Wenn auf true gesetzt, werden Videos, die über diesen Vertrag geteilt werden, automatisch vom Affiliate akzeptiert; andernfalls müssen sie einzeln genehmigt werden</li>
+    </ul>
+    
+    <p>Wir werden unten sehen, wie Sie den Vertrag aktualisieren können.</p>
+    
+    <h4 id="Get_specific_contract">Holen Sie sich einen Vertrag für ein bestimmtes Konto</h4>
+    <!-- table 13 -->
+    
+    <table class="bcls-table">
+      <caption class="bcls-caption--table">Vertrag abrufen</caption>
+      <tbody class="bcls-table__body">
+        <tr>
+          <th>-Methode</th>
+          <td><code translate="No">GET</code></td>
+        </tr>
+        <tr>
+          <th>Endpunkt</th>
+          <td><code translate="No">/accounts/ <span class="bcls-input">affiliate_account_id</span>/contracts/ <span class="bcls-input">master_account_id</span> </code></td>
+        </tr>
+        <tr>
+          <th>Anfrage Body</th>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <th>Sample-Antwort</th>
+          <td>
+          <pre class="line-numbers">
+      <code class="language-json" translate="No">{
+        "account_id": "1485884786001",
+        "channel": {
+          "account_id": "57838016001",
+          "name": "default"
+        },
+        <span class="bcls-highlight">"approved": false,</span>
+        <span class="bcls-highlight">"auto_accept": false,</span>
+        "approved_at": null,
+        "created_at": "2017-08-23T17:45:41.556Z",
+        "updated_at": "2017-08-23T17:45:41.556Z"
+      }</code></pre>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <h4 id="Accept_contract">Vertrag genehmigen</h4>
+    <!-- table 14 -->
+    
+    <table class="bcls-table">
+      <caption class="bcls-caption--table">Vertrag genehmigen</caption>
+      <tbody class="bcls-table__body">
+        <tr>
+          <th>-Methode</th>
+          <td><code translate="No">PATCH</code></td>
+        </tr>
+        <tr>
+          <th>Endpunkt</th>
+          <td><code translate="No">/accounts/ <span class="bcls-input">affiliate_account_id</span>/contracts/ <span class="bcls-input">master_account_id</span> </code></td>
+        </tr>
+        <tr>
+          <th>Anfrage Body</th>
+          <td>
+          <pre class="line-numbers">
+      <code class="language-json" translate="No">{
+        "approved": true,
+        "auto_accept": true
+      }</code></pre>
+          </td>
+        </tr>
+        <tr>
+          <th>Sample-Antwort</th>
+          <td>
+          <pre class="line-numbers">
+      <code class="language-json" translate="No">{
+        "account_id": "1485884786001",
+        "channel": {
+          "account_id": "57838016001",
+          "name": "default"
+        },
+          <span class="bcls-highlight">"approved": true,</span>
+        <span class="bcls-highlight">"auto_accept": true,</span>
+        "approved_at": "2017-08-27T12:27:21.582Z",
+        "created_at": "2017-08-23T17:45:41.556Z",
+        "updated_at": "2017-08-27T12:27:21.582Z"
+      }</code></pre>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <p>Wenn Sie nur angeben <code translate="No">"approved":true</code>, muss jedes Video einzeln genehmigt werden.</p>
+    </section>
+    
+    <section class="bcls-section">
+    <h2 id="cms_operations_sharing">CMS API-Anfragen - Sharing</h2>
+    
+    <p>In diesem Abschnitt werden die <span translate="No">CMS API</span> Anfragen beschrieben, die beim Teilen von Videos verwendet werden. Medienfreigabe-Vorgänge werden vom Master-Konto durchgeführt. Das Affiliate-Konto kann Aktien annehmen, wenn <code translate="No">auto_accept</code> es deaktiviert ist.</p>
+    
+    <h3>Master-Operationen</h3>
+    
+    <h4 id="List_shares">Auflisten vorhandener Aktien</h4>
+    
+    <p>Um herauszufinden, ob ein Video bereits für andere Konten freigegeben wurde, können Sie die unten stehende Anfrage verwenden.</p>
+    
+    <aside class="bcls-aside bcls-aside--information">Dies ist wichtig, da das Teilen eines Videos für ein Konto, für das Sie es bereits freigegeben haben, eine <strong>Weiterleitung</strong> ist, die alle vom Affiliate vorgenommenen Metadatenänderungen überschreibt!</aside>
+    <!-- table 15 -->
+    
+    <table class="bcls-table">
+      <caption class="bcls-caption--table">Aktien auflisten</caption>
+      <tbody class="bcls-table__body">
+        <tr>
+          <th>-Methode</th>
+          <td><code translate="No">GET</code></td>
+        </tr>
+        <tr>
+          <th>Endpunkt</th>
+          <td><code translate="No">/accounts/ <span class="bcls-input">master_account_id</span>/videos/ <span class="bcls-input">video_id</span>/shares</code></td>
+        </tr>
+        <tr>
+          <th>Anfrage Body</th>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <th>Sample-Antwort</th>
+          <td>
+          <pre class="line-numbers">
+      <code class="language-json" translate="No">[
+        {
+          "video_id": "5553744346001",
+          "affiliate_id": "1752604059001",
+          "affiliate_video_id": "5553754248001",
+          "status": "COMPLETE",
+          "shared_at": "2017-08-27T14:35:01.890Z",
+          "updated_at": "2017-08-27T14:35:25.630Z"
+        },
+        {
+          "video_id": "5553744346001",
+          "affiliate_id": "1485884786001",
+          "affiliate_video_id": "5553758415001",
+          "status": "COMPLETE",
+          "shared_at": "2017-08-27T14:34:34.919Z",
+          "updated_at": "2017-08-27T14:35:25.212Z"
+        }
+      ]</code></pre>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <h4 id="Share_video">Ein Video teilen (oder erneut teilen)</h4>
+    
+    <p>Die unten beschriebene Anfrage wird ein Video für ein oder mehrere Affiliate-Konten freigeben.</p>
+    
+    <aside class="bcls-aside bcls-aside--information">Denken Sie daran, dass diese Anfrage das Video <strong>erneut teilt, wenn das Video bereits an einen Affiliate weitergegeben</strong> wurde, alle Änderungen, die der Affiliate an den Video-Metadaten vorgenommen hat!</aside>
+    <!-- table 16 -->
+    
+    <table class="bcls-table">
+      <caption class="bcls-caption--table">Video freigeben</caption>
+      <tbody class="bcls-table__body">
+        <tr>
+          <th>-Methode</th>
+          <td><code translate="No">POST</code></td>
+        </tr>
+        <tr>
+          <th>Endpunkt</th>
+          <td><code translate="No">/accounts/ <span class="bcls-input">master_account_id</span>/videos/ <span class="bcls-input">video_id</span>/shares</code></td>
+        </tr>
+        <tr>
+          <th>Anfrage Body</th>
+          <td>
+          <pre class="line-numbers">
+      <code class="language-json" translate="No">[
+        { "id": "<span class="bcls-input">affiliate_account_id_1</span>" },
+        { "id": "<span class="bcls-input">affiliate_account_id_2</span>" }
+      ]</code></pre>
+          </td>
+        </tr>
+        <tr>
+          <th>Sample-Antwort</th>
+          <td>
+          <p>Erfolgreiche Antwort</p>
+    
+          <pre class="line-numbers">
+      <code class="language-json" translate="No">[
+        {
+          "video_id": "5553744346001",
+          "affiliate_id": "1485884786001",
+          "affiliate_video_id": null,
+          "status": "PROCESSING",
+          "shared_at": "2017-08-27T14:25:55.710Z",
+          "updated_at": "2017-08-27T14:25:55.710Z"
+        }
+      ]</code></pre>
+    
+          <p>Reaktion auf Fehler</p>
+    
+          <pre class="line-numbers">
+      <code class="language-json" translate="No">{
+      "video_id": "5553744346001",
+      "affiliate_id": "1485884786001",
+      "affiliate_video_id": null,
+      "status": "ERROR",
+      "error_message": "[{\"error_code\":\"MISSING_CUSTOM_FIELDS\",\"error_message\":\"Affiliate account is missing custom fields: [myfieldname]\"}]",
+      "shared_at": "2017-10-23T15:21:38.541Z",
+      "updated_at": "2017-10-23T15:22:58.519Z"
+      }</code></pre>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <p>Durch das Teilen wird ein neues Video im Konto des Partners erstellt. Die <code translate="No">state</code> Videofreigabe wird <code translate="No">PROCESSING</code> so lange angezeigt, bis die Freigabe abgeschlossen ist <strong>und</strong> das Video im Affiliate-Konto erstellt wird. Der Affiliate muss das Video möglicherweise noch akzeptieren (wenn <code translate="No">auto_accept</code> es vom Affiliate <code translate="No">false</code> auf den Vertrag festgelegt ist - siehe vorherigen Abschnitt über das Einrichten der Freigabe).</p>
+    
+    <aside class="bcls-aside bcls-aside--information">Eine <code translate="No">GET</code> Aktienanfrage des Hauptkontos gibt die Affiliate-Video-ID erst zurück, wenn der Freigabestatus lautet <code translate="No">COMPLETE</code>.</aside>
+    
+    <aside class="bcls-aside bcls-aside--warning">
+    <p>WICHTIGE HINWEISE:</p>
+    
+    <ul>
+      <li>Dieser Vorgang wird ein Video erneut teilen, wenn es bereits mit den/den Partnern geteilt wurde - lesen Sie unbedingt <a href="#Resharing_videos">Resharing-Videos</a> , bevor Sie das tun!</li>
+      <li>
+      <p>Wenn das <code translate="No">reference_id</code> für das Master-Video bereits im Affiliate-Konto verwendet wird, schlägt die Freigabe fehl. Der Master und der Affiliate müssen das Problem lösen, indem sie das <code translate="No">reference_id</code> in einem der Konten ändern und dann die Freigabe wiederholen.</p>
+    
+      <p>Da die Freigabe eine asynchrone Operation ist, wird bei den Freigabeanfragen kein Fehler zurückgegeben. Die GET-Aktienanfrage (siehe oben) zeigt jedoch einen Fehler für das Konto an.</p>
+      </li>
+    </ul>
+    </aside>
+    
+    <h4 id="Unshare_video_affiliate">Ein Video für einen Affiliate freigeben</h4>
+    <!-- table 17 -->
+    
+    <table class="bcls-table">
+      <caption class="bcls-caption--table">Video nicht weitergeben</caption>
+      <tbody class="bcls-table__body">
+        <tr>
+          <th>-Methode</th>
+          <td><code translate="No">DELETE</code></td>
+        </tr>
+        <tr>
+          <th>Endpunkt</th>
+          <td><code translate="No">/accounts/ <span class="bcls-input">master_account_id</span>/videos/ <span class="bcls-input">video_id</span>/shares/ <span class="bcls-input">affiliate_account_id</span> </code></td>
+        </tr>
+        <tr>
+          <th>Anfrage Body</th>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <th>Sample-Antwort</th>
+          <td><code translate="No">202 ACCEPTED</code> ( leerer Antworttext) - Die Antwort zeigt an, dass die Anfrage zur Bearbeitung angenommen wurde, der Vorgang jedoch möglicherweise einige Minuten lang nicht abgeschlossen ist</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <aside class="bcls-aside bcls-aside--warning">Beachten Sie, dass das Aufheben und das erneute Teilen eines Videos dazu führt, dass das geteilte Video eine andere Video-ID im Affiliate-Konto hat.</aside>
+    <!-- table 18 --><!-- <h4 id="Unshare_video">Unsharing a video for all Affiliates</h4>
+          <table class="bcls-table">
+          <caption class="bcls-caption--table">Unshare Video</caption>
+          <tbody class="bcls-table__body">
+              <tr>
+                  <th>Method</th>
+                  <td>DELETE</td>
+              </tr>
+              <tr>
+                  <th>Endpoint</th>
+                  <td>/accounts/<span class="bcls-input">master_account_id</span>/videos/<span class="bcls-input">video_id</span>/shares</td>
+              </tr>
+              <tr>
+                  <th>Request body</th>
+                  <td>
+                  </td>
+              </tr>
+              <tr>
+                  <th>Sample response</th>
+                  <td>202 ACCEPTED (empty response body) - the response indicates that the request has been accepted for processing, but the operation may not be completed for a couple of minutes</td>
+              </tr>
+          </tbody>
+      </table>
+      <aside class="bcls-aside bcls-aside--warning">Note that un-sharing and re-sharing a video will result in the shared video having a different video id in the Affiliate account.</aside> -->
+    
+    <h3>Affiliate-Operationen</h3>
+    
+    <h4 id="Accept_share">Geteiltes Video akzeptieren</h4>
+    
+    <p>Um ein geteiltes Video zu akzeptieren, aktualisiert der Affiliate das freigegebene Video und setzt <code translate="No">state</code> es auf <code translate="No">ACTIVE</code>. (Das Setzen des <code translate="No">state</code> auf <code translate="No">INACTIVE</code> lehnt die Aktie ab.)</p>
+    <!-- table 19 -->
+    
+    <table class="bcls-table">
+      <caption class="bcls-caption--table">Geteiltes Video akzeptieren</caption>
+      <tbody class="bcls-table__body">
+        <tr>
+          <th>-Methode</th>
+          <td><code translate="No">PATCH</code></td>
+        </tr>
+        <tr>
+          <th>Endpunkt</th>
+          <td><code translate="No">/accounts/ <span class="bcls-input">affiliate_account_id</span>/videos/ <span class="bcls-input">affiliate_video_id</span> </code></td>
+        </tr>
+        <tr>
+          <th>Anfrage Body</th>
+          <td>
+          <pre class="line-numbers">
+      <code class="language-json" translate="No">
+        {
+          "state": "ACTIVE"
+        }
+      </code></pre>
+          </td>
+        </tr>
+        <tr>
+          <th>Sample-Antwort</th>
+          <td>
+          <pre class="line-numbers">
+      <code class="language-json" translate="No">{
+        "id": "5557656136001",
+        "account_id": "1485884786001",
+        "ad_keys": null,
+        "clip_source_video_id": null,
+        "complete": true,
+        "created_at": "2017-08-30T13:35:51.796Z",
+        "cue_points": [
+        ],
+        "custom_fields": {
+        },
+        "delivery_type": "dynamic_origin",
+        "description": null,
+        "digital_master_id": "4728546275001",
+        "duration": 11111,
+        "economics": "AD_SUPPORTED",
+        "folder_id": null,
+        "geo": null,
+        "has_digital_master": true,
+        "images": {
+          "thumbnail": {
+            "asset_id": "5473683978001",
+            "remote": false,
+            "src": "http://brightcove.vo.llnwd.net/e1/pd/57838016001/57838016001_5473683978001_4728519374001-th.jpg?pubId=1485884786001&amp;videoId=5557656136001",
+            "sources": [
+              {
+                "src": "http://brightcove.vo.llnwd.net/e1/pd/57838016001/57838016001_5473683978001_4728519374001-th.jpg?pubId=1485884786001&amp;videoId=5557656136001",
+                "height": 90,
+                "width": 160
+              },
+              {
+                "src": "https://brightcove.hs.llnwd.net/e1/pd/57838016001/57838016001_5473683978001_4728519374001-th.jpg?pubId=1485884786001&amp;videoId=5557656136001",
+                "height": 90,
+                "width": 160
+              }
+            ]
+          },
+          "poster": {
+            "asset_id": "5473684427001",
+            "remote": false,
+            "src": "http://brightcove.vo.llnwd.net/e1/pd/57838016001/57838016001_5473684427001_4728519374001-vs.jpg?pubId=1485884786001&amp;videoId=5557656136001",
+            "sources": [
+              {
+                "src": "http://brightcove.vo.llnwd.net/e1/pd/57838016001/57838016001_5473684427001_4728519374001-vs.jpg?pubId=1485884786001&amp;videoId=5557656136001",
+                "height": 720,
+                "width": 1280
+              },
+              {
+                "src": "https://brightcove.hs.llnwd.net/e1/pd/57838016001/57838016001_5473684427001_4728519374001-vs.jpg?pubId=1485884786001&amp;videoId=5557656136001",
+                "height": 720,
+                "width": 1280
+              }
+            ]
+          }
+        },
+        "link": null,
+        "long_description": null,
+        "name": "oystercatcher.mp4",
+        "original_filename": "57838016001_4728546275001_4728519374001.mp4",
+        "projection": null,
+        "published_at": "2017-08-30T13:41:13.974Z",
+        "reference_id": "2016-01-29T21:41:33.225Z-screencast-1280",
+        "schedule": null,
+        "sharing": {
+          "by_external_acct": true,
+          "by_id": "57838016001",
+          "source_id": "4728519374001",
+          "to_external_acct": false,
+          "by_reference": true
+        },
+        "state": "ACTIVE",
+        "tags": [
+          "newtag",
+          "foo"
+        ],
+        "text_tracks": [
+        ],
+        "updated_at": "2017-08-30T13:41:14.075Z"
+      }</code></pre>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <p>Setzen Sie den <code translate="No">state</code> auf <code translate="No">INACTIVE</code> , um die Aktie abzulehnen.</p>
+    
+    <p>Beachten Sie, dass es keine spezielle Benachrichtigung gibt, die darauf hinweist, dass ein Video für Ihr Konto freigegeben wurde. Wenn Sie jedoch <a href="/cms/searching/cms-and-playback-apis-video-search-v2.html">Videos suchen</a> zum <code translate="No">state:pending</code> , die nicht akzeptierte Aktien finden. Alternativ können Sie die Liste „Ausstehende Aktien“ im Studio Media-Modul verwenden, um ausstehende Freigaben anzuzeigen und abzulehnen:</p>
+    
+    <figure class="bcls-figure"><img class="bcls-image" alt="Ausstehende Aktien" src="/assets/images/cms/managing-videos/pending-share.png"/>
+    <figcaption class="bcls-caption--image">Ausstehende Aktien</figcaption>
+    </figure>
+    </section>
+    
+    <section class="bcls-section">
+    <h2 id="Errors">Fehler</h2>
+    
+    <p>Fehler bei der Medienfreigabe werden nicht als separate Fehlerantwort auf die API-Anfrage zurückgegeben, sondern in einem <code translate="No">error_message</code> Feld in der normalen Antwort:</p>
+    
+    <pre class="line-numbers">
+      <code class="language-json" translate="No">[
+        {
+          "video_id" : "1239817239128",
+          "affiliate_id" : "32871239",
+          "affiliate_video_id" : "30308254055202",
+          "status" : "COMPLETE",
+          "shared_at" : "2017-12-11T17:57:45.530Z",
+          "updated_at" : "2017-12-11T18:03:32.789Z",
+          "error_message" : <span class="bcls-highlight">"[{"error_code":"MISSING_CUSTOM_FIELDS","error_message":"Affiliate account is missing custom fields: [whisky]"}]"</span>
+        }
+      ]</code></pre>
+    
+    <p>Siehe <a href="/cms/references/cms-api-error-message-reference.html#Media_sharing_errors">die <span translate="No">CMS API</span> Fehlerreferenz</a> für weitere Details.</p>
+    </section>
+    
+    <section class="bcls-section">
+    <h2 id="Limitations">Einschränkungen</h2>
+    
+    <p>Derzeit hat das Teilen von Medien die folgenden Einschränkungen:</p>
+    
+    <ul>
+      <li>DRM: Die gemeinsame Nutzung von Medien über den <span translate="No">CMS API</span> wird derzeit nicht für DRM-fähige Konten unterstützt. Das Teilen von Videos von einem Konto, das nicht DRM-fähig ist, für ein DRM-fähiges Konto wird unterstützt, aber die freigegebenen Videos werden <strong>nicht</strong> für DRM verpackt.</li>
+      <li>
+      <p>Wenn der vom Hauptkonto definierte Kanal <code translate="No">enforce_custom_fields</code> auf <code translate="No">true</code> ein Video mit einem vom Affiliate-Konto nicht zulässigen Wert festgelegt hat und dann ein Video freigegeben hat, der vom Affiliate-Konto nicht zulässig ist, schlägt dieser Freigabeversuch fehl. Der Freigabestatus wird mit einer Fehlermeldung wie dieser aktualisiert:</p>
+    
+      <pre class="line-numbers">
+      <code class="language-json" translate="No">[{"error_code": "ILLEGAL_CUSTOM_FIELD_VALUE", "error_message": "Illegal value for custom fields: [topic]"}]
+      </code></pre>
+    
+      <p>Wenn der vom Hauptkonto definierte Kanal <code translate="No">enforce_custom_fields</code> auf <code translate="No">false</code> ein Video mit einem vom Affiliate-Konto nicht zulässig ist und dann ein Video mit einem benutzerdefinierten Feld freigegeben hat, der vom Affiliate-Konto nicht zulässig ist, funktioniert der Freigabeversuch, aber der -Feld mit dem schlechten Wert wird nicht in die Affiliate-Kopie des Videos aufgenommen.</p>
+      </li>
+      <li>
+        Wenn Sie ein geteiltes Video mit SSAI abspielen, verwendet SSAI Macro replacement die Metadaten aus dem übergeordneten Video anstelle des untergeordneten Videos. SSAI wird auch die Anzeigensuche überspringen, wenn das übergeordnete Video als markiert ist <code translate="No">Advertising='Free'</code>, selbst wenn das untergeordnete Video als gekennzeichnet ist <code translate="No">Ad Supported</code>.
+      </li>
+    </ul>
+    </section>
+    </article>
+    
+<!-- complete bootstrap layout -->
+    </div>
+    <div class="col-sm-2 right-side-bar">
+      
+      <nav class="right-side-nav" id="right_side_nav">
+        <h6 class="toc">Inhalt der Seite</h6>
+        <ul id="in_page_nav" class="list-none"></ul>
+      </nav>
+      
+    </div>
+  </div>
+</div>
+
+<hr>
+<div class="last-updated">
+  Seite zuletzt aktualisiert am 02 Dez. 2020
+</div>
+
+<footer class="bcls-footer" role="contentinfo">
+  <div class="row">
+    <div class="region region-footer-top-center col-md-12">
+      <nav role="navigation" aria-labelledby="block-brightcovesupport-menu" id="block-brightcovesupport" class="footer-menu">
+
+        <h2>Brightcove Support-Service</h2>
+
+        <ul class="menu">
+          <li>
+            <a href="https://status.brightcove.com">Systemstatus</a>
+          </li>
+          <li>
+            <a href="https://supportportal.brightcove.com/s/login/?">Kontakt mit dem Support</a>
+          </li>
+          <li>
+            <a href="https://support.brightcove.com/">DOKUMENTATION</a>
+          </li>
+        </ul>
+
+      </nav>
+      <nav role="navigation" aria-labelledby="block-training-menu" id="block-training" class="footer-menu">
+
+        <h2>Schulungen</h2>
+
+        <ul class="menu">
+          <li>
+            <a href="https://studio.support.brightcove.com/training/online-training-courses.html">Online-Kurse</a>
+          </li>
+          <li>
+            <a href="https://studio.support.brightcove.com/training/register-training.html">Für einen Kurs anmelden</a>
+          </li>
+          <li>
+            <a href="https://university.brightcove.com/">Brightcove Universität</a>
+          </li>
+        </ul>
+
+      </nav>
+      <nav role="navigation" aria-labelledby="block-brightcove-menu" class="footer-menu">
+
+        <h2>Brightcove</h2>
+
+        <ul class="menu">
+          <li>
+            <a href="https://www.brightcove.com">brightcove.com</a>
+          </li>
+          <li>
+            <a href="https://supportportal.brightcove.com/s/login/?">Kontaktiere uns</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  <div class="row">
+    <div class="region region-footer-bottom-center col-md-12">
+      <div class="bcls-copyright footer-menu">
+        <table>
+          <tr>
+            <td>
+              <div id="bc_copyright" class="field field--name-field-copyright-year field--type-string field--label-hidden field--item" style="float: left;"> Brightcove Inc. Alle Rechte vorbehalten.</div>
+            </td>
+            <td><a href="https://www.brightcove.com/en/legal/privacy">Privacy</a> | <a href="https://www.brightcove.com/en/terms-and-conditions">Allgemeine Geschäftsbedingungen</a></td>
+            <td>
+              <div class="gf-links-cols footer-menu">
+                <div class="gf-social"><a href="https://www.linkedin.com/company/16439" title="LinkedIn" newtab="newtab" class="gf-social-linkedin"><i class="fab fa-linkedin-in" style="font-size: 1.5rem;"></i></a><a href="https://twitter.com/brightcove" title="Twitter" newtab="newtab" class="gf-social-twitter"><i class="fab fa-twitter" style="font-size: 1.5rem;"></i></a><a href="https://www.facebook.com/Brightcove" title="Facebook" newtab="newtab" class="gf-social-facebook"><i class="fab fa-facebook-f" style="font-size: 1.5rem;"></i></a>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</footer>
+<div id="talla_wrapper">
+  <p style="text-align: right;position: relative;"><button style="background:rgb(9, 7, 140);color:Snow;padding:.3rem;position:fixed;right:0;bottom:1em;z-index:9999999" onclick="javascript:displayChat()">Fragen? </button> </p>
+  <div id="talla_chat">
+</div>
+</div>
+<script>
+      
+  var searchBox = sajari.init({
+    mode: "search-box",
+    project: "1588255093746585379", // Set this to your project.
+    collection: "brightcove-documenation", // Set this to your collection.
+    instantPipeline: "autocomplete", // Pipeline used as you type
+    inputPlaceholder: "Search", // Input element placeholder
+    maxSuggestions: 5, // Maximum number of suggestions to show
+    attachSearchBox: document.getElementById("nav-search-box") // DOM element to attach to
+  });
+  
+    searchBox("sub", "pipeline.search-sent", function (_, query) {
+      window.location = "/search.html?q=" + encodeURIComponent(query.q);
+    });
+  
+
+</script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https://support.brightcove.com/site-assets/js/site/https-fix.js"></script>
+  <script src="https://support.brightcove.com/site-assets/js/site/setDate.js"></script>
+  
+  <script src="https://support.brightcove.com/site-assets/js/site/prism.js"></script>
+  
+  <script src="https://support.brightcove.com/site-assets/js/site/site.js"></script>
+  <script src="https://support.brightcove.com/site-assets/js/site/tabs.js"></script>
+  <script src="https://support.brightcove.com/site-assets/js/site/toc.js"></script>
+  <script src="/assets/js/sites_nav.js"></script>
+  <script src="https://support.brightcove.com/site-assets/js/site/bcls-utils.js"></script>
+  <script src="https://support.brightcove.com/site-assets/js/site/local-link-fix.js"></script>
+  <script src="/assets/js/feedback.js"></script>
+  
+  <script src="/assets/js/sajari-search-foot.js"></script>
+  
+  <!-- <script src="/assets/js/sajari-index.js"></script> -->
+  <script src="https://assets.talla.com/latest/embeddedjs/talla.js"></script>
+  <script src="/assets/js/talla-init.js"></script>
+  <style>
+    a.sj-paginator__page-number.sj-paginator__page-number--current.css-so0ov7 {
+      background-color: lightblue;
+    }
+    div.sj-tabs__tab {
+      margin-top: 3rem;
+      margin-left: .3rem;
+      border-top-left-radius: .4rem;
+      border-top-right-radius: .4rem;
+      background-color:#e8e8e8;
+    }
+
+    div.sj-tabs__tab.sj-tabs__tab--selected {
+      border-bottom-color: crimson;
+      background-color: #f8f8f8;
+    }
+
+    p.sj-results__result__description.css-p9jvyt {
+      font-size: 1rem;
+    }
+
+    .sj-result__text.css-31l7gp h3 {
+      color: navy;
+      font-size: 1.4rem;
+    }
+    </style>
+
+</body>
+
+</html>
