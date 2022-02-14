@@ -1,0 +1,750 @@
+---
+title: 'Live-API: Cue Points und Ad Beacons mit SSAI'
+description: In diesem Thema erfahren Sie, wie Sie Cue-Points und Anzeigenbeacons verwalten, wenn Sie die serverseitige Anzeigeneinfügung (SSAI) von Brightcove für Ihre Livestream-Jobs verwenden.
+parent: SSAI 
+grandparent: Live API
+---
+
+
+<article class="bcls-article">
+ <h1>{{ page.title }}</h1>
+ <summary>{{ page.description }}</summary>
+{% raw %}
+ <section class="bcls-section">
+  <h2 id="Overview">Überblick</h2>
+  
+  <p>Serverseitige Anzeigenschaltung <span translate="No">(SSAI)</span> ermöglicht Ihnen die Anzeige von Anzeigen während eines Live-Streaming-Ereignisses zu bestimmten Zeiten. Allgemeine Informationen finden Sie im <a href="/live-api/ssai/live-api-server-side-ad-insertion-ssai.html">Live-API: Serverseitige Anzeigenschaltung <span translate="No">(SSAI)</span></a> dokumentieren.</p>
+  
+  <aside class="bcls-aside bcls-aside--information">
+    
+    <ul>
+      <li>Bevor Sie es verwenden können <span translate="No">SSAI</span> , muss es für Ihr Konto aktiviert sein. Weitere Informationen erhalten Sie von Ihrem Account Manager.</li>
+   </ul>
+  
+  </aside>
+  </section>
+  
+  <section class="bcls-section">
+  <h2 id="Cue_points">Cue-Punkte</h2>
+  
+  <p>Werbeunterbrechungen werden durch Cue-Points ausgelöst, die auf zwei Arten angegeben werden können:</p>
+  
+  <ul>
+    <li>Vom Encoder an Brightcove gesendet</li>
+    <li>Sofortige Cue-Punkte, die über die . erstellt wurden <span translate="No">Live-API</span></li>
+  </ul>
+  
+  <h3>Vom Encoder</h3>
+  
+  <p>Das Brightcove-Live-Delivery-System kann vom Encoder übermittelte Cue-Punkte im AMF-Format interpretieren:</p>
+  
+  <pre class="line-numbers">
+  <code class="language-bash" translate="No">AMFDataList
+  [0]:onCuePoint
+  [1]:{Obj[]:
+    time: 1.9889, //Difference from PTS of THIS packet to the first PTS of the 1st video frame in the adbreak
+    name: "scte35",
+    type: "event",
+    ad_server_data: "eyJrZXkiOiJ2YWx1ZSJ9",	// optional introduced by Brightcove. It is a base64 encoded json map of parameters e.g. {"key":"value"}
+    parameters: {Obj[]:
+      type: "avail_in",
+      duration: 12.0
+    }
+  }</code></pre>
+  
+  <h4>Anmerkungen:</h4>
+  
+  <ul>
+    <li>Nur <code translate="No">avail_in</code> Cue-Punkte vom Typ werden derzeit in der RTMP-Eingabe unterstützt.</li>
+    <li>SCTE-35-Cue-Punkte werden in RTP- und SRT-Eingängen unterstützt.</li>
+  </ul>
+  
+  <aside class="bcls-aside bcls-aside--information">Siehe die <a href="#Appendix">Anhang unten</a> für einen Screenshot eines Beispiel-Cue-Point-Setups für den Elemental-Encoder.</aside>
+  </section>
+  
+  <section class="bcls-section">
+  <h2 id="Manual_cue_point_insertion">Manuelles Einfügen von Cue-Punkten</h2>
+  
+  <p>Sie können sofort Cue-Punkte erstellen, indem Sie die <span translate="No">Live-API</span> durch Senden einer <code translate="No">POST</code> Anfrage:</p>
+  
+  <table class="bcls-table">
+    <tbody class="bcls-table__body">
+      <tr>
+        <th>Methode</th>
+        <td style="width:80em;"><code class="language-http" translate="No">POST</code></td>
+      </tr>
+      <tr>
+        <th>URL</th>
+        <td><code class="language-http" translate="No">https://api.bcovlive.io/v1/jobs/<span class="bcls-input">Job_ID</span>/cuepoint</code></td>
+      </tr>
+      <tr>
+        <th>Header</th>
+        <td><code class="language-http" translate="No">X-API-KEY: <span class="bcls-input">your API KEY</span></code></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <p>Fügen Sie einen Anfragetext ein, der Folgendes angibt:</p>
+  
+  <table class="bcls-table">
+    <thead class="bcls-table__head">
+      <tr>
+        <th>Gebiet</th>
+        <th>Typ</th>
+        <th>Beschreibung</th>
+      </tr>
+    </thead>
+    <tbody class="bcls-table__body">
+      <tr>
+        <td><code translate="No">duration</code></td>
+        <td>Ganze Zahl</td>
+        <td>Dauer der Pause in Sekunden.<br />
+        <br />
+        Die Dauer des eingefügten Cue-Punkts muss <strong>mindestens die doppelte Länge der Segmente</strong> in der Arbeit. Siehe die <a href="#Duration_example">Dauer Beispiel</a>.</td>
+      </tr>
+      <tr>
+        <td><code translate="No">timecode</code></td>
+        <td>SMPTE-Format</td>
+        <td>OPTIONAL:<strong></strong> Ein Timecode im SMPTE-Format, <strong>HH:MM:SS:FF</strong> (FF = Frames), um anzugeben, wann ein Satz von Variablen (Schlüssel/Wert-Paare) an den AdServer übergeben werden soll.<br />
+        <br />
+        Wenn er weggelassen wird, wird der Cue-Point sofort eingefügt.<br />
+        <br />
+        Wenn Sie die Timecode-Eigenschaft verwenden, muss der Encoder SMPTE-formatierte (<code translate="No">HH:MM:SS:FF</code> ) Timecode gespeichert im <code translate="No">tc</code> Eigentum über <code translate="No">OnFI</code>. Timecodes sind vom Beginn des Livestreams an.</td>
+      </tr>
+      <tr>
+        <td><code translate="No">ad_server_data</code></td>
+        <td>Objekt</td>
+        <td>OPTIONAL:<strong></strong> Welche Schlüssel/Wert-Paare Sie übergeben, hängt vom verwendeten Ad-Server ab. Weitere Informationen finden Sie in Ihrer Ad-Server-Dokumentation und in der <a href="/live-api/ssai/live-api-server-side-ad-insertion-ssai.html#Targeting_ads_using_ad_macros">Targeting von Anzeigen mithilfe von Anzeigenmakros</a> Sektion.</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h4 id="Duration_example">Dauerbeispiel</h4>
+  
+  <p>Die Dauer des eingefügten Cue-Punkts muss <strong>mindestens die doppelte Länge der Segmente</strong> in der Arbeit.</p>
+  
+  <p>Beispiel: Einfügen von a <strong>10 Sekunden Cue-Punkt</strong> in einem Job mit <code translate="No">"segment_seconds"=4</code> , wird gut funktionieren. Das Einfügen desselben Cue-Points in einen Job jedoch mit <code translate="No">"segment_seconds"=6</code> führt zu folgendem Fehler:</p>
+  
+  <pre>
+  <code class="language-json" translate="No">"error": "The parameter duration should be greater than
+    or equal to (2 * target duration) of the job"
+ </code></pre>
+  &nbsp;
+  
+  <h3>Beispielanfragetext</h3>
+  
+  <pre class="line-numbers">
+  <code class="language-json" translate="No">{
+    "duration": 30,
+    "timecode": "15:50:49:16",
+    "ad_server_data" : {
+    "adbreakid": 12312
+    "breaktheme": "fitness"
+    }
+  }</code></pre>
+  
+  <h4>Anmerkungen</h4>
+  
+  <ol>
+    <li>Software-Encoder wie Wirecast und OBS unterstützen das Senden von Timecode über . nicht <code translate="No">OnFI</code> Pakete im RTMP-Stream</li>
+    <li>Elementale Hardware-Encoder unterstützen das Senden von Timecode über <code translate="No">OnFI</code> Pakete im RTMP-Stream</li>
+  </ol>
+  
+  <h3>Beispielantwort</h3>
+  
+  <pre class="line-numbers">
+  <code class="language-json" translate="No">{
+    "id": "Job_ID",
+    "cue_point": {
+      "id": "adBreak-2f58393ada1442d98eca0817fa565ba4",
+      "duration": 30,
+      "accuracy": "segment", [Can be <code translate="No">segment</code> or <code translate="No">frame</code> ]
+      "inserted_at": "2017-07-21T09:30:46.307Z" [ Time when the cue point was inserted in the stream]
+    },
+  }</code></pre>
+  </section>
+  
+  <section class="bcls-section">
+  <h2 id="Beacons">Beacons</h2>
+  
+  <p>Beacons sind Datenpunkte bei der Wiedergabe, die an Drittanbieter-Analysen gesendet werden, um zu verfolgen, ob und wie viele Anzeigen abgespielt wurden. In diesem Abschnitt werden wir uns die Beacon-Typen ansehen, die mit dem eingestellt werden können <span translate="No">Live-API</span> , und Variablen, die zum Bereitstellen der Daten verwendet werden können. Im nächsten Abschnitt werden die API-Anfragen beschrieben, die zum Erstellen und Verwalten von Beacon-Sets verwendet werden.</p>
+  
+  <h3>Beacon-Typen</h3>
+  
+  <table class="bcls-table">
+    <caption class="bcls-caption--table">Beacon-Typen</caption>
+    <thead class="bcls-table__head">
+      <tr>
+        <th style="width:20%;">Beacon-Typ</th>
+        <th style="width:60%;word-wrap:break-word">Beschreibung</th>
+      </tr>
+    </thead>
+    <tbody class="bcls-table__body">
+      <tr>
+        <td style="width:20%"><code translate="No">Load</code></td>
+        <td style="text-align:left;width:60%;word-wrap:break-word">Wird einmal pro Sitzung ausgelöst und wird nur ausgelöst, wenn das Manifest der obersten Ebene angefordert wird</td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">Play</code></td>
+        <td style="text-align:left;width:60%;word-wrap:break-word">Inhalt wurde angefordert und das erste Segment zurückgegeben</td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">Heartbeat</code></td>
+        <td style="text-align:left;width:60%;word-wrap:break-word">Zieldauer (Segmentsekunden)</td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">AdStart</code></td>
+        <td style="text-align:left;width:60%;word-wrap:break-word">Einzelanzeige gestartet</td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">AdFirstQuartile</code></td>
+        <td style="text-align:left;width:60%;word-wrap:break-word">Erstes Anzeigenquartil (25 %)</td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">AdMidpoint</code></td>
+        <td style="text-align:left;width:60%;word-wrap:break-word">Zweites Anzeigenquartil (50 %)</td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">AdThirdQuartile</code></td>
+        <td style="text-align:left;width:60%;word-wrap:break-word">Drittes Anzeigenquartil (75 %)</td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">AdComplete</code></td>
+        <td style="text-align:left;width:60%;word-wrap:break-word">Einzelanzeige abgeschlossen</td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">AdBreakStart</code></td>
+        <td style="text-align:left;width:60%;word-wrap:break-word">Werbepause hat begonnen</td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">AdBreakComplete</code></td>
+        <td style="text-align:left;width:60%;word-wrap:break-word">Werbepause ist beendet</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h3>Beacon-/Anzeigenvariablen</h3>
+  
+  <p>Die folgende Tabelle zeigt die Variablen, die Sie verwenden können, um Daten für die Beacon-URLs bereitzustellen. Um eine Variable einzuschließen, umgeben Sie sie mit doppelten geschweiften Klammern wie folgt: <code translate="No"><span class="bcls-highlight">{{</span>job.job_id<span class="bcls-highlight">}}</span></code>. Vollständige Beispiele finden Sie im nächsten Abschnitt zum Verwalten von Beacon-Sets.</p>
+  <aside class="bcls-aside bcls-aside--information">Notiz:
+    <ul>
+      <li>​Die maximal zulässige Länge für Variablennamen beträgt 256 und für den Wert 1024.</li>
+    </ul>
+  </aside>
+  
+  <table class="bcls-table">
+    <caption class="bcls-caption--table">Variablen für die Anzeigenkonfiguration</caption>
+    <thead class="bcls-table__head">
+      <tr>
+        <th style="width:20%;">Variable</th>
+        <th style="width:60%;">
+        <div style="word-wrap:break-word;">Beschreibung</div>
+        </th>
+      </tr>
+    </thead>
+    <tbody class="bcls-table__body">
+      <tr>
+        <td style="width:20%"><code translate="No">session.session_id</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">eindeutige Sitzungs-ID</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">job.job_id</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">einzigartige Job-ID</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">videocloud.video_id</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">Nur verfügbar für Jobs, die mit einem VideoCloud-Video erstellt wurden.</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">application_ad_configuration.description</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">Wert der Anwendung bei der Sitzungserstellung</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">random.int32</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">zufällige 32-Bit-Ganzzahl mit Vorzeichen</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">random.int64</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">zufällige 64-Bit-Ganzzahl mit Vorzeichen</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">random.uint32</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">zufällige 32-Bit-Ganzzahl ohne Vorzeichen</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">random.uint64</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">zufällige 64-Bit-Ganzzahl ohne Vorzeichen</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">random.uuid</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">zufällige uuid</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">server.timestamputc</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">Epochenzeit in Millisekunden, wenn der Aufruf von der Ads-Api getätigt wurde</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">client.useragent</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">HTTP-User-Agent-Header-Wert bei Sitzungserstellung</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">client.ipaddress</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">http x-forwarded-for Header-Wert bei Sitzungserstellung, falls angegeben, andernfalls die Remote-Adresse</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">client.referrer</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">HTTP-Referer-Header-Wert bei der Sitzungserstellung (Hinweis: das ist die richtige Schreibweise)</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">client.referer</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">HTTP-Referer-Header-Wert bei Sitzungserstellung (http-Rechtschreibung)</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">client.ipuaid</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">Hashwert von client.ipaddress und client.useragent</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">live.adbreak</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">(derzeit unbenutzt)</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">live.adbreakdurationms</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">Dauer der Werbeunterbrechung in Millisekunden</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">live.adbreakduration</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">Dauer der Werbeunterbrechung in Gleitkomma-Sekunden mit doppelter Genauigkeit</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">live.adbreakdurationint</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">Dauer der Werbeunterbrechung in ganzzahligen Sekunden</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">live.adbreak.timestamputc.wallclock</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">Epochenzeit in Millisekunden, wenn der Aufruf an den Anzeigenserver erfolgt ist</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">live.adbreak.timestamputc.origin</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">Epochenzeit in Millisekunden von der ursprünglichen Chunkliste. Dieser Wert gibt die Zeit an, zu der der Cue-Out-Chunk in der Ursprungs-Chunkliste erstellt wurde.</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">live.adbreak.timestamputc.session</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">Epochenzeit in Millisekunden aus der ssai-Chunkliste. Dieser Wert gibt die Zeit des Cue-Out-Chunks in der ssai-Chunkliste an. Da der Adbreak-Inhalt und die Adbreak-Lücke normalerweise NICHT gleich sind, wird nach dem 1. <code translate="No">live.adbreak.timestamputc.origin</code> unterscheidet sich von <code translate="No">live.adbreak.timestamputc.session</code>. Dieser Wert berücksichtigt die Zeitanpassungen, die im <span translate="No">SSAI</span> stückliste.</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h3>SCTE-35-Anzeigenvariablen</h3>
+  
+  <p>Die <a href="https://www.scte.org/">Society of Cable Telecommunications Engineers (SCTE)</a> definiert einen Standard für die dynamische Anzeigeneinfügung für Livestreams. Die folgende Tabelle fasst die SCTE-35-Anzeigenkonfigurationsvariablen zusammen.</p>
+  
+  <aside class="bcls-aside bcls-aside--information">
+  <p>Die SCTE-35-Anzeigenparameter werden derzeit sowohl mit Real-time Transport Protocol (RTP) mit oder ohne Forward Error Correction (FEC) als auch mit Secure Reliable Transport (SRT)-Eingabequellen unterstützt, die auf Transport Stream (TS) basieren. Beachten Sie, dass FEC für RTP dringend empfohlen wird.</p>
+  Diese Anzeigenparameter sind bei Eingabestreams, die das Real-Time Messaging Protocol (RTMP) verwenden, nicht verfügbar.</aside>
+  
+  <table class="bcls-table">
+    <caption class="bcls-caption--table">SCTE-35-Anzeigenkonfigurationsvariablen</caption>
+    <thead class="bcls-table__head">
+      <tr>
+        <th style="width:20%;">Variable</th>
+        <th style="width:60%;">
+        <div style="word-wrap:break-word;">Beschreibung</div>
+        </th>
+      </tr>
+    </thead>
+    <tbody class="bcls-table__body">
+      <tr>
+        <td style="width:20%"><code translate="No">scte35_eventID</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">eine eindeutige Ereignis-ID, die mit einer SCTE35-Nachricht übergeben wird.</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">scte35_programID</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">Eine eindeutige Programm-ID, die mit einer SCTE35-Nachricht übergeben wird.</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">scte35_availNum</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">Eine für Anzeigen verfügbare ID für eine bestimmte Spleißzeit, die über eine SCTE35-Nachricht gesendet wird.</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">scte35_breakDuration</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">Pausendauer für die Werbeunterbrechung, ausgedrückt in Ticks des 90-kHz-Takts des Programms, die mit einer SCTE35-Nachricht übergeben wird.</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="width:20%"><code translate="No">scte35_spliceTime</code></td>
+        <td style="text-align:left;width:60%;">
+        <div style="word-wrap:break-word;">Die Spleißzeit für eine Werbeunterbrechung, ausgedrückt in Ticks des 90-kHz-Takts des Programms, wird mit einer SCTE35-Nachricht übergeben.</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  </section>
+  
+  <section class="bcls-section">
+  <h2 id="Managing_beacon_sets">Beacon-Sets verwalten</h2>
+  
+  <p>Dieser Abschnitt enthält Details zu den API-Anfragen zum Verwalten von Beacon-Sets. Informationen zu Beacon-Typen und -Variablen finden Sie im vorherigen Abschnitt.</p>
+  
+  <p>Um einem Live-Job ein Beacon-Set hinzuzufügen, erstellen Sie zuerst das Beacon-Set und fügen Sie dann die ID beim Erstellen des Jobs ein, wie folgt:</p>
+  
+  <pre class="line-numbers">
+  <code class="language-json" translate="No">{
+  "live_stream": true,
+  "region": "us-west-2",
+  "reconnect_time": 30,
+  "ad_insertion": true,
+  "beacon_set": "<span class="bcls-input">beacon_set_id</span>", ...</code></pre>
+  
+  <h3>Erstellen Sie ein Beacon-Set</h3>
+  
+  <p>Um ein Beacon-Set zu erstellen, senden Sie a <code translate="No">POST</code> Anfrage:</p>
+  
+  <table class="bcls-table">
+    <tbody class="bcls-table__body">
+      <tr>
+        <th>Methode</th>
+        <td style="width:80em;"><code class="language-http" translate="No">POST</code></td>
+      </tr>
+      <tr>
+        <th>URL</th>
+        <td><code class="language-http" translate="No">https://api.bcovlive.io/v1/ssai/beaconsets</code></td>
+      </tr>
+      <tr>
+        <th>Header</th>
+        <td><code class="language-http" translate="No">X-API-KEY: <span class="bcls-input">your API KEY</span></code></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h4>Beispielanfragetext</h4>
+  
+  <pre class="line-numbers">
+  <code class="language-json" translate="No">{
+    "account_id": "<span class="bcls-input">User's Account ID [Optional]</span>",
+    "beacon_urls": [
+      {
+        "beacon_url": "https://myserver.com/beaconRX/{{job.job_id}}/load?position=load&amp;sid={{session.session_id}}&amp;jid={{job.job_id}}&amp;app={{application_ad_configuration.description}}&amp;rnd32={{random.int32}}&amp;rnd64={{random.int64}}&amp;bid={{random.uuid}}&amp;t={{server.timestamputc}}&amp;ua={{client.useragent}}&amp;ip={{client.ipaddress}}&amp;ref={{client.referrer}}&amp;ref={{client.referer}}&amp;ab={{live.adbreak}}&amp;abd={{live.adbreakduration}}&amp;abdi={{live.adbreakdurationint}}",
+        "beacon_type": "Load"
+      },
+      {
+        "beacon_url": "https://myserver.com/beaconRX/{{job.job_id}}/play?position=play&amp;sid={{session.session_id}}&amp;jid={{job.job_id}}&amp;app={{application_ad_configuration.description}}&amp;rnd32={{random.int32}}&amp;rnd64={{random.int64}}&amp;bid={{random.uuid}}&amp;t={{server.timestamputc}}&amp;ua={{client.useragent}}&amp;ip={{client.ipaddress}}&amp;ref={{client.referrer}}&amp;ref={{client.referer}}&amp;ab={{live.adbreak}}&amp;abd={{live.adbreakduration}}&amp;abdi={{live.adbreakdurationint}}",
+        "beacon_type": "Play"
+      }
+    ]
+  }</code></pre>
+  
+  <aside class="bcls-aside bcls-aside--information">Die <code translate="No">account_id</code> Feld ist die Live-Konto-ID. Wenn es weggelassen wird, wird die Konto-ID des anfordernden Benutzers verwendet.</aside>
+  
+  <h4>Beispielantwort</h4>
+  
+  <pre class="line-numbers">
+  <code class="language-json" translate="No">{
+    "beacon_set": {
+      "beacon_urls": [{
+      "beacon_url": "https://myserver.com/beaconRX/{{job.job_id}}/load?position=load&amp;sid={{session.session_id}}&amp;jid={{job.job_id}}&amp;app={{application_ad_configuration.description}}&amp;rnd32={{random.int32}}&amp;rnd64={{random.int64}}&amp;bid={{random.uuid}}&amp;t={{server.timestamputc}}&amp;ua={{client.useragent}}&amp;ip={{client.ipaddress}}&amp;ref={{client.referrer}}&amp;ref={{client.referer}}&amp;ab={{live.adbreak}}&amp;abd={{live.adbreakduration}}&amp;abdi={{live.adbreakdurationint}}",
+      "beacon_type": "Load"
+    },
+    {
+      "beacon_url": "https://myserver.com/beaconRX/{{job.job_id}}/play?position=play&amp;sid={{session.session_id}}&amp;jid={{job.job_id}}&amp;app={{application_ad_configuration.description}}&amp;rnd32={{random.int32}}&amp;rnd64={{random.int64}}&amp;bid={{random.uuid}}&amp;t={{server.timestamputc}}&amp;ua={{client.useragent}}&amp;ip={{client.ipaddress}}&amp;ref={{client.referrer}}&amp;ref={{client.referer}}&amp;ab={{live.adbreak}}&amp;abd={{live.adbreakduration}}&amp;abdi={{live.adbreakdurationint}}",
+      "beacon_type": "Play"
+    }],
+    "beacon_set_id": "Inserted Beacon Set ID",
+    "account_id": "USER's ACCOUNT ID"
+    }
+    "inserted": true
+  }</code></pre>
+  
+  <h3>Aktualisieren Sie ein Beacon-Set</h3>
+  
+  <p>Das Aktualisieren eines Beacon-Sets ähnelt dem Erstellen eines Beacon-Sets. Sende ein <code translate="No">PUT</code> Anfrage:</p>
+  
+  <table class="bcls-table">
+    <tbody class="bcls-table__body">
+      <tr>
+        <th>Methode</th>
+        <td style="width:80em;"><code class="language-http" translate="No">PUT</code></td>
+      </tr>
+      <tr>
+        <th>URL</th>
+        <td><code class="language-http" translate="No">https://api.bcovlive.io/v1/ssai/beaconsets/beaconset/<span class="bcls-input">beacon_set_id</span></code></td>
+      </tr>
+      <tr>
+        <th>Header</th>
+        <td><code class="language-http" translate="No">X-API-KEY: <span class="bcls-input">your API KEY</span></code></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h4>Beispielanfragetext</h4>
+  
+  <pre class="line-numbers">
+  <code class="language-json" translate="No">{
+    "account_id": "<span class="bcls-input">User's Account ID [Optional]</span>",
+    "beacon_urls": [
+      {
+      "beacon_url": "https://myserver.com/beaconRX/load",
+      "beacon_type": "Load"
+      },
+      {
+      "beacon_url": "https://myserver.com/beaconRX/play",
+      "beacon_type": "Play"
+      }
+    ]
+  }</code></pre>
+  
+  <aside class="bcls-aside bcls-aside--information">Die <code translate="No">account_id</code> Feld ist die Live-Konto-ID. Wenn es weggelassen wird, wird die Konto-ID des anfordernden Benutzers verwendet.</aside>
+  
+  <h4>Beispielantwort</h4>
+  
+  <pre class="line-numbers">
+  <code class="language-json" translate="No">{
+    "beacon_set": {
+      "account_id": "User's Account ID",
+      "beacon_set_id": "Beacon set ID",
+      "beacon_urls": [{
+        "beacon_url": "https://myserver.com/beaconRX/load",
+        "beacon_type": "Load"
+        },
+        {
+        "beacon_url": "https://myserver.com/beaconRX/play",
+        "beacon_type": "Play"
+      }],
+      "updated_beacon_set": {
+        "beacon_set_id": "Beacon set ID",
+        "beacon_urls": [{
+          "beacon_url": "https://myserver.com/beaconRX/load",
+          "beacon_type": "Load"
+        },
+        {
+          "beacon_url": "https://myserver.com/beaconRX/play",
+          "beacon_type": "Play"
+        }],
+        "account_id": "User's Account ID"
+      }
+    }
+  }</code></pre>
+  
+  <h3>Beacon-Sets erhalten</h3>
+  
+  <p>Um die Beacon-Sets für ein Konto abzurufen, senden Sie a <code translate="No">GET</code> Anfrage:</p>
+  
+  <table class="bcls-table">
+    <tbody class="bcls-table__body">
+      <tr>
+        <th>Methode</th>
+        <td style="width:80em;"><code class="language-http" translate="No">GET</code></td>
+      </tr>
+      <tr>
+        <th>URL</th>
+        <td><code class="language-http" translate="No">https://api.bcovlive.io/v1/ssai/beaconsets/account/<span class="bcls-input">Account ID</span></code></td>
+      </tr>
+      <tr>
+        <th>Header</th>
+        <td><code class="language-http" translate="No">X-API-KEY: <span class="bcls-input">your API KEY</span></code></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <aside class="bcls-aside bcls-aside--information">Beachten Sie, dass die Konto-ID hier die Live-Konto-ID ist.</aside>
+  
+  <h4>Beispielantwort</h4>
+  
+  <pre class="line-numbers">
+  <code class="language-json" translate="No">[{
+      "account_id": "User's Account ID",
+      "beacon_set_id": "Beacon set ID1",
+      "beacon_urls": [{
+      "beacon_url": "https://myserver.com/beaconRX/load",
+      "beacon_type": "Load"
+    }]
+    },
+    {
+      "account_id": "User's Account ID",
+      "beacon_set_id": "Beacon set ID2",
+      "beacon_urls": [{
+      "beacon_url": "https://myserver.com/beaconRX2/load",
+      "beacon_type": "Load"
+      },
+      {
+      "beacon_url": "https://myserver.com/beaconRX2/play",
+      "beacon_type": "Play"
+      }]
+  }]</code></pre>
+  
+  <h3>Beacon-Sets für anfragende Benutzer abrufen</h3>
+  
+  <p>Sie können die Beacon-Sets auch für das Konto des anfordernden Benutzers abrufen, ohne die Konto-ID in die Anforderungs-URL aufzunehmen:</p>
+  
+  <table class="bcls-table">
+    <tbody class="bcls-table__body">
+      <tr>
+        <th>Methode</th>
+        <td style="width:80em;"><code class="language-http" translate="No">GET</code></td>
+      </tr>
+      <tr>
+        <th>URL</th>
+        <td><code class="language-http" translate="No">https://api.bcovlive.io/v1/ssai/beaconsets</code></td>
+      </tr>
+      <tr>
+        <th>Header</th>
+        <td><code class="language-http" translate="No">X-API-KEY: <span class="bcls-input">your API KEY</span></code></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h4>Beispielantwort</h4>
+  
+  <pre class="line-numbers">
+  <code class="language-json" translate="No">[{
+      "account_id": "User's Account ID",
+      "beacon_set_id": "Beacon set ID1",
+      "beacon_urls": [{
+      "beacon_url": "https://myserver.com/beaconRX/load",
+      "beacon_type": "Load"
+    }]
+    },
+    {
+      "account_id": "User's Account ID",
+      "beacon_set_id": "Beacon set ID2",
+      "beacon_urls": [{
+      "beacon_url": "https://myserver.com/beaconRX2/load",
+      "beacon_type": "Load"
+      },
+      {
+      "beacon_url": "https://myserver.com/beaconRX2/play",
+      "beacon_type": "Play"
+      }]
+  }]</code></pre>
+  
+  <h3>Holen Sie sich ein Beacon-Set von id</h3>
+  
+  <p>Um ein einzelnes Beacon-Set anhand seiner ID abzurufen, senden Sie a <code translate="No">GET</code> Anfrage:</p>
+  
+  <table class="bcls-table">
+    <tbody class="bcls-table__body">
+      <tr>
+        <th>Methode</th>
+        <td style="width:80em;"><code class="language-http" translate="No">GET</code></td>
+      </tr>
+      <tr>
+        <th>URL</th>
+        <td><code class="language-http" translate="No">https://api.bcovlive.io/v1/ssai/beaconsets/beaconset/<span class="bcls-input">beacon_set_id</span></code></td>
+      </tr>
+      <tr>
+        <th>Header</th>
+        <td><code class="language-http" translate="No">X-API-KEY: <span class="bcls-input">your API KEY</span></code></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h4>Beispielantwort</h4>
+  
+  <pre class="line-numbers">
+  <code class="language-json" translate="No">{
+      "account_id": "User account ID",
+      "beacon_set_id": "Beacon set ID",
+      "beacon_urls": [{
+        "beacon_type": "Load",
+        "beacon_url": "https://myserver.com/beaconRX2/load"
+    },
+    {
+      "beacon_type": "Play",
+      "beacon_url": "https://myserver.com/beaconRX2/play"
+    }]
+  }</code></pre>
+  
+  <h3>Beacon-Set löschen</h3>
+  
+  <p>Um schließlich ein Beacon-Set zu löschen, senden Sie a <code translate="No">DELETE</code> Anfrage:</p>
+  
+  <table class="bcls-table">
+    <tbody class="bcls-table__body">
+      <tr>
+        <th>Methode</th>
+        <td style="width:80em;"><code class="language-http" translate="No">DELETE</code></td>
+      </tr>
+      <tr>
+        <th>URL</th>
+        <td><code class="language-http" translate="No">https://api.bcovlive.io/v1/ssai/beaconsets/beaconset/<span class="bcls-input">beacon_set_id</span></code></td>
+      </tr>
+      <tr>
+        <th>Header</th>
+        <td><code class="language-http" translate="No">X-API-KEY: <span class="bcls-input">your API KEY</span></code></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <h4>Beispielantwort</h4>
+  
+  <p>Die Antwort wird wie folgt aussehen:</p>
+  
+  <pre class="line-numbers">
+  <code class="language-json" translate="No">{
+    "beacon_set_id": "Beacon set ID",
+    "deleted": true
+  }</code></pre>
+  </section>
+  
+  <section class="bcls-section">
+  <h2 id="Appendix">Anhang</h2>
+  
+  <p>Unten ist ein Screenshot, der ein Beispiel für ein Cue-Point-Setup für den Elemental-Encoder zeigt.</p>
+  
+  <figure class="bcls-figure"><img class="bcls-image" alt="Elemental Cue Point Setup" src="/assets/images/live-api/18835/elemental-screenshot.png" />
+  <figcaption class="bcls-caption--image">Elemental-Cue-Point-Setup</figcaption>
+  </figure>
+  </section>
+  {% endraw %}
+  </article>
+ 

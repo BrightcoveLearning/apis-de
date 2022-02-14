@@ -1,0 +1,185 @@
+---
+title: 'Live-API: Fehlermeldungen'
+description: In diesem Thema werden Fehlermeldungen aufgelistet, die von der Live-API zurückgegeben werden. Dies ist in Arbeit. Wenn Sie einen Fehler sehen, der hier nicht aufgeführt ist, informieren Sie das Learning Services-Team und wir werden ihn hinzufügen.
+parent: References 
+grandparent: Live API
+---
+ <h1>{{ page.title }}</h1>
+<article class="bcls-article">
+  <summary>{{ page.description }}</summary>
+
+<section class="bcls-section">
+<h2 id="error_message_reference">Fehlermeldungsreferenz</h2>
+
+<table class="bcls-table">
+  <caption class="bcls-caption--table">Live-API-Fehlermeldungen</caption>
+  <thead class="bcls-table__head">
+    <tr>
+      <th>Fehler</th>
+      <th>Beschreibung</th>
+      <th>Gilt für</th>
+      <th>Antworttext</th>
+    </tr>
+  </thead>
+  <tbody class="bcls-table__body">
+    <tr>
+      <td><code translate="No">400 BAD_REQUEST</code></td>
+      <td>Die <code translate="No">region </code> in der Anfrage angegeben ist nicht vorhanden oder wird nicht unterstützt</td>
+      <td>Live-Job erstellen</td>
+      <td>
+      
+<code class="language-json" translate="No">{
+"error": "Invalid region"
+}
+</code>
+
+      </td>
+    </tr>
+    <tr>
+      <td><code translate="No">400 BAD_REQUEST</code></td>
+      <td>Die Dauer des eingefügten Cue-Points muss mindestens die doppelte Länge der Segmente im Job betragen</td>
+      <td>Cue-Punkt einfügen</td>
+      <td>
+      
+<code class="language-json" translate="No">{
+  "error": "The parameter duration should be greater than or equal to (2 * target duration) of the job"
+}
+</code>
+    
+      </td>
+    </tr>
+    <tr>
+      <td><code translate="No">400 BAD_REQUEST</code></td>
+      <td>Der JSON enthält einen ungültigen Wert für einige Felder</td>
+      <td>Live-Job erstellen, VOD-Clip erstellen, Anzeigenkonfiguration erstellen/aktualisieren, Beacon-Set erstellen/aktualisieren, Slate aufnehmen, Beacon-Set erstellen</td>
+      <td>
+      
+<code class="language-json" translate="No">{
+"error": "Invalid input value"
+}
+</code>
+
+      </td>
+    </tr>
+    <tr>
+      <td><code translate="No">400 BAD_REQUEST</code></td>
+      <td>In der Benachrichtigungs-URL fehlt das Protokoll oder das Protokoll ist kein unterstützter Typ</td>
+      <td>Live-Job erstellen, VOD-Clip erstellen, Anzeigenkonfiguration erstellen/aktualisieren, Beacon-Set erstellen/aktualisieren, Slate aufnehmen, Beacon-Set erstellen</td>
+      <td>
+      
+<code class="language-json" translate="No">{
+"error": "The notification target type is not supported currently"
+}
+</code>
+
+      </td>
+    </tr>
+    <tr>
+      <td><code translate="No">400 BAD_REQUEST</code></td>
+      <td>Die Anzahl der zulässigen SEP-Jobs ist begrenzt. Sie erhalten diesen Fehler auch, wenn Sie einschließen <code translate="No">"channel_type": "24x7"</code> in der Auftragserstellungsanforderung und haben nur SEPs, keine Ereignisse gekauft.</td>
+      <td>Live-Job erstellen</td>
+      <td>
+      
+<code class="language-json" translate="No">{
+    "error": "You've reached the number of static entry points jobs you can create in this region for your account"
+}
+</code>
+
+      </td>
+    </tr>
+    <tr>
+      <td><code translate="No">400 BAD_REQUEST</code></td>
+      <td>Es sind nur 5 Aufträge im Wartezustand (Warten auf Anschluss eines Gebers) erlaubt. Um zusätzliche Jobs zu erstellen, müssen Sie einen Encoder mit einem der wartenden Jobs verbinden oder diesen abbrechen</td>
+      <td>Live-Job erstellen</td>
+      <td>
+      
+<code class="language-json" translate="No">{
+"error" : "You've reached the number of waiting jobs you can create for your account"
+}
+</code>
+
+      </td>
+    </tr>
+    <tr>
+      <td><code translate="No">400 BAD_REQUEST</code></td>
+      <td>Um VOD-Assets zu erstellen, müssen Sie unsere eigene Lieferung verwenden</td>
+      <td>Die wahrscheinlichste Ursache ist, dass Sie ein vollständiges VOD-Asset oder einen Clip in einem verschlüsselten Stream anfordern. VOD-Assets für verschlüsselte Streams werden nicht unterstützt</td>
+      <td>
+      
+<code class="language-json" translate="No">{
+"error": "The notification target type is not supported currently"
+}
+</code>
+
+      </td>
+    </tr>
+    <tr>
+      <td><code translate="No">401 UNAUTHORIZED</code></td>
+      <td>Die <code translate="No">X-API-KEY </code> Header wurde nicht mit der Anfrage gesendet oder der Schlüsselwert war ungültig</td>
+      <td>Alle Anfragen</td>
+      <td>
+      
+<code class="language-json" translate="No">{
+"message": "Unauthorized"
+}
+</code>
+
+      </td>
+    </tr>
+    <tr>
+      <td><code translate="No">404 RESOURCE_NOT_FOUND</code></td>
+      <td>Die Anfrage-URL war fehlerhaft</td>
+      <td>Alle Anfragen</td>
+      <td>
+      
+<code class="language-json" translate="No">{
+"message": "Unauthorized"
+}
+</code>
+
+      </td>
+    </tr>
+    <tr>
+      <td><code translate="No">500 INTERNAL_SERVER_ERROR</code></td>
+      <td>Sie haben versucht, einen bereits gestoppten Live-Job zu stoppen</td>
+      <td>Live-Job abbrechen</td>
+      <td>
+      
+<code class="language-json" translate="No">{
+"error": "After filtering, there is no job to process"
+}
+</code>
+
+      </td>
+    </tr>
+    <tr>
+      <td><code translate="No">500 INTERNAL_SERVER_ERROR</code></td>
+      <td>Sie haben eine Job- oder Asset-ID angegeben, die nicht existiert</td>
+      <td>Jobdetails abrufen, Live-Job abbrechen, SEP-Job aktivieren, Cuepoint einfügen, ID3-gezeitete Metadaten einfügen, VOD-Clip erstellen</td>
+      <td>
+      
+<code class="language-json" translate="No">{
+"error": "DB getItem, no results found"
+}
+</code>
+
+      </td>
+    </tr>
+    <tr>
+      <td><code translate="No">400 BAD_REQUEST</code></td>
+      <td>Die folgende Meldung wird angezeigt, wenn das Limit von 5 RTMP-Ausgaben pro Live-Job erreicht ist.
+      </td>
+      <td>RTMP-Ausgaben sind auf 5 Ausgaben pro Live-Job begrenzt</td>
+      <td>
+      
+<code class="language-json" translate="No">{ 
+  "error":"RTMP outputs limit reached, failed to add" 
+}
+</code>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+</section>
+</article>

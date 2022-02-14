@@ -1,0 +1,55 @@
+<section class="bcls-section" id="workingSample">
+  <h2>Generator für Videoberichte</h2>
+
+  <fieldset class="bcls-fieldset">
+    <legend>Eingang</legend>
+
+    <p>Wenn Sie keine Kontoinformationen eingeben, wird ein Brightcove-Beispielkonto verwendet.</p>
+
+    <p>Konto-ID: <input id="account_id" type="text" value="" placeholder="1752604059001" /></p>
+
+    <p>Kunden ID: <input id="client_id" type="text" size="60" value="" placeholder="c5d0a622-5479-46d8-8d8a-5f034b943fab" /></p>
+
+    <p>Client-Geheimnis: <input id="client_secret" type="text" size="60" value="" placeholder="w7NQYu0vUloM4GYYy2SXAxrvyFpt8fwI35qAFZcS13-VIgs0itwKNsAwHOS80sOWK" /></p>
+
+    <p>Videos zum Abrufen: <select name="videoCount" id="videoCount">
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+        <option value="500">500</option>
+        <option value="All">Alle</option>
+      </select></p>
+
+    <p>Startversatz: <input id="initial_offset" type="text" value="0" size="20" /><br>
+    (Setzen Sie dies auf die Anzahl der Videos, die Sie bereits abgerufen haben)</p>
+
+    <p>Berichtsformat: <select name="report_type" id="report_type">
+      <option value="json">JSON</option>
+      <option value="csv">CSV</option>
+    </select></p>
+
+    <aside class="bcls-aside bcls-aside--warning">Wenn Sie auswählen <code translate="No">All</code> , seien Sie bereit, eine Weile zu warten! Sie können den Bericht auch in Stapeln ausführen, indem Sie die oben genannte Offset-Option verwenden - dies wird für große Videobibliotheken empfohlen.</aside>
+
+    <p><button class="bcls-button" id="makeReport">Bericht erstellen</button></p>
+  </fieldset>
+
+  <fieldset class="bcls-fieldset">
+    <legend>Protokoll</legend>
+
+    <div id="logger" style="color:rgb(237, 104, 38)">
+      <p id="logText">Warte auf Eingabe...</p>
+    </div>
+
+    <p>Aktuelle API-Anfrage</p>
+
+    <pre class="line-numbers">
+<code id="apiRequest" class="language-http">API-Anfrage wird hier angezeigt...</code></pre>
+  </fieldset>
+</section>
+
+<section id="csvDisplay" class="bcls-section">
+  <h2>Bericht über ältere Videos</h2>
+
+  <p>Kopieren Sie die folgenden Daten, fügen Sie sie in eine leere Textdatei ein und speichern Sie sie mit der Erweiterung .csv. Anschließend können Sie die Datei öffnen, um sie in Ihrer Tabellenkalkulationsanwendung anzuzeigen.</p>
+  <textarea name="csvData" id="csvData" class="bcls-code" style="height:30em;"></textarea>
+</section>

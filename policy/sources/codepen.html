@@ -1,46 +1,46 @@
-﻿<fieldset><legend>Richtlinienschlüssel erstellen</legend>
+<fieldset><legend>Richtlinienschlüssel erstellen</legend>
 
   <p>Wenn Sie keine Kontoinformationen eingeben, wird ein Brightcove-Beispielkonto verwendet.</p>
 
-  <p>Weitere Informationen zu den Optionen für Richtlinienschlüssel finden Sie unter <a href="https://apis.support.brightcove.com/policy/getting-started/overview-policy-api.html">Übersicht über die Richtlinienschlüssel-API</a>.</p>
+  <p>Weitere Informationen zu den Optionen für Richtlinienschlüssel finden Sie im <a href="https://apis.support.brightcove.com/policy/getting-started/overview-policy-api.html">Übersicht über die Richtlinienschlüssel-API</a>.</p>
   
   <p>Konto-ID: <input id="account_id" type="text" value="" placeholder="1752604059001" /></p>
   
-  <p>Kunden-ID: <input id="client_id" type="text" size="60" value="" placeholder="c5d0a622-5479-46d8-8d8a-5f034b943fab" /></p>
+  <p>Kunden ID: <input id="client_id" type="text" size="60" value="" placeholder="c5d0a622-5479-46d8-8d8a-5f034b943fab" /></p>
   
-  <p>Geheimnis des Kunden: <input id="client_secret" type="text" size="60" value="" placeholder="w7NQYu0vUloM4GYYy2SXAxrvyFpt8fwI35qAFZcS13-VIgs0itwKNsAwHOS80sOWKJ1BUwHIvSFG2I" /></p>
+  <p>Client-Geheimnis: <input id="client_secret" type="text" size="60" value="" placeholder="w7NQYu0vUloM4GYYy2SXAxrvyFpt8fwI35qAFZcS13-VIgs0itwKNsAwHOS80sOWKJ1BUwHIvSFG2I" /></p>
     
-    <p><input type="checkbox" id="search_enabled" checked> <label for="search_enabled">Suchfähiger Richtlinienschlüssel?</label></p>
-    <p><input type="checkbox" id="restrict_domains"> <label for="restrict_domains">Domain-Einschränkungen hinzufügen?</label></p>
+    <p><input type="checkbox" id="search_enabled" checked> <label for="search_enabled">Richtlinienschlüssel mit aktivierter Suchfunktion?</label></p>
+    <p><input type="checkbox" id="restrict_domains"> <label for="restrict_domains">Domaineinschränkungen hinzufügen?</label></p>
     <div>
-      Geben Sie eine durch Kommas getrennte Liste der Domänen ein <strong>dürfen</strong> (<code translate="No">https://mysite.com,https://somesite.com</code>)
+      Geben Sie eine durch Kommas getrennte Liste von Domänen ein, die <strong>dürfen</strong> (<code translate="No">https://mysite.com,https://somesite.com</code>)
       <p>
         <input type="text" id="domain_list" size="60">
       </p>
     </div>
     <p><input type="checkbox" id="restrict_geo"> <label for="restrict_geo">Geobeschränkungen hinzufügen?</label></p>
     <div>
-      Geben Sie eine durch Kommas getrennte Liste von Länderabkürzungen ein (<code translate="No">us,usmil,pr,gu,vi,as,mp</code>)
+      Geben Sie eine durch Kommas getrennte Liste mit Länderabkürzungen ein (<code translate="No">us,usmil,pr,gu,vi,as,mp</code>)
       <p>
         <input type="text" id="country_list" size="60">
       </p>
-      <p><input type="checkbox" id="disallowed"> <label for="disallowed">Anzeigen <strong>nicht</strong> aus diesen Ländern erlaubt</label> (falls nicht markiert, ist das Anzeigen <strong>nur</strong> in diesen Ländern erlaubt)</p>
+      <p><input type="checkbox" id="disallowed"> <label for="disallowed">Ansehen <strong>nicht</strong> aus diesen Ländern erlaubt</label> (wenn nicht markiert, ist das Ansehen erlaubt <strong>nur</strong> in diesen Ländern)</p>
     </div>
-    <p><input type="checkbox" id="require_ssai"> <label for="require_ssai">Erfordert SSAI</label> (falls nicht markiert, ist das Anzeigen <strong>nur</strong> in diesen Ländern erlaubt)</p>
+    <p><input type="checkbox" id="require_ssai"> <label for="require_ssai">SSAI erforderlich</label> (wenn nicht markiert, ist das Ansehen erlaubt <strong>nur</strong> in diesen Ländern)</p>
   
-  <p><button class="bcls-button" id="generateKey" style="color:#eeeeee;font-weight:normal">Erstellen Sie den Richtlinienschlüssel</button></p>
+  <p><button class="bcls-button" id="generateKey" style="color:#eeeeee;font-weight:normal">Richtlinienschlüssel erstellen</button></p>
   
   <h4>API-Anfrage</h4>
   
   <pre class="line-numbers">
   <code id="apiRequest" class="language-http">Dies wird dynamisch ausgefüllt</code></pre>
   
-  <h4>Anfrage Body</h4>
+  <h4>Anfragetext</h4>
   
   <pre class="line-numbers">
   <code id="requestBody" class="language-json">Dies wird dynamisch ausgefüllt</code></pre>
 
-  <h4>Richtlinien-</h4>
+  <h4>Richtlinienschlüssel</h4>
     <textarea name="policy_key" id="policy_key" cols="100" rows="3"></textarea>
 
   <h4>Vollständige Antwort</h4>

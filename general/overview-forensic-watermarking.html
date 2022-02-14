@@ -1,0 +1,463 @@
+---
+title: 'Überblick: Forensische Wasserzeichen'
+description: "In diesem Thema erhalten Sie einen allgemeinen Überblick über die forensische Wasserzeichenfunktion von Brightcove."
+parent: Forensic Watermarking
+---
+ <h1>{{ page.title }}</h1>
+<article class="bcls-article">
+  <summary>{{ page.description }}</summary>
+
+  <section class="bcls-section">
+    <h2 id="Introduction">Einführung</h2>
+    <p>Brightcove hat eine Partnerschaft mit <a href="https://dtv.nagra.com/nexguard-forensic-watermarking">NAGRA</a> um forensische Wasserzeichen als Funktion in der Video Cloud-Plattform bereitzustellen. Dies trägt dazu bei, Ihre Premium-Inhalte vor Piraterie und unbefugtem Teilen von Inhalten zu schützen. Diese Funktion hilft auch, die Quelle eines Inhaltslecks schnell zu identifizieren, sodass Maßnahmen ergriffen werden können.</p>
+  </section>
+  <section class="bcls-section">
+    <h2 id="Setup">Aufstellen</h2>
+    <p>Die folgende Einrichtung ist erforderlich, um die forensische Wasserzeichenlösung von Brightcove zu unterstützen:</p>
+    <ol class="bcls-tasklist-restart">
+      <li>
+        Wenden Sie sich an Ihren Account Manager:
+        <ol>
+          <li>Stellen Sie sicher, dass Ihr Konto für Dynamic Delivery aktiviert ist.</li>
+          <li>Aktivieren Sie Ihr Konto für forensische Wasserzeichen; Dies ist ein kostenpflichtiges Add-on für Video Cloud.</li>
+        </ol>
+      </li>
+      <li>Holen Sie sich Ihren Lizenzschlüssel von <a href="https://dtv.nagra.com/nexguard-forensic-watermarking">NAGRA</a>.</li>
+      <li>Generieren Sie ein öffentlich-privates Schlüsselpaar, das vom Forensic Watermarking JWT verwendet und vom CDN entschlüsselt wird. (siehe unten)</li>
+      <li>Verwenden Sie das von NAGRA bereitgestellte Skript, um ein JSON-Webtoken (JWT) für das forensische Wasserzeichen zu generieren. Achten Sie darauf, zu verwalten, wie das forensische Wasserzeichen-Token und die einzelnen Viewer verknüpft sind. Sie werden es brauchen, wenn Sie <a href="#Configure_your_player">Konfigurieren Sie Ihre Spieler</a> und im Falle eines Erkennungsdienstes, um zu erfahren, welcher Zuschauer den Inhalt illegal durchgesickert hat.</li>
+    </ol>
+    <p>
+      Es gibt viele Möglichkeiten, das öffentlich-private Schlüsselpaar zu generieren. Hier sind einige Beispiele:
+    </p>
+    <h3>
+      Beispiel für ein Bash-Skript:
+    </h3>
+    <aside class="bcls-aside bcls-aside--information">Beachten Sie, dass das folgende Skript die <strong>jq</strong> Paket zum Parsen von JSON. Wenn Sie jq nicht installiert haben, lesen Sie die <a href="https://github.com/stedolan/jq/wiki/Installation">Installationsanleitung</a>.</aside>
+    <p>
+      Beispielskript zum Generieren des Schlüsselpaars:
+    </p>
+<pre class="line-numbers"><code class="language-bash" translate="No">#!/bin/bash
+set -euo pipefail
+
+NAME=${1:-}
+test -z "${NAME:-}" &amp;&amp; NAME="brightcove-forensic-watermarking-key-$(date +%s)"
+mkdir "$NAME"
+
+PRIVATE_PEM="./$NAME/private.pem"
+PUBLIC_PEM="./$NAME/public.pem"
+PUBLIC_TXT="./$NAME/public_key.txt"
+
+ssh-keygen -t rsa -b 2048 -m PEM -f "$PRIVATE_PEM" -q -N ""
+openssl rsa -in "$PRIVATE_PEM" -pubout -outform PEM -out "$PUBLIC_PEM" 2&gt;/dev/null
+openssl rsa -in "$PRIVATE_PEM" -pubout -outform DER | base64 &gt; "$PUBLIC_TXT"
+
+rm "$PRIVATE_PEM".pub
+
+echo "Public key to saved in $PUBLIC_TXT"
+</code></pre>
+    <p>
+      Führen Sie das Skript aus:
+    </p>
+    <pre><code class="language-bash" translate="No">$ bash keygen.sh
+</code></pre>
+
+    <details id="Example_using_Go">
+      <summary>Beispiel mit <span translate="No">gehen</span></summary>
+      <p>
+        Beispiel mit dem <span translate="No">gehen</span> Programmiersprache, um das Schlüsselpaar zu generieren:
+      </p>
+      <aside class="bcls-aside bcls-aside--tip">Wenn du neu bist <span translate="No">gehen</span> , siehe die <a href="https://golang.org/">Die <span translate="No">gehen</span> Programmiersprache</a> Startseite.</aside>
+<pre class="line-numbers"><code class="language-bash" translate="No">package main
+  
+  import (
+    "crypto/rand"
+    "crypto/rsa"
+    "crypto/x509"
+    "encoding/base64"
+    "encoding/pem"
+    "flag"
+    "fmt"
+    "io/ioutil"
+    "os"
+    "path"
+    "strconv"
+    "time"
+  )
+  
+  func main() {
+    var out string
+  
+    flag.StringVar(&amp;out, "output-dir", "", "Output directory to write files into")
+    flag.Parse()
+  
+    if out == "" {
+      out = "rsa-key_" + strconv.FormatInt(time.Now().Unix(), 10)
+    }
+  
+    if err := os.MkdirAll(out, os.ModePerm); err != nil {
+      panic(err.Error())
+    }
+  
+    priv, err := rsa.GenerateKey(rand.Reader, 2048)
+    if err != nil {
+      panic(err.Error())
+    }
+  
+    privBytes := x509.MarshalPKCS1PrivateKey(priv)
+  
+    pubBytes, err := x509.MarshalPKIXPublicKey(priv.Public())
+    if err != nil {
+      panic(err.Error())
+    }
+  
+    privOut, err := os.OpenFile(path.Join(out, "private.pem"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+    if err != nil {
+      panic(err.Error())
+    }
+  
+    if err := pem.Encode(privOut, &amp;pem.Block{Type: "RSA PRIVATE KEY", Bytes: privBytes}); err != nil {
+      panic(err.Error())
+    }
+  
+    pubOut, err := os.OpenFile(path.Join(out, "public.pem"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+    if err != nil {
+      panic(err.Error())
+    }
+  
+    if err := pem.Encode(pubOut, &amp;pem.Block{Type: "PUBLIC KEY", Bytes: pubBytes}); err != nil {
+      panic(err.Error())
+    }
+  
+    var pubEnc = base64.StdEncoding.EncodeToString(pubBytes)
+  
+    var pubEncOut = path.Join(out, "public_key.txt")
+    if err := ioutil.WriteFile(pubEncOut, []byte(pubEnc+"\n"), 0600); err != nil {
+      panic(err.Error())
+    }
+  
+    fmt.Println("Public key saved in " + pubEncOut)
+  }
+  </code></pre>
+    </details>
+    <br>
+
+    <details id="Example_using_node_js">
+      <summary>Beispiel mit node.js</summary>
+      <p>
+        Beispiel mit node.js zum Generieren des Schlüsselpaars:
+      </p>
+      <aside class="bcls-aside bcls-aside--tip">Dieses Skriptbeispiel erfordert Knotenversion 11 oder höher.</aside>
+  <pre class="line-numbers"><code class="language-javascript" translate="No">var crypto = require("crypto");
+  var fs = require("fs");
+  
+  var now = Math.floor(new Date() / 1000);
+  var dir = "rsa-key_" + now;
+  fs.mkdirSync(dir);
+  
+  crypto.generateKeyPair(
+    "rsa",
+    {modulusLength: 2048},
+    (err, publicKey, privateKey) =&gt; {
+      fs.writeFile(
+        dir + "/public.pem",
+        publicKey.export({ type: "spki", format: "pem" }),
+        err =&gt; {}
+      );
+      fs.writeFile(
+        dir + "/public_key.txt",
+        publicKey.export({ type: "spki", format: "der" }).toString("base64") +
+          "\n",
+        err =&gt; {}
+      );
+      fs.writeFile(
+        dir + "/private.pem",
+        privateKey.export({ type: "pkcs1", format: "pem" }),
+        err =&gt; {}
+      );
+    }
+  );
+  
+  console.log("Public key saved in " + dir + "/public_key.txt");</code></pre>
+    </details>
+
+  </section>
+  <section class="bcls-section">
+    <h2 id="Implementation">Implementierung</h2>
+    <p>Sie können das forensische Wasserzeichen entweder mit Video Cloud Studio implementieren oder dies manuell mithilfe der Brightcove-APIs tun. Die Methoden werden in den folgenden Abschnitten detailliert beschrieben.</p>
+  </section>
+  <section class="bcls-section"></section>
+    <h2 id="Video_Cloud_Studio">Video Cloud Studio</h2>
+    <p>Führen Sie diese Schritte aus, um das forensische Wasserzeichen mit Video Cloud Studio zu verwenden:</p>
+    <ol class="bcls-tasklist-restart">
+      <li>
+        <p>Forensisches Wasserzeichen ist nicht mit einem bestimmten Aufnahmeprofil verknüpft. Sie können jedes Dynamic Delivery- oder Context Aware Encoding-Profil verwenden.</p>
+        <ol>
+          <li>Stellen Sie Brightcove Ihren NAGRA-Lizenzschlüssel zur Verfügung. Dieser Lizenzschlüssel wird während der Transcodierung verwendet, um das Wasserzeichen zu generieren.</li>
+          <li>In dem <strong>Hochladen</strong> Wählen Sie Ihr Aufnahmeprofil aus.</li>
+          <li>
+            <p>Überprüf den <strong>Forensisches Wasserzeichen aktivieren</strong> Möglichkeit.</p>
+            <figure class="bcls-figure"><img class="bcls-image--no-border" alt="Enable watermarking option" src="/assets/images/general/forensic-watermarking/enable-watermarking.png" />
+              <figcaption class="bcls-caption--image">Option für Wasserzeichen aktivieren</figcaption>
+              </figure> 
+          </li>
+          <li>
+          Tag hinzufügen <code translate="No">watermarked</code> zum Video, da dies die Identifizierung der Videos mit forensischen Wasserzeichen erheblich erleichtert und <a href="#Analytics_reports">Erstellen Sie Analyseberichte über sie</a>:
+          <figure class="bcls-figure">
+            <img class="bcls-image" src="/assets/images/general/forensic-watermarking/add-tag.png" alt="Add Tag">
+            <figcaption class="bcls-caption--image">Tag hinzufügen</figcaption>
+          </figure>
+          </li>
+          <li>
+            <p>Ziehen oder suchen Sie nach Ihrem Video, um die Aufnahme zu starten.</p>
+            <aside class="bcls-aside bcls-aside--information">Sie können die Videos, die Sie mit einem Wasserzeichen versehen möchten, aufnehmen oder erneut transkodieren.</aside>
+          </li>
+        </ol>
+      </li>
+      <!-- <li>In the <strong>Media</strong> module, you can enable/disable your videos for watermarking.</li> -->
+      <li id="Configure_your_player">
+        <p>Konfigurieren Sie Ihren Player.</p>
+        <p>Hier übergibst du dem Spieler den NAGRA-Wasserzeichen-Token und die Viewer-ID. Sie können entweder den Brightcove-Webplayer oder die nativen SDK-Player verwenden:</p>
+        <ul>
+          <li><a href="https://player.support.brightcove.com/playback/forensic-watermarking-with-bcp.html">Forensische Wasserzeichen mit Brightcove Player</a></li>
+          <li><a href="https://sdks.support.brightcove.com/features/forensic-watermarking-with-sdks.html">Forensisches Wasserzeichen mit den nativen SDKs</a></li>
+          <!-- <li><a href="https://live.support.brightcove.com/general/forensic-watermarking-live.html">Forensic Watermarking with Live Streams</a></li> -->
+        </ul>
+      </li>
+      <li>Spielen Sie Inhalte ab, die für Forensic Watermarking aufgenommen wurden.</li>
+    </ol>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="Analytics_reports">Analytics-Berichte</h2>
+    <p>Analyseberichte zu Zuschauern für forensische Videos mit Wasserzeichen sind über das <a href="/analytics/index.html">Analytics-API</a> nur. Berichte können im JSON-, CSV- oder XLXS-Format zurückgegeben werden</p>
+    <p>In den Analytics-Daten:</p>
+    <pre><code translate="no">1 Transaktion = 1 eindeutiger Betrachter pro Video in 24 Stunden</code></pre>
+    <aside class="bcls-aside bcls-aside--information language-editable">Beachten Sie, dass einige der unten aufgeführten Beispiele davon ausgehen, dass Sie das Tag hinzugefügt haben <code translate="No">watermarked</code> zu Ihren Videos mit forensischen Wasserzeichen. Wenn nicht, müssen Sie Ihre Anfragen mit a . filtern <code translate="No">where=video=={video_id}</code> filtern (wie im ersten Beispiel).</aside>
+    <h3>Beispiel 1: Zuschauer für ein Video nach Datum</h3>
+    <p>Für dieses Beispiel fragen wir die <code translate="No">video</code> , <code translate="No">viewer</code> und <code translate="No">date</code> Dimensionen und erhalten Sie den Bericht im CSV-Format zurück.</p>
+    <h4>Musteranfrage</h4>
+<pre><code class="language-http" translate="No">https://analytics.api.brightcove.com/v1/data?accounts=4800266849001&from=2021-06-23&to=2021-06-25&dimensions=date,viewer&limit=10&where=video==70702952720202&fields=video,viewer,video_view&format=csv</code></pre>
+    <h4>Antwort</h4>
+<pre><code class="language-csv" translate="No">"date","video","viewer","video_view"
+"2021-06-25","70702952720202","3f46037f932b0c5a","1"
+"2021-06-24","70702952720202","3f46037f932b0c5a","2"</code></pre>
+<p>Notiere dass der <code translate="No">viewer</code> wird vom Brightcove-Player generiert und auf eine eindeutige Zeichenfolge basierend auf Benutzeragent und IP festgelegt. Idealerweise sollten Sie die Viewer-ID selbst basierend auf einer Anmelde-ID festlegen - siehe <a href="https://player.support.brightcove.com/playback/xdr-with-bcplayer.html#Set_the_user_identifier">dieses Thema</a> für Informationen, wie das geht. Ihre Kennung basiert auf Informationen, die über JavaScript abgerufen werden können.</p>
+    <h3>Beispiel 2: Zuschauerzahl</h3>
+    <p>In diesem Beispiel gehen wir davon aus, dass alle Videos mit forensischen Wasserzeichen das Tag . haben <code translate="No">watermarked</code>. Wir werden das nochmal abfragen <code translate="No">video</code> , <code translate="No">viewer</code> und <code translate="No">date</code> Abmessungen und senden Sie einfach einen Artikel zurück, da es die Zusammenfassung ist, die uns hier interessiert:</p>
+    <h4>Musteranfrage</h4>
+<pre><code class="language-http" translate="No">https://analytics.api.brightcove.com/v1/data?accounts=4800266849001&from=2021-06-23&to=2021-06-25&dimensions=date,viewer&limit=1&where=video.q==tags:watermarked</code></pre>
+    <h4>Antwort</h4>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "item_count": 7,
+  "items": [
+    {
+      "date": "2021-06-25",
+      "viewer": "07B1489C-5786-400E-945B-ABB3559B3897",
+      "video_view": 1
+    }
+  ],
+  "summary": {
+    "video_view": 25
+  }
+}</code></pre>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="APIs">APIs</h2>
+    <p>Hier sind die APIs und Felder im Zusammenhang mit Forensic Watermarking:</p>
+    <h3><a href="/dynamic-ingest/index.html">Dynamische Aufnahme-API</a></h3>
+    <p>Sobald ein Konto für forensische Wasserzeichen aktiviert ist, können Sie einem Video forensische Wasserzeichen hinzufügen, indem Sie die <code translate="No">forensic_watermarking</code> Feld für Ihre Aufnahmeanfrage und setzen Sie es auf <code translate="No">true</code>. Dies kann für die ursprüngliche Aufnahme, Ersetzung oder Neutranscodierung des Videos erfolgen.</p>
+    <h4>Beispielanfragetext</h4>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "master": {
+          "url": "http://solutions.brightcove.com/video/Walking_Dead_609.mp4",
+          "audio_tracks": [
+              {
+                  "language": "en",
+                  "variant": "main"
+              }
+          ]
+      },
+    "profile": "multi-platform-standard-static-with-mp4",
+    <span class="bc-highlight">"forensic_watermarking": true,</span>
+    "capture-images": true
+}</code></pre>
+    <p>Da ist auch ein <code translate="No">forensic_watermarking_stub_mode</code> Flag, das, wenn es auf gesetzt ist, <code translate="No">true</code> erzeugt sichtbare forensische Wasserzeichen:</p>
+    <figure class="bcls-figure">
+      <img class="bcls-image" src="/assets/images/general/forensic-watermarking/visible-watermarks.png" alt="Visible Forensic Watermarks">
+      <figcaption class="bcls-caption--image">Sichtbare forensische Wasserzeichen</figcaption>
+    </figure>
+    <aside class="bcls-aside bcls-aside--information language-editable">Beachten Sie, dass <code translate="No">forensic_watermarking_stub_mode</code> kann nur über die Dynamic Ingest API festgelegt werden. Sie können es nicht mit dem Upload-Modul einstellen.</aside>
+    <p><code translate="No">forensic_watermarking</code> muss auch eingestellt werden auf <code translate="no">wahr</code> um sichtbare Wasserzeichen zu aktivieren.</p>
+    <p>Verwenden Sie sichtbare Wasserzeichen in einem Video, um Integrationen zu testen (Sie sollten mit einem Video von mindestens 10 Minuten Länge testen). Sobald Sie überprüft haben, dass die forensischen Wasserzeichen vorhanden sind, sollten Sie sie entfernen, damit nur noch unsichtbare forensische Wasserzeichen vorhanden sind. Dazu müssen Sie eine weitere Dynamic Ingest-Anfrage senden, um das Video neu zu transcodieren, diesmal die Einstellung <code translate="No">forensic_watermarking_stub_mode</code> zu <code translate="No">false</code>.</p>
+    <h4>Beispielanforderungstext für sichtbare forensische Wasserzeichen</h4>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "master": {
+          "url": "http://solutions.brightcove.com/video/Walking_Dead_609.mp4",
+          "audio_tracks": [
+              {
+                  "language": "en",
+                  "variant": "main"
+              }
+          ]
+      },
+    "profile": "multi-platform-standard-static-with-mp4",
+    <span class="bc-highlight">"forensic_watermarking": true,</span>
+    <span class="bc-highlight">"forensic_watermarking_stub_mode": true,</span>
+    "capture-images": true
+}</code></pre>
+    <h4>Beispiel für den Anfragetext zum Entfernen sichtbarer forensischer Wasserzeichen</h4>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+    "profile": "multi-platform-standard-static-with-mp4",
+    <span class="bc-highlight">"forensic_watermarking": true,</span>
+    <span class="bc-highlight">"forensic_watermarking_stub_mode": false,</span>
+    "capture-images": true
+}</code></pre>
+    
+    <h3><a href="/cms/index.html">CMS-API</a></h3>
+    <p>Standardmäßig werden forensische Wasserzeichen-Darstellungen geliefert, wenn während der Aufnahme ein forensisches Wasserzeichen angefordert wurde. Das Vorhandensein von forensischen Wasserzeichen wird durch das schreibgeschützte Feld angezeigt <code translate="No">forensic_watermarking</code>. Wenn das Feld einen Wert von hat <code translate="No">ACTIVE</code> , wurde das forensische Wasserzeichen zu VOD hinzugefügt. Wenn das Feld einen Wert von hat <code translate="No">UNAVAILABLE</code> oder <code translate="No">null</code> , hat das VOD kein forensisches Wasserzeichen.</p>
+      
+      <!-- <p>You can disable this using a video update request to the CMS API and setting <code translate="No">forensic_watermarking</code> to <code translate="No">INACTIVE</code>. To enable delivery of forensic watermarked renditions again, send another update request setting <code translate="No">forensic_watermarking</code> to <code translate="No">ACTIVE</code>.</p>
+    <p>For accounts not enable for forensic watermarking, <code translate="No">forensic_watermarking</code> will be <code translate="No">null</code> and not included in API responses</p>
+    <h4>Sample request body</h4>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "forensic_watermarking": "INACTIVE"
+}</code></pre> -->
+
+    <h3>Wiedergabe-API</h3>
+    <p>Die GET-Videoantworten der Playback API enthalten außerdem a <code translate="No">forensic_watermarking</code> (wenn das Konto für forensische Wasserzeichen aktiviert ist). Wenn der Wert ist <code translate="No">ACTIVE</code> , werden Wiedergaben mit forensischen Wasserzeichen als Quellen an den Player geliefert. Andernfalls werden Wiedergaben ohne Wasserzeichen geliefert.</p>
+    <h3>Zencoder<a href="https://zencoder.support.brightcove.com/index.html"></a></h3>
+      <p>Um in Zencoder Ausgaben mit forensischem Wasserzeichen zu generieren, müssen Sie 2 Ausgaben pro Video angeben, eine mit <code translate="no">"forensic_watermark": "EIN"</code> und das andere mit <code translate="no">"forensic_watermark": "B"</code> (Dies sind die einzigen beiden Werte, die <code translate="no">forensisches_Wasserzeichen</code> Feld haben kann).</p>
+      <h4>Musteranfrage (nur Ausgaben)</h4>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "outputs": [
+      {
+          "base_url": "s3://urlTest",
+          "filename": "contextAwareEncoding1_A.m4f",
+          "public": false,
+          "format": "m4f",
+          "label": "m4f-contextAwareEncoding1-A-b30e1",
+          "generate_mp4_atom_map": true,
+          "Mp4_atom_map_filename": "contextAwareEncod-A-atom_map.json",
+          "skip_audio": true,
+          <span class="bc-highlight">"forensic_watermark": "A"</span>,
+          "dynamic_profile_rendition": 1,
+          "skip": {
+              "require_video": true
+          },
+          "fragment_duration": 2000,
+          "segment_seconds": 2,
+          "headers": {
+              "x-amz-server-side-encryption": "AES256"
+          }
+      },
+      {         
+          "base_url": "s3://urlTest",
+          "filename": "contextAwareEncoding1_B.m4f",
+          "public": false,
+          "format": "m4f",
+          "label": "m4f-contextAwareEncoding1-B-e348",
+          "generate_mp4_atom_map": true,
+          "mp4_atom_map_filename": "contextAwareEncod-B-atom_map.json",
+          "skip_audio": true,
+          <span class="bc-highlight">"forensic_watermark": "B"</span>,
+          "dynamic_profile_rendition": 1,
+          "skip": {
+              "require_video": true
+          },
+          "fragment_duration": 2000,
+          "segment_seconds": 2,
+          "headers": {
+              "x-amz-server-side-encryption": "AES256"
+          }
+      }
+  ]
+}</code></pre>
+    <h4>Sichtbare Wasserzeichen zum Testen</h4>
+    <p>Zu Testzwecken, um zu überprüfen, ob forensische Wasserzeichen vorhanden sind, können Sie sichtbare forensische Wasserzeichen erzwingen, indem Sie hinzufügen <code translate="No">"forensic_watermark_stub_mode":true</code> zu Ausgängen, wie im Beispiel unten gezeigt:</p>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "outputs": [
+      {
+          "base_url": "s3://urlTest",
+          "filename": "contextAwareEncoding1_A.m4f",
+          "public": false,
+          "format": "m4f",
+          "label": "m4f-contextAwareEncoding1-A-b30e1",
+          "generate_mp4_atom_map": true,
+          "Mp4_atom_map_filename": "contextAwareEncod-A-atom_map.json",
+          "skip_audio": true,
+          <span class="bc-highlight">"forensic_watermark": "A"</span>,
+          <span class="bc-highlight">"forensic_watermark_stub_mode":true</span>,
+          "dynamic_profile_rendition": 1,
+          "skip": {
+              "require_video": true
+          },
+          "fragment_duration": 2000,
+          "segment_seconds": 2,
+          "headers": {
+              "x-amz-server-side-encryption": "AES256"
+          }
+      },
+      {         
+          "base_url": "s3://urlTest",
+          "filename": "contextAwareEncoding1_B.m4f",
+          "public": false,
+          "format": "m4f",
+          "label": "m4f-contextAwareEncoding1-B-e348",
+          "generate_mp4_atom_map": true,
+          "mp4_atom_map_filename": "contextAwareEncod-B-atom_map.json",
+          "skip_audio": true,
+          <span class="bc-highlight">"forensic_watermark": "B"</span>,
+          <span class="bc-highlight">"forensic_watermark_stub_mode":true</span>,
+          "dynamic_profile_rendition": 1,
+          "skip": {
+              "require_video": true
+          },
+          "fragment_duration": 2000,
+          "segment_seconds": 2,
+          "headers": {
+              "x-amz-server-side-encryption": "AES256"
+          }
+      }
+  ]
+}</code></pre>
+  </section>
+  <section class="bcls-section">
+    <h2 id="supported_features">Unterstützte Funktionen</h2>
+    <ul>
+      <li>DRM</li>
+      <li>Wiedergabebeschränkungen</li>
+      <li>Neu-Transcodierung</li>
+      <li>Quelldatei ersetzen</li>
+      <li>CAE</li>
+      <li>Offline-Download</li>
+      <li>Chromecast</li>
+      <li>Luftspiel</li>
+    </ul>
+
+  </section>
+  <section class="bcls-section">
+    <h2 id="Limitations">Einschränkungen</h2>
+    <ul>
+      <li>Derzeit wird nur VOD unterstützt. Forensische Wasserzeichen für Livestreams werden nicht unterstützt.</li>
+      <li>Videos müssen mindestens fünf Minuten lang sein, damit forensische Wasserzeichen angebracht werden.</li>
+      <li>HLSv7 wird nicht unterstützt. HLSv7 wird verwendet, um HEVC, gemischte Codecs und 5.1-Audio bereitzustellen. Daher werden HEVC, gemischte Codec-Videos und 5.1-Audio derzeit nicht unterstützt.</li>
+      <li>Verschlüsselte HLS-Videos (HLSe) werden derzeit nicht unterstützt.</li>
+      <li>Diese Funktion erfordert einen NAGRA-Lizenzschlüssel.</li>
+      <li>Die Spieler benötigen ein forensisches Wasserzeichen-JWT, das Sie mit einem von der NAGRA bereitgestellten Skript erstellen.</li>
+      <li><a href="/delivery-rules/index.html">Lieferregeln</a> kann nicht mit Playern verwendet werden, die zum Bereitstellen von Videos mit forensischen Wasserzeichen verwendet werden.</li>
+      <li>Sie müssen das CDN von Brightcove verwenden. BYO-CDN wird nicht unterstützt.</li>
+      <!-- <li>You are responsible for generating and managing the tokens used to identify each viewer.</li> -->
+      <li>Brightcove übernimmt keine Erkennungsanalyse. Wenden Sie sich hierzu an die NAGRA.</li>
+    </ul>
+  </section>
+  <section class="bcls-section">
+    <h2 id="related_topics">Verwandte Themen</h2>
+    <ul>
+      <li><a href="https://player.support.brightcove.com/playback/forensic-watermarking-with-bcp.html">Forensische Wasserzeichen mit Brightcove Player</a></li>
+      <li><a href="https://sdks.support.brightcove.com/features/forensic-watermarking-with-sdks.html">Forensisches Wasserzeichen mit den nativen SDKs</a></li>
+      <li>Zencoder:<a href="https://zencoder.support.brightcove.com/encoding-guides/forensic-watermarking.html"> Forensische Wasserzeichen</a></li>
+      <li>Zencoder:<a href="https://zencoder.support.brightcove.com/encoding-settings/content-protection/encoding-settings-forensic-watermarking.html"> Forensische Wasserzeicheneinstellungen</a></li>
+    </ul>
+  </section>
+</article>

@@ -1,0 +1,58 @@
+---
+title: 'Überblick: In-Page-Erlebnis-API'
+description: 'Dieses Thema bietet einen Überblick über die In-Page Experiences API.'
+parent: Getting Started 
+grandparent: In-Page Experience API
+---
+ <h1>{{ page.title }}</h1>
+<article class="bcls-article">
+  <summary>{{ page.description }}</summary>
+  <section class="bcls-section">
+    <h2 id="Introduction">Einführung</h2>
+    <p>Mit In-Page-Erlebnissen sind zwei APIs verbunden, die jedoch für sehr unterschiedliche Zwecke verwendet werden:</p>
+    <dl>
+      <dt>In-Page-Erlebnisse-API (REST)</dt>
+      <dd>
+        <p>Die In-Page-Erlebnisse-API ist eine REST-API, mit der Sie In-Page-Erlebnisse programmgesteuert verwalten können. Es ist in erster Linie für die Integration der Video Cloud-Plattform in Ihre CMS-Anwendung vorgesehen.</p>
+        <p>Sehen Sie auch die vollständige <a href="/ipx/references/reference.html">API-Referenz</a> für vollständige Details der verfügbaren Anfragen.</p>
+      </dd>
+      <dt>In-Page-Erfahrungen-Client-API</dt>
+      <dd>
+        <p>Die Client-API für In-Page-Erfahrungen ist eine JavaScript-Bibliothek, mit der Sie das Verhalten der In-Page-Erfahrung zur Laufzeit verwalten können, ähnlich wie die Brightcove Player-API zum Steuern des Verhaltens des Players verwendet wird. Die API ist auf jeder Seite verfügbar, auf der eine oder mehrere eingebettete Brightcove-Erlebnisse ausgeführt werden. Siehe die <a href="https://gallery.support.brightcove.com/develop/overview-page-experience-client-api.html">Überblick: In-Page-Experience-Client-API</a> für mehr Informationen.</p>
+      </dd>
+    </dl>
+    <p>Der Rest dieser Übersicht befasst sich mit der REST-API zur Verwaltung Ihrer In-Page-Erlebnisse im Backend.</p>
+    <p>Eine allgemeine Einführung in In-Page-Erlebnisse finden Sie unter <a href="https://gallery.support.brightcove.com/experiences/inpage/overview-creating-editing-and-publishing-page-experiences.html">Überblick: Erstellen, Bearbeiten und Veröffentlichen von In-Page-Erlebnissen</a>.</p>
+    <p>Die folgenden Abschnitte bieten einen Überblick über die 4 Gruppen von REST-API-Anfragen:</p>
+    <ul>
+      <li><a href="#experiences">Erfahrungen</a></li>
+      <li><a href="#templates">Vorlagen</a></li>
+      <li><a href="#themes">Themen</a></li>
+      <li><a href="#fonts">Schriftarten</a></li>
+    </ul>
+  </section>
+  <section class="bcls-section">
+    <h2 id="experiences">Erfahrungen</h2>
+    <p>Anfragen für Erfahrungen lassen sich in drei Unterkategorien einteilen:</p>
+    <dl>
+      <dt>Erfahrungen verwalten</dt>
+      <dd>Mit diesen Anfragen erhalten Sie eine Liste aller Erlebnisse für das Konto. Sie können auch eine neue Erfahrung erstellen und eine bestimmte Erfahrung abrufen, aktualisieren oder löschen. Schließlich können Sie ein Erlebnis duplizieren, um einen Ausgangspunkt für ein neues Erlebnis zu schaffen.</dd>
+      <dt>Erfahrungen veröffentlichen/veröffentlichen</dt>
+      <dd>Diese fordert alle auf, eine Liste aller Vorlagen für das Konto oder eine bestimmte Vorlage zu erhalten.</dd>
+      <dt>Status für Live-Erlebnisse verwalten</dt>
+      <dd>Mit diesen beiden Anfragen können Sie entweder den aktuellen Status einer Live-Erfahrung abrufen oder diesen Status ändern (von <code translate="No">preEvent </code> zu <code translate="No">live</code> , zum Beispiel).</dd>
+    </dl>
+  </section>
+  <section class="bcls-section">
+    <h2 id="templates">Vorlagen</h2>
+    <p>Vorlagen steuern das allgemeine Erscheinungsbild einer Erfahrung. Benutzerdefinierte Vorlagen können nicht erstellt werden, es gibt jedoch mehrere Standardvorlagen und im Laufe der Zeit können weitere hinzugefügt werden. Mit der API können Sie eine Liste der für Ihr Konto verfügbaren Vorlagen abrufen oder eine bestimmte Vorlage abrufen.</p>
+  </section>
+  <section class="bcls-section">
+    <h2 id="themes">Themen</h2>
+    <p>Mit Designs können Sie eine Vorlage anpassen, um das gewünschte Erscheinungsbild für Ihre Erfahrung zu erstellen. Die API bietet Methoden, um Ihre Themen vollständig zu verwalten, zu erstellen, zu erhalten, zu aktualisieren oder zu löschen.</p>
+  </section>
+  <section class="bcls-section">
+    <h2 id="fonts">Schriftarten</h2>
+    <p>Sie können Ihre eigenen Schriftarten verwenden. Mit diesen Methoden können Sie Schriftarten hinzufügen, aktualisieren, abrufen oder löschen. Dies sind Webfonts, die über CSS geladen werden.</p>
+  </section>
+</article>

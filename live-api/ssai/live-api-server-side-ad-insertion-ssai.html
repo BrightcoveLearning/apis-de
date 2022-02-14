@@ -1,0 +1,658 @@
+---
+title: 'Brightcove Live-API: Serverseitige Anzeigeneinfügung (SSAI)'
+description: In diesem Thema erfahren Sie, wie Sie die serverseitige Anzeigeneinfügung (SSAI) für Ihre Livestream-Jobs einrichten.
+parent: SSAI 
+grandparent: Live API
+---
+ <h1>{{ page.title }}</h1>
+<article class="bcls-article">
+  <summary>{{ page.description }}</summary>
+
+  {% raw %}
+<section class="bcls-section">
+<h2 id="Overview">Überblick</h2>
+
+<p><span translate="No">SSAI</span> ermöglicht Ihnen die Anzeige von Anzeigen während eines Live-Streaming-Ereignisses zu bestimmten Zeiten. Zu den Hauptmerkmalen gehören:</p>
+
+<ul>
+	<li>Fügen Sie Anzeigen mit Cue-Points ein, die von Ihrem Encoder gesendet werden, oder erstellen Sie einen Instant-Cue-Point mit dem <span translate="No">Live-API</span></li>
+	<li>Nehmen Sie "Slate"-Assets auf, um ungenutzte Anzeigenzeit zu füllen</li>
+	<li>Vermeiden Sie Werbeblocker mit Anzeigen, die serverseitig in den Livestream eingebunden werden</li>
+</ul>
+
+<aside class="bcls-aside bcls-aside--information">
+  <ul>
+    <li>Bevor Sie es verwenden können <span translate="No">SSAI</span> , muss es für Ihr Konto aktiviert sein. Weitere Informationen erhalten Sie von Ihrem Account Manager.</li>
+    <li>Beachten Sie, dass SSAI die vom Livestream verwendete Origin-Bandbreite erhöht. Wenn Anzeigen geliefert werden, sind die HLS-Manifeste für jede Betrachtersitzung eindeutig und können daher nicht zwischengespeichert werden, sondern werden stattdessen für jeden Betrachter vom Ursprung angefordert. Wenn auch DVR aktiviert ist, erhöht dies die Größe der nicht zwischengespeicherten Manifeste erheblich.</li>
+ </ul>
+
+
+</aside>
+
+<p>Gehen Sie wie folgt vor, um einen Livestream mit serverseitigen Anzeigen zu erstellen:</p>
+
+<ol class="bcls-tasklist-restart">
+	<li><a href="#General_information">Lesen Sie die allgemeinen Informationen zur Live-API</a></li>
+	<li><a href="#Create_an_ad_configuration">Erstellen Sie eine Live-Anzeigenkonfiguration</a>. Sie können dies auch in <a href="https://studio.support.brightcove.com/admin/configuring-server-side-ad-settings.html#bc-ipnav-1">Video Cloud Studio</a>. Weitere Informationen zur Verwaltung Ihrer Anzeigenkonfigurationen mit der Live-API finden Sie in den folgenden Abschnitten.</li>
+	<li><a href="#Managing_slates">Slate-Assets erstellen</a>. Wenn Sie eine Benutzeroberfläche bevorzugen, können Sie <a href="https://live.support.brightcove.com/live-module/implementing-server-side-ads-live-module.html#fill_slate">Schiefertafeln in Studio verwalten</a>.</li>
+	<li>Optional: <a href="/live-api/ssai/live-api-cue-points-and-ad-beacons-ssai.html">Cue-Points und Werbe-Beacons einfügen</a>.</li>
+	<li>Jetzt bist du bereit zu <a href="/live-api/getting-started/quick-start-create-live-stream-using-brightcove-live-api.html">Erstellen Sie einen Live-Stream mit der Live-API</a>. Wenn Sie Studio bevorzugen, können Sie <a href="https://live.support.brightcove.com/live-module/implementing-server-side-ads-live-module.html">serverseitige Anzeigen im Live-Modul implementieren</a></li>
+</ol>
+
+<p>Weitere Informationen zu benutzerdefinierten Headern, Anzeigenkonfigurationsvariablen und der Verwendung von DFP und Anzeigenmakros finden Sie im Rest dieses Dokuments.</p>
+</section>
+
+<section class="bcls-section">
+<h2 id="General_information">Allgemeine Information</h2>
+
+<p>Die folgenden Informationen beziehen sich auf alle Live-APIs mit SSAI-Anfragen.</p>
+
+<h3>Basis-URL</h3>
+
+<p>Die Basis-URL für die Live-API mit SSAI lautet:</p>
+
+<pre>
+    <code class="language-http" translate="No">https://api.bcovlive.io/v1/ssai</code></pre>
+
+<h3>Authentifizierung</h3>
+
+<p>Die Authentifizierung für Anfragen erfordert einen Header mit einem API-Schlüssel:</p>
+
+<pre class="line-numbers">
+    <code class="language-http" translate="No">X-API-KEY: <span class="bcls-input">your API KEY</span>
+    </code></pre>
+
+<p>Wenden Sie sich an Ihren Account Manager, um einen mit Ihrem Account verknüpften API-Schlüssel zu erhalten.</p>
+</section>
+
+<section class="bcls-section">
+<h2 id="Create_an_ad_configuration">Erstellen Sie eine Anzeigenkonfiguration</h2>
+
+<p>Um eine neue Anzeigenkonfiguration zu erstellen, senden Sie eine <code translate="No">POST</code> wie folgt anfordern:</p>
+
+<table class="bcls-table">
+	<tbody class="bcls-table__body">
+		<tr>
+			<th>Methode</th>
+			<td style="width:80em;"><code class="language-http" translate="No">POST</code></td>
+		</tr>
+		<tr>
+			<th>URL</th>
+			<td><code class="language-http" translate="No">https://api.bcovlive.io/v1/ssai/applications</code></td>
+		</tr>
+		<tr>
+			<th>Header</th>
+			<td><code class="language-http" translate="No">X-API-KEY: <span class="bcls-input">your API KEY</span></code></td>
+		</tr>
+	</tbody>
+</table>
+
+<h3>Beispielanfragetext</h3>
+<pre class="line-numbers">
+    <code class="language-json" translate="No">{
+      "application_ad_configuration": {
+        "ad_configuration_description": "Human readable description of the configuration",
+        "ad_configuration_expected_response_type": "<span class="bcls-input">Dfp, Vast or SmartXML</span>",
+        "ad_configuration_headers": {
+        "X-Custom-Header-Rand": "{{random.int32}}",
+        "X-VIDEOPLAZA-FORWARDED-FOR": "{{client.ipaddress}}"
+        },
+        "ad_configuration_headers_for_impressions": false,
+        "ad_configuration_strategy": "<span class="bcls-input">SingleAdResponse or MultipleAdResponse</span>",
+        "ad_configuration_transforms": [
+          {
+          "xpath": "/",
+          "xslt": "&lt;xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:Det=\"http://Det.com\"&gt;&lt;xsl:output omit-xml-declaration=\"yes\"/&gt;&lt;xsl:template match=\"node()|@*\"&gt;&lt;xsl:copy&gt;&lt;xsl:apply-templates select=\"node()|@*\"/&gt;&lt;/xsl:copy&gt;&lt;/xsl:template&gt;&lt;/xsl:stylesheet&gt;"
+          }
+        ],
+        "ad_configuration_url_format": "https://ad-provider-host.com/path/to/ad-handler?ip={{client.ipaddress}}&amp;num={{random.int32}}&amp;ses={{session.session_id}}"
+      },
+      "application_description": "Human readable description of the ad application",
+      "account_id": "<span class="bcls-input">User's Account ID [Optional]</span>"
+    }</code></pre>
+<aside class="bcls-aside bcls-aside--information">Die <code translate="No">account_id </code> Feld ist die Live-Konto-ID. Wenn es weggelassen wird, wird die Konto-ID des anfordernden Benutzers verwendet.</aside>
+
+<h3>Beispielantwort</h3>
+
+<pre class="line-numbers">
+    <code class="language-json" translate="No">{
+      "application": {
+        "account_id": "User Account ID",
+        "application_description": "Human readable description of the ad application",
+        "application_ad_configuration": {
+          "ad_configuration_description": "Human readable description of the configuration",
+          "ad_configuration_expected_response_type": "<span class="bcls-highlight">Dfp | Vast | SmartXML</span>",
+          "ad_configuration_headers": {
+            "X-Custom-Header-Rand": "{{random.int32}}",
+            "X-VIDEOPLAZA-FORWARDED-FOR": "{{client.ipaddress}}"
+          },
+          "ad_configuration_headers_for_impressions": false,
+          "ad_configuration_strategy": "<span class="bcls-highlight">SingleAdResponse | MultipleAdResponse</span>",
+          "ad_configuration_transforms": [
+            {
+              "xpath": "/",
+              "xslt": "&lt;xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:Det=\"http://Det.com\"&gt;&lt;xsl:output omit-xml-declaration=\"yes\"/&gt;&lt;xsl:template match=\"node()|@*\"&gt;&lt;xsl:copy&gt;&lt;xsl:apply-templates select=\"node()|@*\"/&gt;&lt;/xsl:copy&gt;&lt;/xsl:template&gt;&lt;/xsl:stylesheet&gt;"
+            }
+          ],
+          "ad_configuration_url_format": "https://ad-provider-host.com/path/to/ad-handler?ip={{client.ipaddress}}&amp;num={{random.int32}}&amp;ses={{session.session_id}}"
+        },
+        "application_id": <span class="bcls-highlight">"Application ID"</span>
+      },
+      "inserted": true
+    }</code></pre>
+</section>
+
+<section class="bcls-section">
+<h2 id="Update_an_ad_configuration">Aktualisieren einer Anzeigenkonfiguration</h2>
+
+<p>Das Aktualisieren einer Anzeigenkonfiguration ist dem Erstellen einer Anzeigenkonfiguration sehr ähnlich. Mach ein <code translate="No">PUT</code> wie folgt anfordern:</p>
+
+<table class="bcls-table">
+	<tbody class="bcls-table__body">
+		<tr>
+			<th>Methode</th>
+			<td style="width:80em;"><code class="language-http" translate="No">PUT</code></td>
+		</tr>
+		<tr>
+			<th>URL</th>
+			<td><code class="language-http" translate="No">https://api.bcovlive.io/v1/ssai/applications/application/<span class="bcls-input">Application_ID</span></code></td>
+		</tr>
+		<tr>
+			<th>Header</th>
+			<td><code class="language-http" translate="No">X-API-KEY: <span class="bcls-input">your API KEY</span></code></td>
+		</tr>
+	</tbody>
+</table>
+
+<h3>Beispielanfragetext</h3>
+
+<pre class="line-numbers">
+    <code class="language-json" translate="No">{
+      "application_ad_configuration": {
+        "ad_configuration_description": "Some Updated Description Value",
+        "ad_configuration_expected_response_type": "<span class="bcls-input">Dfp or Vast or SmartXML</span>,
+        "ad_configuration_headers": {
+          "X-Custom-Header-Rand": "{{random.int32}}",
+          "X-VIDEOPLAZA-FORWARDED-FOR": "{{client.ipaddress}}"
+        },
+        "ad_configuration_headers_for_impressions": false,
+        "ad_configuration_strategy": "<span class="bcls-input">SingleAdResponse or MultipleAdResponse</span>",
+        "ad_configuration_transforms": [
+          {
+          "xpath": "/",
+          "xslt": "&lt;xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:Det=\"http://Det.com\"&gt;&lt;xsl:output omit-xml-declaration=\"yes\"/&gt;&lt;xsl:template match=\"node()|@*\"&gt;&lt;xsl:copy&gt;&lt;xsl:apply-templates select=\"node()|@*\"/&gt;&lt;/xsl:copy&gt;&lt;/xsl:template&gt;&lt;/xsl:stylesheet&gt;"
+          }
+        ],
+        "ad_configuration_url_format": "https://updated-ad-provider-host.com/path/to/ad-handler?ip={{client.ipaddress}}&amp;num={{random.int32}}&amp;ses={{session.session_id}}"
+      },
+      "application_description": "Human readable description of the ad application",
+      "account_id": "<span class="bcls-input">User's Account ID [Optional]</span>"
+    }</code></pre>
+
+<aside class="bcls-aside bcls-aside--information">Die <code translate="No">account_id </code> Feld ist die Live-Konto-ID. Wenn es weggelassen wird, wird die Konto-ID des anfordernden Benutzers verwendet.</aside>
+
+<h3>Beispielantwort</h3>
+
+<pre class="line-numbers">
+    <code class="language-json" translate="No">{
+      "account_id": "User Account ID",
+      "application_description": "Human readable description of the ad application",
+      "application_ad_configuration": {
+        "ad_configuration_description": "Some Updated Description Value",
+        "ad_configuration_expected_response_type": "<span class="bcls-highlight">Dfp | Vast | SmartXML</span>",
+        "ad_configuration_headers": {
+        "X-Custom-Header-Rand": "{{random.int32}}",
+        "X-VIDEOPLAZA-FORWARDED-FOR": "{{client.ipaddress}}"
+        },
+        "ad_configuration_headers_for_impressions": false,
+        "ad_configuration_strategy": "<span class="bcls-highlight">SingleAdResponse | MultipleAdResponse</span>",
+        "ad_configuration_transforms": [
+          {
+          "xpath": "/",
+          "xslt": "&lt;xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:Det=\"http://Det.com\"&gt;&lt;xsl:output omit-xml-declaration=\"yes\"/&gt;&lt;xsl:template match=\"node()|@*\"&gt;&lt;xsl:copy&gt;&lt;xsl:apply-templates select=\"node()|@*\"/&gt;&lt;/xsl:copy&gt;&lt;/xsl:template&gt;&lt;/xsl:stylesheet&gt;"
+          }
+        ],
+        "ad_configuration_url_format": "https://updated-ad-provider-host.com/path/to/ad-handler?ip={{client.ipaddress}}&amp;num={{random.int32}}&amp;ses={{session.session_id}}"
+      },
+      "application_id": <span class="bcls-highlight">"Application ID"</span>
+    }</code></pre>
+</section>
+
+<section class="bcls-section">
+<h2 id="Get_all_ad_configurations">Alle Anzeigenkonfigurationen abrufen</h2>
+
+<p>Um alle Anzeigenkonfigurationen für ein Konto abzurufen, senden Sie a <code translate="No">GET </code> wie folgt anfordern:</p>
+
+<table class="bcls-table">
+	<tbody class="bcls-table__body">
+		<tr>
+			<th>Methode</th>
+			<td style="width:80em;"><code class="language-http" translate="No">GET</code></td>
+		</tr>
+		<tr>
+			<th>URL</th>
+			<td><code class="language-http" translate="No">https://api.bcovlive.io/v1/ssai/applications/account/<span class="bcls-input">Account_ID</span></code></td>
+		</tr>
+		<tr>
+			<th>Header</th>
+			<td><code class="language-http" translate="No">X-API-KEY: <span class="bcls-input">your API KEY</span></code></td>
+		</tr>
+	</tbody>
+</table>
+
+<aside class="bcls-aside bcls-aside--information">Die <code translate="No">Account_ID</code> Hier ist die Live-Konto-ID.</aside>
+
+<h3>Beispielantwort</h3>
+
+<pre class="line-numbers">
+    <code class="language-json" translate="No">[
+      {
+        "application_id": "Application_ID_1",
+        "application_description": "DFP Single Midroll",
+        "application_ad_configuration": {
+        "ad_configuration_description": "DFP Test Config Single Midroll",
+        "ad_configuration_strategy": "MultipleAdResponse",
+        "ad_configuration_transforms": [],
+        "ad_configuration_url_format": "https://ad-provider-host.com/path/to/ad-handler",
+        "ad_configuration_expected_response_type": "Dfp"
+        },
+        "account_id": "Account_ID"
+      },
+      {
+        "application_id": "Application_ID_2",
+        "application_description": "Test DFP Single Midroll"
+        "application_ad_configuration": {
+        "ad_configuration_description": "DFP Test Config Single Midroll",
+        "ad_configuration_strategy": "MultipleAdResponse",
+        "ad_configuration_transforms": [
+        {
+          "xslt": "&lt;xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:Det=\"http://Det.com\"&gt;&lt;xsl:output omit-xml-declaration=\"yes\"/&gt;&lt;xsl:template match=\"node()|@*\"&gt;&lt;xsl:copy&gt;&lt;xsl:apply-templates select=\"node()|@*\"/&gt;&lt;/xsl:copy&gt;&lt;/xsl:template&gt;&lt;/xsl:stylesheet&gt;",
+          "xpath": "/"
+        }
+        ],
+        "ad_configuration_url_format": "https://ad-provider-host.com/path/to/ad-handler?ip={{client.ipaddress}}&amp;num={{random.int32}}&amp;ses={{session.session_id}}",
+        "ad_configuration_expected_response_type": "Dfp"
+        },
+        "account_id": "Account_ID"
+      }
+    ]</code></pre>
+</section>
+
+<section class="bcls-section">
+<h2 id="Get_an_ad_configuration">Anzeigenkonfiguration abrufen</h2>
+
+<p>Sie können eine bestimmte Anzeigenkonfiguration auch über ihre <code translate="No">application_id </code> durch Senden einer <code translate="No">GET</code> wie folgt anfordern:</p>
+
+<table class="bcls-table">
+	<tbody class="bcls-table__body">
+		<tr>
+			<th>Methode</th>
+			<td style="width:80em;"><code class="language-http" translate="No">GET</code></td>
+		</tr>
+		<tr>
+			<th>URL</th>
+			<td><code class="language-http" translate="No">https://api.bcovlive.io/v1/ssai/applications/application/<span class="bcls-input">Application_ID</span></code></td>
+		</tr>
+		<tr>
+			<th>Header</th>
+			<td><code class="language-http" translate="No">X-API-KEY: <span class="bcls-input">your API KEY</span></code></td>
+		</tr>
+	</tbody>
+</table>
+
+<h3>Beispielantwort</h3>
+
+<pre class="line-numbers">
+    <code class="language-json" translate="No">{
+      "application_id": "Application_ID",
+      "application_description": "Test DFP Single Midroll",
+      "application_ad_configuration": {
+        "ad_configuration_description": "DFP Test Config Single Midroll",
+        "ad_configuration_strategy": "MultipleAdResponse",
+        "ad_configuration_transforms": [
+          {
+          "xslt": "&lt;xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:Det=\"http://Det.com\"&gt;&lt;xsl:output omit-xml-declaration=\"yes\"/&gt;&lt;xsl:template match=\"node()|@*\"&gt;&lt;xsl:copy&gt;&lt;xsl:apply-templates select=\"node()|@*\"/&gt;&lt;/xsl:copy&gt;&lt;/xsl:template&gt;&lt;/xsl:stylesheet&gt;",
+          "xpath": "/"
+          }
+        ],
+        "ad_configuration_url_format": "https://ad-provider-host.com/path/to/ad-handler?ip={{client.ipaddress}}&amp;num={{random.int32}}&amp;ses={{session.session_id}}",
+        "ad_configuration_expected_response_type": "Dfp"
+      },
+      "account_id": "Account_ID"
+    }</code></pre>
+</section>
+
+<section class="bcls-section">
+<h2 id="Delete_an_ad_configuration">Anzeigenkonfiguration löschen</h2>
+
+<p>Um eine Anzeigenkonfiguration zu löschen, senden Sie a <code translate="No">DELETE</code> wie folgt anfordern:</p>
+
+<table class="bcls-table">
+	<tbody class="bcls-table__body">
+		<tr>
+			<th>Methode</th>
+			<td style="width:80em;"><code class="language-http" translate="No">DELETE</code></td>
+		</tr>
+		<tr>
+			<th>URL</th>
+			<td><code class="language-http" translate="No">https://api.bcovlive.io/v1/ssai/applications/application/<span class="bcls-input">APPLICATION_ID</span></code></td>
+		</tr>
+		<tr>
+			<th>Header</th>
+			<td><code class="language-http" translate="No">X-API-KEY: <span class="bcls-input">your API KEY</span></code></td>
+		</tr>
+	</tbody>
+</table>
+
+<h3>Beispielantwort</h3>
+
+<pre class="line-numbers">
+    <code class="language-json" translate="No">{
+    "application_id": "Application_ID",
+    "deleted": true
+    }</code></pre>
+</section>
+
+<section class="bcls-section">
+<h2 id="Managing_slates">Schiefer verwalten</h2>
+
+<p>Slates sind Ihre eigenen Assets, mit denen ungenutzte Werbezeit gefüllt wird. Sie können Schiefertafeln verwenden, um eine Nachricht mit der Aufschrift "Bin gleich zurück" oder andere Inhalte bereitzustellen, die Ihnen gefallen.</p>
+
+<p>Nachfolgend finden Sie Details zu den API-Anfragen zum Hinzufügen und Verwalten von Slate-Assets.</p>
+
+<h3>Slate-Asset hinzufügen</h3>
+
+<p>Um ein neues Slate-Medienquellen-Asset aufzunehmen, senden Sie a <code translate="No">POST</code> Anfrage:</p>
+
+<table class="bcls-table">
+	<tbody class="bcls-table__body">
+		<tr>
+			<th>Methode</th>
+			<td style="width:80em;"><code class="language-http" translate="No">POST</code></td>
+		</tr>
+		<tr>
+			<th>URL</th>
+			<td><code class="language-http" translate="No">https://api.bcovlive.io/v1/ssai/slates</code></td>
+		</tr>
+		<tr>
+			<th>Header</th>
+			<td><code class="language-http" translate="No">X-API-KEY: <span class="bcls-input">your API KEY</span></code></td>
+		</tr>
+	</tbody>
+</table>
+
+<h4>Beispielanfragetext</h4>
+
+<pre class="line-numbers">
+    <code class="language-json" translate="No">{
+      "source_url": "https://somesourceasset.com/slate-to-ingest.mp4",
+      "account_id": "<span class="bcls-input">Account_ID [Optional]</span>",
+      "source_description": "<span class="bcls-input">User identifiable description for the slate  [Optional]</span>"
+    }
+    </code>
+    </pre>
+
+<aside class="bcls-aside bcls-aside--information">Die <code translate="No">account_id </code> Hier ist die Live-Konto-ID. Wenn es weggelassen wird, wird die Konto-ID des anfordernden Benutzers verwendet.</aside>
+
+<h4>Beispielantwort</h4>
+
+<pre class="line-numbers">
+    <code class="language-json" translate="No">{
+      "media_source_asset_id": "New_UUID",
+      "account_id": "Account_ID",
+      "media_source_asset_default": false,
+      "media_source_asset_type": "slate",
+      "media_source_asset_url": "https://somesourceasset.com/slate-to-ingest.mp4",
+      "media_source_asset_status": "transcoding"
+      "media_source_asset_description": "User identifiable description for the slate"
+    }</code></pre>
+
+<aside class="bcls-aside bcls-aside--information">Hinweis: diese Einstellung <code translate="No">media_source_asset_default</code> ist <strong>nicht</strong> in dieser Zeit unterstützt.</aside>
+
+<h3>Slate-Asset löschen</h3>
+
+<p>Um ein Slate-Medienquellen-Asset zu löschen, senden Sie eine <code translate="No">DELETE</code> Anfrage:</p>
+
+<table class="bcls-table">
+	<tbody class="bcls-table__body">
+		<tr>
+			<th>Methode</th>
+			<td style="width:80em;"><code class="language-http" translate="No">DELETE</code></td>
+		</tr>
+		<tr>
+			<th>URL</th>
+			<td><code class="language-http" translate="No">https://api.bcovlive.io/v1/ssai/slates/slate/<span class="bcls-input">Slate_MSA_ID</span></code></td>
+		</tr>
+		<tr>
+			<th>Header</th>
+			<td><code class="language-http" translate="No">X-API-KEY: <span class="bcls-input">your API KEY</span></code></td>
+		</tr>
+	</tbody>
+</table>
+
+<h4>Beispielantwort</h4>
+
+<pre class="line-numbers">
+    <code class="language-json" translate="No">{
+      "media_source_asset_id": "MSA_UUID",
+      "media_source_asset_type": "slate",
+      "media_source_asset_url": "http://someS3urlpath/media.mp4",
+      "media_source_asset_default": false,
+      "media_source_asset_status": "ready",
+      "account_id": "ACCOUNT_ID"
+    }</code></pre>
+
+<h3>Holen Sie sich Slate-Assets</h3>
+
+<p>Sie können ein Array aller Slate-Medienquellen-Assets für ein Konto abrufen, indem Sie eine <code translate="No">GET</code> Anfrage:</p>
+
+<table class="bcls-table">
+	<tbody class="bcls-table__body">
+		<tr>
+			<th>Methode</th>
+			<td style="width:80em;"><code class="language-http" translate="No">GET</code></td>
+		</tr>
+		<tr>
+			<th>URL</th>
+			<td><code class="language-http" translate="No">https://api.bcovlive.io/v1/ssai/slates/account/<span class="bcls-input">Account_ID</span></code></td>
+		</tr>
+		<tr>
+			<th>Header</th>
+			<td><code class="language-http" translate="No">X-API-KEY: <span class="bcls-input">your API KEY</span></code></td>
+		</tr>
+	</tbody>
+</table>
+
+<aside class="bcls-aside bcls-aside--information">Die <code translate="No">Account_ID </code> Hier ist die Live-Konto-ID.</aside>
+
+<h4>Beispielantwort</h4>
+
+<pre class="line-numbers">
+    <code class="language-json" translate="No">[
+      {
+      "media_source_asset_id": "MSA_UUID_1",
+      "media_source_asset_type": "slate",
+      "media_source_asset_default": false,
+      "media_source_asset_url": "http://someS3urlpath.com/media.mp4",
+      "account_id": "ACCOUNT_ID",
+      "media_source_asset_status": "ready"
+      },
+      {
+      "media_source_asset_id": "MSA_UUID_2",
+      "media_source_asset_type": "slate",
+      "media_source_asset_default": true,
+      "media_source_asset_url": "http://someS3urlpath.com/media.mp4",
+      "account_id": "ACCOUNT_ID",
+      "media_source_asset_status": "ready"
+      }
+    ]</code></pre>
+</section>
+
+<section class="bcls-section">
+<h2 id="Notes_about_DFP">Hinweise zu DFP</h2>
+
+<p>Wenn Sie Anzeigen von DFP beziehen, sollten Sie Folgendes beachten, um Probleme zu vermeiden.</p>
+
+<h3>Anzeigen-Tag</h3>
+
+<p>Achten Sie beim Erstellen eines Anzeigen-Tags für Live darauf, dass Sie die richtigen Richtlinien befolgen und Folgendes einschließen: <code translate="No">/live </code>. Siehe das DFP-Dokument <a href="https://support.google.com/dfp_premium/answer/1068325?hl=en">Erstellen Sie manuell ein Master-Video-Tag</a> für alle Einzelheiten.</p>
+
+<h3>Gleichzeitigkeit</h3>
+
+<p>Wenn Sie ein hohes Maß an Parallelität erwarten, empfehlen wir Ihnen, mit Ihrem DFP-Kontoteam zu sprechen.</p>
+
+<h3>Einzelne/mehrere Anzeigenantworten</h3>
+
+<p>Die <code translate="No">singleadresponse </code> und <code translate="No">multiadresponse </code> Parameter werden derzeit nicht verwendet von <span translate="No">SSAI</span>.</p>
+
+<p>Live <span translate="No">SSAI</span> führt nur einen einzigen Ad-Server-Aufruf aus und erwartet, dass die Antwort alle Anzeigen für die Unterbrechung enthält, mit der Ausnahme, dass sie allen erforderlichen Anzeigen-Wrappern mit einem Limit von 5 Weiterleitungen pro Anzeige folgt. Die folgenden Anzeigenantwortformate werden akzeptiert und wie folgt geparst:</p>
+
+<ul>
+	<li>VAST – Einzelantwort oder ein Anzeigen-Pod in einer einzigen Antwort</li>
+	<li>DFP-Anzeigenregeln – Fasst alle verfügbaren Anzeigen in der Antwort zusammen, einschließlich definierter Pre-, Mid- und Post-Roll-Anzeigen</li>
+	<li>Smart XML – Fasst alle verfügbaren Anzeigen in der Antwort zusammen, einschließlich Pre-, Mid- und Post-Roll-definierter Anzeigen</li>
+</ul>
+</section>
+
+<section class="bcls-section">
+<h2 id="Custom_headers_for_ad_requests">Benutzerdefinierte Header für Anzeigenanfragen</h2>
+
+<p>Die <span translate="No">SSAI</span> Plattform kann benutzerdefinierte Header mit den Anzeigenaufrufen und allen von der Back-End-Plattform verwendeten Beacons übergeben. Einige Adserver wie VideoPlaza erfordern benutzerdefinierte Header.</p>
+
+<p>Benutzerdefinierte Header werden als eine Reihe von Schlüssel-Wert-Paaren in einem . angegeben <code translate="No">ad_configuration_headers</code> Objekt, das Teil des <code translate="No">application_ad_configuration </code> (siehe die <a href="#Create_an_ad_configuration">Erstellen Sie eine Anzeigenkonfiguration</a> Sektion).</p>
+
+<h3>Anmerkungen</h3>
+
+<ul>
+	<li>Standard-Header werden standardmäßig behandelt, wie zum Beispiel:
+	<ul>
+		<li><code translate="No">X-Forwarded-For </code></li>
+		<li><code translate="No">X-Device-User-Agent </code></li>
+	</ul>
+	</li>
+	<li>Header-Werte können die <a href="#Ad_configuration_variables">Anzeigenkonfigurationsvariablen</a></li>
+	<li>Headerwerte können auch statische Strings sein</li>
+</ul>
+
+<aside class="bcls-aside bcls-aside--warning">Header werden an alle nachgelagerten Anfragen weitergegeben, einschließlich Anzeigen-Wrapper oder Impressions/Quartile, daher sollten Sie sie mit Vorsicht verwenden.</aside>
+</section>
+
+<section class="bcls-section">
+<h2 id="Targeting_ads_using_ad_macros">Targeting von Anzeigen mithilfe von Anzeigenmakros</h2>
+
+<p>Wenn du <a href="#Create_an_ad_configuration">Erstellen Sie eine Anzeigenkonfiguration</a> , sieht Ihr Anzeigen-Tag normalerweise so aus:</p>
+
+<pre>
+      <code class="language-http" translate="No">https://ad-provider-host.com/path/to/ad-handler?ip={{client.ipaddress}}&amp;
+      num={{random.int32}}&amp;ses={{session.session_id}}&amp;IDFA={{deviceid}}&amp;
+      sitesection={{sitesection}}&amp;breakid={{breakid}}&amp;breaktheme={{breaktheme}}</code></pre>
+
+<p>Die Elemente innerhalb der doppelten geschweiften Klammern sind Variablen, auch Anzeigenmakros genannt, die Brightcove Live beim Senden der Anzeigenanfrage durch Werte ersetzt, falls vorhanden.</p>
+
+<aside class="bcls-aside bcls-aside--information">
+  <p>Anmerkungen:</p>
+  <ul>
+    <li>Welche Variablen nützlich sind, hängt vom Ad-Server ab.</li>
+    <li>Brightcove-URI codiert jeden Wert, der in die Ad-Server-URL eingefügt wird.</li>
+    <li>Wenn mehrere Werte für einen Schlüssel vorhanden sind, können die codierten Variablen vom Ad-Server nicht gelesen werden. Dies liegt an der URI-Codierung.</li>
+  </ul>
+</aside>
+
+<p>Anzeigenmakrowerte können auf folgende Weise bereitgestellt werden:</p>
+
+<ul>
+	<li><a href="#Using_header_information">Header-Informationen verwenden</a></li>
+	<li><a href="#Appending_the_URL">Anhängen der URL</a></li>
+	<li><a href="#Adding_URLs_dynamically">URLs dynamisch hinzufügen</a></li>
+	<li><a href="#Using_manual_cue_points">Verwenden von manuellen Cue-Punkten</a></li>
+</ul>
+
+<h3 id="Using_header_information">Header-Informationen verwenden</h3>
+
+<p>Header-Informationen, detailliert im <a href="#Ad_configuration_variables">Anzeigenkonfigurationsvariablen</a> Abschnitt oben, steht für jede Anfrage zur Verfügung. Geben Sie einfach die gewünschten Variablen mit den entsprechenden Schlüsselnamen in Ihrer Anzeigenkonfiguration an.</p>
+
+<h3 id="Appending_the_URL">Anhängen der URL</h3>
+
+<p>Zusätzliche Sitzungswerte können an die URL für den Livestream angehängt werden, etwa wie folgt:</p>
+
+<pre>
+      <code class="language-http" translate="No">http://playback.bcovlive.io/e058d9f2737e18/us-west-2/NA/
+      playlist.m3u8<span class="bcls-highlight">?deviceid=123456&amp;sitesection=services</span>"</code></pre>
+
+<h3 id="Adding_URLs_dynamically">URLs dynamisch hinzufügen</h3>
+
+<p>Sie können URLs dynamisch hinzufügen, indem Sie Javascript und die Brightcove Player API verwenden:</p>
+
+<pre class="line-numbers">
+      <code class="language-html" translate="No">&lt;!DOCTYPE html&gt;
+      &lt;body&gt;
+        &lt;video
+        id="myPlayerID"
+        data-video-id="5975635167001"
+        data-account="3737230870001"
+        data-player="tIG7lVKBm"
+        data-embed="default"
+        data-application-id
+        class="video-js"
+        controls
+        width="640"
+        height="360"&gt;&lt;/video&gt;
+        &lt;script src="//players.brightcove.net/3737230870001/tIG7lVKBm_default/index.min.js"&gt;&lt;/script&gt;
+
+        &lt;script type="text/javascript"&gt;
+        var player = videojs("myPlayerID");
+
+        player.one("loadstart", function(){
+          var sourceUrl = player.currentSource();
+          console.log(sourceUrl);
+          var liveUrlWithParams = sourceUrl.src + "?player_width={width}&amp;player_height={height}&amp;deviceid={deviceid}";
+
+          player.src([{
+            "type": "application/vnd.apple.mpegurl",
+            "src": liveUrlWithParams
+          }]);
+        });
+      &lt;/script&gt;
+
+      &lt;/body&gt;</code></pre>
+
+<p>Beachten Sie, dass die Schlüsselnamen in diesem Beispiel den Variablennamen im oben gezeigten Anzeigen-Tag entsprechen.</p>
+</section>
+
+<section class="bcls-section">
+<h2 id="Ad_configuration_variables">Anzeigenkonfigurationsvariablen</h2>
+
+<p>Anzeigenkonfigurationsvariablen, auch als Beacons bezeichnet, können in Anfragen zur Verwaltung von Anzeigenkonfigurationen verwendet werden. Einzelheiten finden Sie im <a href="/live-api/ssai/live-api-cue-points-and-ad-beacons-ssai.html#Beacons">Live-API: Cue Points und Ad Beacons mit SSAI</a> dokumentieren.</p>
+</section>
+
+<section class="bcls-section">
+<h2 id="Using_manual_cue_points">Verwenden von manuellen Cue-Punkten</h2>
+
+<p>Werte für bestimmte Werbeunterbrechungen können mit der manuellen Anforderung zum Einfügen von Cue-Punkten gesendet werden. Einzelheiten finden Sie im <a href="/live-api/ssai/live-api-cue-points-and-ad-beacons-ssai.html#Manual_cue_point_insertion">Live-API: Cue-Points und Ad-Beacons</a> dokumentieren.</p>
+</section>
+
+<section class="bcls-section">
+<h2 id="Known_issues">Bekannte Probleme</h2>
+
+<ul>
+	<li>SSAI erfordert, dass das Live-Streaming-Video eine Audiospur hat.</li>
+	<li>Wenn die zurückgegebene VAST dieselbe Anzeigen-ID hat, fordert der Server den Anzeigeninhalt nicht an, obwohl die Anzeigen-URL dynamische Variablen verwendet, um sie zu einer eindeutigen URL zu machen. Das macht <strong>nicht</strong> gelten, wenn Sie DFP für Anzeigen verwenden.</li>
+	<li>Mit DFP können Sie zwar dieselbe Anzeigen-ID verwenden, es muss jedoch eine andere Motiv-ID vorhanden sein. Mit anderen Worten, Sie können die MediaFile nicht einfach austauschen.</li>
+	<li>
+	<p>Wenn eine Werbeunterbrechung kürzer als die MAX-Dauer der Anzeigen-URL ist (min_ad_duration=0&amp;max_ad_duration=30000), wird die Anzeige nicht wiedergegeben, wenn die Anzeige länger als die Werbeunterbrechung ist.</p>
+	</li>
+	<li>
+	<p>VPAID oder anklickbare Anzeigen werden nicht unterstützt für <span translate="No">Brightcove Live-SSAI</span>.</p>
+	</li>
+	<li>
+	<p>Wenn eine Werbeunterbrechung eine kürzere Restzeit als die Segmentsekunden des Streams hat und eine Slate angezeigt wird, wird die Slate für die Segmentdauer angezeigt und die tatsächliche Werbeunterbrechung ist länger als erwartet.</p>
+   <li>
+     <p>Das Obige kann dazu führen, dass eine der folgenden Werbeunterbrechungen um die Latenzzeit verkürzt wird, um zu versuchen, die Sitzung wieder an den Live-Edge zu bringen.</p></li>
+	</li>
+	<li>Wenn die Anzeige zum ersten Mal von unserem System gesehen wird, wird sie erst abgespielt, wenn sie transcodiert und zur Auslieferung bereit ist.</li>
+	<li>VMAP for Live SSAI wird derzeit nicht unterstützt.</li>
+</ul>
+</section>
+{% endraw %}
+
+</article>

@@ -1,0 +1,55 @@
+
+<h2 id="sample_app">Videos aktualisieren</h2>
+
+<fieldset class="bcls-fieldset"><legend>Kontoinformationen</legend>
+
+<p>Standardmäßig erhalten Sie Ergebnisse aus dem Brightcove-Beispielkonto.</p>
+
+<p><button class="bcls-button" id="use_my_account">Verwenden Sie stattdessen Mein Konto</button></p>
+
+<div id="basic_info" style="display:none;">
+<table class="bcls-table">
+	<tbody class="bcls-table__body">
+		<tr>
+			<td>Video Cloud-Konto (Publisher-ID):</td>
+			<td><input id="account" type="text" size="55" /></td>
+		</tr>
+		<tr>
+			<td class="align-top no-wrap">Kunden ID:</td>
+			<td><input id="cid" type="text" size="100" value="" /> (muss Berechtigungen enthalten für <code translate="No">video-cloud/video/update</code> und <code translate="No">video-cloud/video/read</code> oder <code translate="No">video-cloud/video/all</code>)</td>
+		</tr>
+		<tr>
+			<td class="align-top no-wrap">Client-Geheimnis:</td>
+			<td><input id="secret" type="text" size="100" value="" /> (muss Berechtigungen enthalten für <code translate="No">video-cloud/video/update</code> und <code translate="No">video-cloud/video/read</code> oder <code translate="No">video-cloud/video/all</code>)</td>
+		</tr>
+	</tbody>
+</table>
+
+<p><button id="get_videos" class="bcls-button">Videoliste aktualisieren Neue Kontoinformationen</button></p>
+</div>
+</fieldset>
+
+<fieldset class="bcls-fieldset"><legend>Eingänge</legend>
+
+  <div class="item-list" id="video_list"></div>
+  <div class="item-list" id="field_list"></div>
+
+<p><button id="update_videos" class="bcls-button">Videos aktualisieren</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id="get_next_videos" class="bcls-button">Holen Sie sich die nächsten 25 Videos</button></p>
+</fieldset>
+
+<h2 id="outputLog">Ergebnisse</h2>
+
+<fieldset class="bcls-fieldset"><legend>Ausgänge</legend>
+
+<p>API-Anfrage:
+  <br>
+  <textarea id="api_request" class="bcls-code" style="min-height:2em;max-height: 2em;"></textarea></p>
+
+<p>API-Anfragetext:
+  <br>
+  <textarea id="request_data" class="bcls-code"></textarea></p>
+
+<pre class="line-numbers">
+<code class="language-json" id="results">Antworten werden hier angezeigt...</code></pre>
+</fieldset>
+

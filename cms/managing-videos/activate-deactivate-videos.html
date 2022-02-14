@@ -1,0 +1,244 @@
+---
+title: 'Videos aktivieren/deaktivieren oder planen'
+description: 'In diesem Thema wird gezeigt, wie Sie ein Video mithilfe der Funktion aktivieren, deaktivieren oder planen <span translate="No">CMS-API</span>'
+parent: Managing Videos/Assets 
+grandparent: CMS API
+---
+ <h1>{{ page.title }}</h1>
+<article class="bcls-article">
+  <summary>{{ page.description }}</summary>
+    <section id="intro" class="bcls-section">
+    <h2>Einführung</h2>
+    
+    <p>Es gibt mehrere Gründe, warum Sie ein Video erst einige Zeit später unspielbar machen möchten. Zum Beispiel:</p>
+    <ul>
+      <li>Es wird noch überprüft</li>
+      <li>Es ist ein Trailer für einen Film, der noch nicht veröffentlicht wurde</li>
+      <li>Es ist Teil einer Marketingkampagne, die noch nicht begonnen hat oder beendet ist</li>
+      <li>Es ist Teil einer noch nicht veröffentlichten Nachrichtengeschichte</li>
+    </ul>
+
+    <p>Wenn Sie den Video-Einbettungscode noch nicht in eine öffentliche Seite oder App eingefügt haben, kann er natürlich nicht angezeigt werden, aber es gibt Möglichkeiten, ein Video versehentlich zu veröffentlichen. Der offensichtlichste ist, dass seine Tags oder andere Eigenschaften zu einem Smart passen Playlist, die veröffentlicht wird.</p>
+
+    <p>Es gibt zwei Möglichkeiten, um sicherzustellen, dass ein Video Cloud-Video nicht angezeigt werden kann:</p>
+    <ul>
+      <li>Deaktivieren Sie es</li>
+      <li>Planen Sie es so, dass es irgendwann in der Zukunft spielbar ist</li>
+    </ul>
+
+    <p>Beide Änderungen können über das Media-Modul in Studio implementiert werden, aber hier werden wir behandeln, wie sie mit dem <span translate="No">CMS-API</span>. Beide Aktionen werden mit a . ausgeführt <a href="/cms/references/reference.html#operation/UpdateVideo">Video-Update-Anfrage</a>.</p>
+
+    <aside class="bcls-aside bcls-aside--warning">Hinweis: Die Aktivierungs-/Deaktivierungs- und Planungsmechanismen sind völlig unabhängig, daher sollten Sie je nach Anwendungsfall den einen oder den anderen verwenden, aber nicht beide. Wenn ein Video gemäß den <code translate="no">zeitlicher Ablauf</code> , aber es ist <code translate="no">Zustand</code> ist <code translate="no">INAKTIV</code> , das Video wird nicht abgespielt.</aside>
+  </section>
+  <section class="bcls-section">
+    <h2 id="authentication">Authentifizierung</h2>
+    <p>Anfragen an die <span translate="No">CMS-API</span> benötigen einen Autorisierungs-Header, der Ihre Zugriffstoken enthält. Ausführliche Informationen zum Abrufen von Client-Anmeldeinformationen und deren Verwendung zum Abrufen von Zugriffstoken finden Sie im <a href="/oauth/getting-started/overview-oauth-api-v4.html">Übersicht über Brightcove OAuth</a>.</p>
+    <p>Sie können Client-Anmeldeinformationen erstellen, indem Sie die <a href="/getting-started/authentication-brightcove-api-requests.html">Studio-Admin-Seiten</a> oder der <a href="/oauth/guides/oauth-create-client-credentials-using-curl.html">OAuth-API</a></p>
+
+    <p>Sie können auch die <a href="/oauth/guides/getting-access-tokens.html">OAuth-API</a> direkt, um Zugriffstoken abzurufen, oder wenn Sie die <span class="”notranslate”">Postbote</span> oder <span class="”notranslate”">Schlaflosigkeit</span> app oder stellen Sie Ihre Anfragen, lesen Sie unsere Tutorials zum Einrichten dieser zum Abrufen von Zugriffstoken:</p>
+    <ul>
+      <li><a href="/general/use-insomnia-api-requests.html">Verwenden Sie Schlaflosigkeit, um API-Anfragen zu stellen</a></li>
+      <li><a href="/general/use-postman-api-requests.html">Verwenden Sie Postman, um API-Anfragen zu stellen</a></li>
+    </ul>
+  </section>
+    
+  <section class="bcls-section">
+    <h2 id="update_video">Die Update-Video-Anfrage</h2>
+    
+    <p>Um ein Video zu aktualisieren, sende a <code translate="no">PATCH</code> Anfrage zu</p>
+
+<pre class="line-numbers"><code class="language-http" translate="No">https://cms.api.brightcove.com/v1/accounts/<span class="bcls-input">account_id</span>/videos/<span class="bcls-input">video_id</span></code></pre>
+    
+    <p>Im Allgemeinen muss der Anforderungstext nur die Felder enthalten, die Sie aktualisieren möchten, Sie können jedoch auch andere mit den aktuellen Werten einschließen. In den folgenden Abschnitten werden wir uns die Antragsstellen für die Aktivierung/Deaktivierung und die Planung ansehen.</p>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="Activate_deactivate_video">Ein Video aktivieren/deaktivieren</h2>
+    <p>Ein Video wird aktiviert (sichtbar) oder inaktiv (nicht sichtbar) durch Einstellen seiner <code translate="no">Zustand</code>. Videos sind standardmäßig <code translate="no">AKTIV</code> sobald sie aufgenommen wurden (es sei denn, es wurden Pflichtfelder bei der Erstellung des Videos weggelassen oder mit dem Upload-Modul hochgeladen).</p>
+    <aside class="bcls-aside bcls-aside--information">Beachten Sie, dass das Video weiterhin in der Videovorschau des Studio Media-Moduls abgespielt werden kann (was praktisch ist, wenn Sie das Video während der Überprüfung deaktivieren).</aside>
+    <p>Um ein Video dann zu deaktivieren, müssen Sie nur den folgenden Request-Body mit der Update-Video-Anfrage senden:</p>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "state": "INACTIVE"
+}</code></pre>
+    <p>Sie können überprüfen, ob das Video jetzt inaktiv ist, indem Sie das <code translate="no">Zustand</code> Feld in der API-Antwort</p>
+    <details>
+      <summary>Beispielantwort</summary>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "id": "1698990613556232930",
+  "account_id": "57838016001",
+  "ad_keys": null,
+  "clip_source_video_id": null,
+  "complete": true,
+  "created_at": "2021-05-06T06:48:31.963Z",
+  "created_by": {
+    "type": "unknown"
+  },
+  "cue_points": [
+  ],
+  "custom_fields": {
+  },
+  "delivery_type": "dynamic_origin",
+  "description": "Updated at: 2021-05-07T22:37:46.492Z",
+  "digital_master_id": null,
+  "duration": 41259,
+  "economics": "AD_SUPPORTED",
+  "folder_id": null,
+  "geo": null,
+  "has_digital_master": true,
+  "images": {
+    "poster": {
+      "src": "https://cf-images.us-east-1.prod.boltdns.net/v1/jit/57838016001/1494916a-e8a7-45ac-882f-6e0aa3489846/main/1280x720/20s629ms/match/image.jpg",
+      "sources": [
+        {
+          "src": "https://cf-images.us-east-1.prod.boltdns.net/v1/jit/57838016001/1494916a-e8a7-45ac-882f-6e0aa3489846/main/1280x720/20s629ms/match/image.jpg",
+          "height": 720,
+          "width": 1280
+        }
+      ]
+    },
+    "thumbnail": {
+      "src": "https://cf-images.us-east-1.prod.boltdns.net/v1/jit/57838016001/1494916a-e8a7-45ac-882f-6e0aa3489846/main/160x90/20s629ms/match/image.jpg",
+      "sources": [
+        {
+          "src": "https://cf-images.us-east-1.prod.boltdns.net/v1/jit/57838016001/1494916a-e8a7-45ac-882f-6e0aa3489846/main/160x90/20s629ms/match/image.jpg",
+          "height": 90,
+          "width": 160
+        }
+      ]
+    }
+  },
+  "link": null,
+  "long_description": null,
+  "name": "Great Horned Owl",
+  "original_filename": "greathornedowl.mp4",
+  "projection": null,
+  "published_at": "2021-05-06T06:48:31.963Z",
+  "reference_id": "greathornedowl.mp4_1620283704192",
+  "schedule": null,
+  "sharing": null,
+  <span class="bcls-highlight">"state": "INACTIVE"</span>,
+  "tags": [
+    "bird",
+    "air",
+    "nature"
+  ],
+  "text_tracks": [
+  ],
+  "updated_at": "2021-05-16T22:54:09.168Z",
+  "updated_by": {
+    "type": "api_key",
+    "email": "rcrooks@brightcove.com"
+  },
+  "offline_enabled": false,
+  "playback_rights_id": "primary"
+}</code></pre>
+    </details>
+
+    <p>Um das Video wieder aktiv zu machen, senden Sie einfach eine weitere Update-Video-Anfrage mit dem Anfragetext:</p>
+
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "state": "ACTIVE"
+}</code></pre>
+  </section>
+  <section class="bcls-section">
+    <h2 id="Schedule_video">Planen Sie ein Video</h2>
+    <p>Die zweite Möglichkeit, ein Video abspielbar oder nicht abspielbar zu machen, ist die Verwendung der <code translate="no">zeitlicher Ablauf</code> -Objekt in der Videoaktualisierungsanforderung. Die <code translate="no">Das Zeitplanobjekt hat zwei Eigenschaften:</code></p>
+    <ul>
+      <li><code translate="no">startet um</code> die ISO-8601-Datum-Uhrzeit, wenn das Video abspielbar wird (erforderlich)</li>
+      <li><code translate="no">endet am</code> die ISO-8601-Datum-Uhrzeit, wenn das Video nicht mehr abspielbar ist (optional)</li>
+    </ul>
+
+    <p>Hier ist ein Beispiel für einen Anfragetext, der ein Video am 16. Mai 2021 um 6:00 Uhr (UTC) abspielbar und genau ein Jahr später wieder unabspielbar macht:</p>
+
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "schedule": {
+		"starts_at": "2021-05-16T06:00:00.000Z",
+		"ends_at": "2022-05-16T06:00:00.000Z"
+	}
+}</code></pre>
+
+    <details>
+      <summary>Beispielantwort</summary>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "id": "1698990613556232930",
+  "account_id": "57838016001",
+  "ad_keys": null,
+  "clip_source_video_id": null,
+  "complete": true,
+  "created_at": "2021-05-06T06:48:31.963Z",
+  "created_by": {
+    "type": "unknown"
+  },
+  "cue_points": [
+  ],
+  "custom_fields": {
+  },
+  "delivery_type": "dynamic_origin",
+  "description": "Updated at: 2021-05-07T22:37:46.492Z",
+  "digital_master_id": null,
+  "duration": 41259,
+  "economics": "AD_SUPPORTED",
+  "folder_id": null,
+  "geo": null,
+  "has_digital_master": true,
+  "images": {
+    "poster": {
+      "src": "https://cf-images.us-east-1.prod.boltdns.net/v1/jit/57838016001/1494916a-e8a7-45ac-882f-6e0aa3489846/main/1280x720/20s629ms/match/image.jpg",
+      "sources": [
+        {
+          "src": "https://cf-images.us-east-1.prod.boltdns.net/v1/jit/57838016001/1494916a-e8a7-45ac-882f-6e0aa3489846/main/1280x720/20s629ms/match/image.jpg",
+          "height": 720,
+          "width": 1280
+        }
+      ]
+    },
+    "thumbnail": {
+      "src": "https://cf-images.us-east-1.prod.boltdns.net/v1/jit/57838016001/1494916a-e8a7-45ac-882f-6e0aa3489846/main/160x90/20s629ms/match/image.jpg",
+      "sources": [
+        {
+          "src": "https://cf-images.us-east-1.prod.boltdns.net/v1/jit/57838016001/1494916a-e8a7-45ac-882f-6e0aa3489846/main/160x90/20s629ms/match/image.jpg",
+          "height": 90,
+          "width": 160
+        }
+      ]
+    }
+  },
+  "link": null,
+  "long_description": null,
+  "name": "Great Horned Owl",
+  "original_filename": "greathornedowl.mp4",
+  "projection": null,
+  "published_at": "2021-05-06T06:48:31.963Z",
+  "reference_id": "greathornedowl.mp4_1620283704192",
+  <span class="bcls-highlight">"schedule": {
+    "ends_at": "2022-05-16T06:00:00.000Z",
+    "starts_at": "2021-05-16T06:00:00.000Z"
+  }</span>,
+  "sharing": null,
+  "state": "ACTIVE",
+  "tags": [
+    "bird",
+    "air",
+    "nature"
+  ],
+  "text_tracks": [
+  ],
+  "updated_at": "2021-05-17T00:42:45.172Z",
+  "updated_by": {
+    "type": "api_key",
+    "email": "rcrooks@brightcove.com"
+  },
+  "offline_enabled": false,
+  "playback_rights_id": "primary"
+}</code></pre>
+    </details>
+  </section>
+  
+  <section class="bcls-section">
+    <h2 id="Related_topics">verwandte Themen</h2>
+    <ul>
+      <li><a href="https://studio.support.brightcove.com/basics/video-cloud-basics-activating-and-deactivating-video.html">Video Cloud-Grundlagen: Aktivieren und Deaktivieren eines Videos</a></li>
+      <li><a href="https://studio.support.brightcove.com/media/configuring-video-availability.html">Konfigurieren der Videoverfügbarkeit</a></li>
+    </ul>
+  </section>
+</article>

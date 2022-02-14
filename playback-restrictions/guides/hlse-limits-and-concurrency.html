@@ -1,0 +1,131 @@
+---
+title: Beschreibung der Verwendung von HLSe mit Gerätelimits und Stream Concurrency: "In diesem Thema erfahren Sie, wie Sie Gerätebeschränkungen aktivieren und gleichzeitige Streams mithilfe von HLSe- und Brightcove-Wiedergabebeschränkungen begrenzen."
+parent: Guides 
+grandparent: Playback Restrictions
+layout: staging
+---
+ <h1>{{ page.title }}</h1>
+<article class="bcls-article">
+  <summary>{{ page.description }}</summary>
+  
+  <br/>
+  <aside class="bcls-aside bcls-aside--tip">Diese Funktion ist für eine bestimmte Gruppe von Kunden mit Zugriff auf die eingeschränkte Verfügbarkeitsphase der Brightcove-Wiedergabebeschränkungen verfügbar.</aside>
+  
+  <section class="bcls-section">
+    <h2 id="Introduction">Einführung</h2>
+    <p>Wenn Sie Ihre Inhalte pro Benutzer begrenzen möchten, aber kein DRM integrieren müssen oder möchten, dann kann die Verwendung von HLSe die Lösung für Sie sein.</p>
+    <p>Mit der Standardverschlüsselung mit AES-128 (HLSe) können Sie Ihre Inhalte über das Internet verschlüsseln. Es ist nicht so sicher wie die Verwendung von DRM, da es einen öffentlich zugänglichen Entschlüsselungsschlüssel verwendet.</p>
+    <p>Verwendung von HLSe mit <a href="/playback-restrictions/getting-started/overview-playback-restrictions.html#License_Keys_Protection">Lizenzschlüsselschutz von Brightcove</a> , ermöglicht Ihnen, Wiedergabeanforderungen basierend auf Benutzer- oder erweiterten Informationen zu autorisieren, um den Zugriff auf die Verschlüsselungsschlüssel zuzulassen oder zu verweigern und die Sicherheit der Standardverschlüsselung zu verbessern.</p>
+
+    <p>License Key Protection konzentriert sich auf den Schutz für DRM-Lizenzanfragen sowie die AES-128-Entschlüsselung. JWT-Ansprüche ermöglichen es dem Lizenzschlüsselschutz, Einschränkungen auf Benutzerebene zu unterstützen. Das bedeutet, dass Sie die Wiedergabe auf einen User-Agent, eine maximale Anzahl verschiedener IP-Adressen oder eine maximale Anzahl von Benutzern für jeden Token beschränken können.</p>
+
+    <p>Wenn Sie diese Funktion noch nicht kennen, lesen Sie die <a href="/playback-restrictions/getting-started/overview-playback-restrictions.html">Überblick: Brightcove-Wiedergabebeschränkungen</a> dokumentieren.</p>
+
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="Getting_started">Einstieg</h2>
+    <p>
+      Richten Sie Ihr Konto ein und bereiten Sie Ihre Inhalte vor.
+    </p>
+    <ol class="bcls-tasklist">
+      <li>Wenden Sie sich an Ihren Account Manager, um Ihr Konto für HLSe und Wiedergabebeschränkungen zu aktivieren.</li>
+      <li>
+        Sobald HLSe für Ihr Konto aktiviert ist, nehmen Sie die Videos auf, die Sie schützen möchten, oder transcodieren Sie sie erneut.
+      </li>
+    </ol>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="Workflow">Arbeitsablauf</h2>
+    <p>
+      Führen Sie die folgenden Schritte aus, um Gerätelimits festzulegen oder gleichzeitig mit HLSe zu streamen:
+    </p>
+    <ol class="bcls-tasklist-restart">
+      <li>
+        <p>Ein ... kreieren <a href="https://general.support.brightcove.com/developer/create-json-web-token.html">JSON-Webtoken (JWT)</a> pro Benutzer.</p>
+        <p>Für jede Benutzersitzung müssen Sie ein JWT erstellen. Diese soll anhand der gewünschten Restriktionen mit unterschiedlichen Ansprüchen generiert werden.</p>
+        <ul>
+          <li><p>Gerätebeschränkungen finden Sie im <a href="#Setting_device_limits">Gerätelimits einstellen</a> Sektion.</p></li>
+          <li>Informationen zur Stream-Parallelität finden Sie im <a href="#Setting_stream_concurrency">Stream-Parallelität einstellen</a> Sektion.</li>
+        </ul>
+      </li>
+      <li>
+        <p>Konfigurieren Sie Ihren Player so, dass er Lizenzschlüsselschutz verwendet.</p>
+        Einzelheiten finden Sie im <a href="/playback-restrictions/getting-started/overview-playback-restrictions.html#License_Keys_Protection">Verwenden des Lizenzschlüsselschutzes</a> Abschnitt der Übersicht: Dokument zu Brightcove-Wiedergabeeinschränkungen.
+      </li>
+    </ol>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="Setting_device_limits">Gerätelimits einstellen</h2>
+    <p>Mit License Key Protection können Sie die Wiedergabe auf eine bestimmte Anzahl von Geräten pro Benutzer beschränken.</p>
+    <h3>Behauptungen</h3>
+    <ul>
+      <li>
+        <p>:<code translate="No">maxip</code></p>
+        Für HLSe-Inhalte ist die <code translate="No">maxip</code> Claim definiert, wie viele verschiedene IP-Adressen gleichzeitig streamen können.
+      </li>
+    </ul>
+    <h3>Beispiel</h3>
+    <p>In diesem Beispiel wird ein JWT erstellt, um die Wiedergabe auf eine IP-Adresse pro Benutzer (ein Gerät pro Benutzer) zu beschränken:</p>
+    <ol class="bcls-tasklist-restart">
+      <li>
+        <p>Generieren Sie ein öffentlich-privates Schlüsselpaar.</p>
+        Einzelheiten finden Sie im <a href="https://general.support.brightcove.com/developer/create-json-web-token.html#Generate_public_private_key_pair">Generieren Sie ein öffentlich-privates Schlüsselpaar</a> Abschnitt des Dokuments Erstellen eines JSON Web Token (JWT)-Dokuments.
+      </li>
+      <li>
+        <p>Registrieren Sie Ihren öffentlichen Schlüssel.</p>
+        Einzelheiten finden Sie im <a href="/playback-restrictions/guides/authentication-apis.html">Verwenden von Authentifizierungs-APIs</a> dokumentieren.
+      </li>
+      <li>
+        <p>Erstellen Sie ein JSON-Webtoken.</p>
+        <p>Hier ist ein Beispiel mit bash. Stellen Sie sicher, dass Sie die hinzufügen <code translate="No">"maxip":1</code> behaupten, die Wiedergabe auf eine IP-Adresse (Gerät) pro Benutzer zu beschränken.</p>
+        <pre class="line-numbers">
+<code class="language-bash" translate="No">#! /usr/bin/env bash
+  # Static header fields.
+  HEADER='{
+    &quot;type&quot;: &quot;JWT&quot;,
+    &quot;alg&quot;: &quot;RS256&quot;
+  }'
+  
+  payload='{
+    &quot;pkid&quot;: &quot;<span class="bcls-input">your policy key</span>&quot;,
+    &quot;accid&quot;: &quot;<span class="bcls-input">your account id</span>&quot;,
+    <span class="bcls-highlight">&quot;maxip&quot;: 1</span>
+  }'
+  
+  # Use jq to set the dynamic `iat` and `exp`
+  # fields on the payload using the current time.
+  # `iat` is set to now, and `exp` is now + 1 second.
+  PAYLOAD=$(
+    echo &quot;${payload}&quot; | jq --arg time_str &quot;$(date +%s)&quot; \
+    '
+    ($time_str | tonumber) as $time_num
+    | .iat=$time_num
+    | .exp=($time_num + 60 * 60)
+    '
+  )
+  
+  function b64enc() { openssl enc -base64 -A | tr '+/' '-_' | tr -d '='; }
+  
+  function rs_sign() { openssl dgst -binary -sha256 -sign {your_private_key_path} ; }
+  
+  JWT_HDR_B64=&quot;$(echo -n &quot;$HEADER&quot; | b64enc)&quot;
+  JWT_PAY_B64=&quot;$(echo -n &quot;$PAYLOAD&quot; | b64enc)&quot;
+  UNSIGNED_JWT=&quot;$JWT_HDR_B64.$JWT_PAY_B64&quot;
+  SIGNATURE=$(echo -n &quot;$UNSIGNED_JWT&quot; | rs_sign | b64enc)
+  
+  echo &quot;$UNSIGNED_JWT.$SIGNATURE&quot;</code></pre>
+        
+      </li>
+    </ol>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="Setting_stream_concurrency">Stream-Parallelität einstellen</h2>
+    <p>Kommt bald!</p>
+    
+  </section>
+
+</article>

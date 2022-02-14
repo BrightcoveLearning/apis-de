@@ -1,0 +1,373 @@
+---
+title: 'Überblick: Kanal-API'
+description: 'Mit den Channel Manager-Endpunkten können Sie einen Cloud Playout-Kanal erstellen, Assets und Live-Ereignisse zur Playlist hinzufügen und den Kanal dann aktivieren, starten, stoppen und löschen.'
+parent: Getting Started 
+grandparent: Cloud Playout APIs
+---
+ <h1>{{ page.title }}</h1>
+<article class="bcls-article">
+  <summary>{{ page.description }}</summary>
+  <section class="bcls-section">
+    <h2 id="requirements">Anforderungen</h2>
+    <ul>
+      <li>Eine registrierte Anwendung mit in der Video-Cloud aktivierten Authentifizierungsbereichen der Cloud Playout API. (<code>Studio-Benutzeroberfläche -&gt; Admin -&gt; API-Authentifizierung</code>)</li>
+    </ul>
+    <aside class="bcls-aside bcls-aside--information language-editable"> Beachten Sie, dass Sie zusätzlich zu den Cloud-Playout-Kanalvorgängen auch die CMS-API verwenden müssen, um diese Inhalte zu verwalten. Wir empfehlen daher, alle erforderlichen Berechtigungen für Ihre Client-Anmeldeinformationen einzuholen:
+      <figure class="bcls-figure">
+        <img class="bcls-image" src="/assets/images/cloud-playout/permissions-channel-api.png" alt="Cloud Player and CMS API Permissions">
+        <figcaption class="bcls-caption--image">Cloud Player- und CMS-API-Berechtigungen</figcaption>
+      </figure>
+      <p>Sehen <a href="/getting-started/authentication-brightcove-api-requests.html">Weitere Informationen zur Authentifizierung für die Brightcove-API.</a></p>
+    </aside>
+  </section>
+  <section class="bcls-section">
+    <h2 id="creating-a-cloudplayoutchannelmanager-workflow">Erstellen eines CloudPlayoutChannelManager-Workflows</h2>
+    <p>Unten ist der typische Workflow für die Kanalverwaltung von Cloud Playout:</p>
+    <ul>
+    <li>Kanal erstellen</li>
+    <li>Assets und Live-Ereignisse zur Playlist hinzufügen</li>
+    <li>Aktiviere den Kanal</li>
+    <li>Kanal starten</li>
+    <li>Stoppen Sie den Kanal</li>
+    <li>Kanal löschen</li>
+    </ul>
+    <p>Abgesehen von diesen, <strong>Kanal abrufen</strong> ist hilfreich, um die Kanalinformationen und den Status des Kanals zu überprüfen.</p>
+    </section>
+    <section class="bcls-section">
+      <h2 id="create-channel">Kanal erstellen</h2>
+      <p>Um einen Kanal zu erstellen, benötigen wir obligatorische Attribute wie Name des Kanals, Startzeit, Eingabe- und Ausgabegruppe, Region und Live-Profil. DateTime-Werte werden im ISO 8601-Datumsformat (UTC oder mit Zeitversatz) bevorzugt.</p>
+    <h3>Musteranfrage</h3>
+    <h4>Anfrage</h4>
+    <p>Mach ein <code translate="No">POST</code> Anfrage zu:</p>
+<pre><code class="language-http" translate="No">https://cm.cloudplayout.brightcove.com/accounts/<span class="bc-input">{account_id}</span>/cp_channels</code></pre>
+    <h4>Überschriften</h4>
+<pre class="line-numbers"><code class="language-bash" translate="No">Content-Type: application/json
+Authorization: Bearer <span class="bc-input">{token}</span></code></pre>
+    <h4>Anfragetext</h4>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "name": "channel name",
+  "start_time": "2021-06-29T08:30:50.344Z",
+  "input_group": [
+    {
+      "input_type": "playlist or rtmp or slate",
+      "input_id": "dummy",
+      "loop_on_completion": false
+    }
+  ],
+  "live_profile": "your live profile",
+  "output_group": [
+    {
+      "type": "rtmp or rtp",
+      "ingest_locations": [
+        {
+          "pipeline_id": 1,
+          "location": "bc_live or any live channel from your account"
+        }
+      ]
+    },
+    {
+      "type": "s3",
+      "ingest_locations": [
+        {
+          "pipeline_id": 1,
+          "location": "s3 credential id"
+        }
+      ]
+    }
+  ],
+  "region": "aws region"
+}</code></pre>
+<details>
+  <summary>Beispielantwort</summary>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "public_id": "79f0e7503fd64af3b7d2b0f825100f28",
+  "name": "channel name",
+  "description": "",
+  "account_id": "Your account id",
+  "state": "DRAFT",
+  "status": null,
+  "start_time": "2021-06-29 08:30:50 UTC",
+  "stop_time": null,
+  "input_groups": "playlist",
+  "output_groups": "rtmp:s3",
+  "loop_playlist": false,
+  "playlist_id": "1703814612527248093",
+  "channel_class": "single-pipeline",
+  "ssai_enabled": true,
+  "aws_region": "aws region",
+  "message": null,
+  "created_at": "2021-06-28 12:43:55 UTC",
+  "updated_at": "2021-06-28 12:43:55 UTC",
+  "image_url": "https://bc-cloudplayout-prod.s3.amazonaws.com/default_channel_image.png",
+  "output_destinations": [
+    "Brightcove Live"
+  ],
+  "channel_created_at": "2021-06-28 12:43:55 UTC",
+  "channel_updated_at": "2021-06-28 12:43:55 UTC",
+  "channel_created_by": "username@brightcove.com",
+  "channel_updated_by": "username@brightcove.com"
+}</code></pre>
+</details>
+<p>Neben Pflichtfeldern gibt es Felder, die gesetzt werden können wie <code translate="No">description</code> , <code translate="No">stop_time</code> , <code translate="No">ssai_enabled</code> , <code translate="No">image_id</code> , <code translate="No">mid_roll_import_enabled</code> , <code translate="No">mid_roll_slot_time</code> , etc. Bitte beachten Sie die Beispiele aus dem <a href="/cloud-playout-apis/references/reference-channels.html">Channels API-Referenz</a> zum Erstellen von Kanälen mit unterschiedlichen Konfigurationen.</p>
+  </section>
+  <section class="bcls-section">
+    <h2 id="Add_content">Inhalte zur Playlist hinzufügen</h2>
+    <p>Der nächste Schritt besteht darin, Inhalte zum Kanalinhalt hinzuzufügen. Dazu verwenden Sie die <a href="/cloud-playout-apis/references/reference-cms-interactions.html">CMS-API</a> (beachten Sie, dass dies eine abgekürzte Version des Ganzen ist <a href="/cms/references/reference.html">CMS-API-Referenz</a> einschließlich nur der für Cloud Playout relevanten Vorgänge und mit Beschreibungen, die für Cloud Playout besser geeignet sind).</p>
+    <p>Rufen Sie die playlist_id des Kanals ab (aus der Antwort auf die Anfrage zum Erstellen eines Kanals oder aus einer Anfrage zum Abrufen des Kanals). Dies ist die Playlist, in der wir unsere Assets für unseren Cloud Playout-Kanal verwalten.</p>
+    <h3>Musteranfrage</h3>
+    <h4>Anfrage</h4>
+    <p>Eine Videoaktualisierungsanfrage wird verwendet, um Inhalte hinzuzufügen. Im folgenden Beispiel wird eine Sammlung von Video-IDs hinzugefügt, um eine manuelle Wiedergabeliste zu erstellen. Beachten Sie jedoch, dass Sie auch intelligente Wiedergabelisten basierend auf Video-Tags usw. erstellen können.</p>
+    <p>Mach ein <code translate="No">PATCH</code> Anfrage zu:</p>
+<pre><code class="language-http" translate="No">https://cms.api.brightcove.com/v1/accounts/<span class="bc-input">{account_id}</span>/playlists/<span class="bc-input">{playlist_id}</span></code></pre>
+    <h4>Überschriften</h4>
+<pre class="line-numbers"><code class="language-bash" translate="No">Content-Type: application/json
+Authorization: Bearer <span class="bc-input">{token}</span></code></pre>
+    <h4>Anfragetext</h4>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "video_ids": [
+    "70702887566202",
+    "70702887586202",
+    "70702260704202",
+    "70702260706202"
+  ]
+}</code></pre>
+    <details>
+      <summary>Beispielantwort</summary>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "id": "1701632459864392160",
+  "account_id": "Your account id",
+  "created_at": "2021-06-04T10:39:32.934Z",
+  "updated_at": "2021-06-04T12:29:06.793Z",
+  "description": "cloudplayout",
+  "favorite": false,
+  "name": "cloudplayout_dvfdb",
+  "reference_id": null,
+  "type": "EXPLICIT",
+  "video_ids": [
+    "70702887566202",
+    "70702887586202",
+    "70702260704202",
+    "70702260706202"
+  ],
+  "state": "READY"
+}</code></pre>
+    </details>
+  </section>
+  <section class="bcls-section">
+    <h2 id="add_live_event">Live-Ereignis hinzufügen</h2>
+    <p>Um einem Kanal eine Live-Veranstaltung hinzuzufügen, erstellen Sie eine <strong>Video erstellen</strong> Anfrage an die CMS-API und achten Sie darauf, einige spezielle Tags einzufügen, die es als Cloud Playout-Live-Ereignis identifizieren.</p>
+    <h3>Musteranfrage</h3>
+    <h4>Anfrage</h4>
+    <p>Mach ein <code translate="No">POST</code> Anfrage zu:</p>
+<pre><code class="language-http" translate="No">https://cms.api.brightcove.com/v1/accounts/<span class="bc-input">{account_id}</span>/videos</code></pre>
+    <h4>Überschriften</h4>
+<pre class="line-numbers"><code class="language-bash" translate="No">Content-Type: application/json
+Authorization: Bearer <span class="bc-input">{token}</span></code></pre>
+    <h4>Anfragetext</h4>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "name": "Name of the event",
+  <span class="bc-highlight">
+    "tags": [
+      "cp-live-placeholder",
+      "duration-00:40:00"
+    ]
+  </span>,
+  "description": "Description of the event"
+}</code></pre>
+    <details>
+      <summary>Beispielantwort</summary>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "id": "70702834583294",
+  "account_id": "Your account id",
+  "ad_keys": null,
+  "clip_source_video_id": null,
+  "complete": false,
+  "created_at": "2021-06-04T11:00:48.551Z",
+  "created_by": {
+    "type": "user",
+    "id": "76072843583",
+    "email": "username@brightcove.com"
+  },
+  "cue_points": [
+  ],
+  "custom_fields": {
+  },
+  "delivery_type": "unknown",
+  "description": "test description",
+  "digital_master_id": null,
+  "duration": null,
+  "economics": "AD_SUPPORTED",
+  "folder_id": null,
+  "geo": null,
+  "has_digital_master": false,
+  "images": {
+  },
+  "link": null,
+  "long_description": null,
+  "name": "test live event",
+  "original_filename": null,
+  "projection": null,
+  "published_at": "2021-06-04T11:00:48.565Z",
+  "reference_id": null,
+  "schedule": null,
+  "sharing": null,
+  "state": "ACTIVE",
+  "tags": [
+    "cp-live-placeholder",
+    "duration-00:05:00"
+  ],
+  "text_tracks": [
+  ],
+  "updated_at": "2021-06-04T11:00:48.572Z",
+  "updated_by": {
+    "type": "user",
+    "id": "76076294383",
+    "email": "username@brightcove.com"
+  },
+  "playback_rights_id": "primary"
+}</code></pre>
+</details>
+    <p>Bitte beziehen Sie sich auf die <a href="/cloud-playout-apis/references/reference-cms-interactions.html">CMS API-Referenz für Cloud Playout</a> Weitere Beispiele zum Verwalten von Assets in Cloud Playout.</p>
+  </section>
+  <section class="bcls-section">
+    <h2 id="get-channel">Kanal abrufen</h2>
+    <p>Wir können diesen Endpunkt verwenden, um die Kanaldetails und den Status des Kanals zu überprüfen.</p>
+    <h3>Musteranfrage</h3>
+    <h4>Anfrage</h4>
+    <p>Mach ein <code translate="No">GET</code> Anfrage zu:</p>
+<pre><code class="language-http" translate="No">https://cm.cloudplayout.brightcove.com/accounts/<span class="bc-input">{account_id}</span>/cp_channels/<span class="bc-input">{channel_id}</span></code></pre>
+    <h4>Überschriften</h4>
+<pre class="line-numbers"><code class="language-bash" translate="No">Content-Type: application/json
+Authorization: Bearer <span class="bc-input">{token}</span></code></pre>
+    <details>
+      <summary>Beispielantwort</summary>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "public_id": "channel id",
+  "name": "channel name",
+  "description": "Channel created for testing Cloud Playout",
+  "account_id": "Your account id",
+  "state": "DRAFT",
+  "status": null,
+  "start_time": "2020-12-17 06:00:00 UTC",
+  "stop_time": "2020-12-17 07:00:00 UTC",
+  "input_groups": "playlist",
+  "output_groups": "rtmp",
+  "loop_playlist": true,
+  "playlist_id": "1686204667297382886",
+  "channel_class": "single-pipeline",
+  "ssai_enabled": false,
+  "aws_region": "us-east-1",
+  "message": null,
+  "created_at": "2020-12-16 03:41:22 UTC",
+  "updated_at": "2020-12-17 04:53:30 UTC",
+  "image_url": "https://bc-cloudplayout-prod.s3.amazonaws.com/default_channel_image.png",
+  "output_destinations": [
+    "Brightcove Live"
+  ],
+  "channel_created_at": "2020-12-16 03:41:22 UTC",
+  "channel_updated_at": "2020-12-17 04:53:30 UTC",
+  "channel_created_by": "username@brightcove.com",
+  "channel_updated_by": "username@brightcove.com",
+  "live_profile": {
+    "display_name": "Standard Live HD 720p - Tier 1",
+    "name": "standard-live-hd-720p-tier-1",
+    "date_created": "2018-06-04 18:16:44 UTC",
+    "date_modified": "2018-06-04 18:16:44 UTC"
+  },
+  "channel_data": {
+    "input_group": [
+      {
+        "input_type": "playlist",
+        "value": "cloudplayout_testChannel",
+        "description": "Playlist created for Cloud Playout",
+        "public_id": "1686204667297382886"
+      }
+    ],
+    "output_groups": [
+      {
+        "type": "rtmp",
+        "location": "bc_live",
+        "destination": "Brightcove Live"
+      }
+    ]
+  }
+}</code></pre>
+    </details>
+  </section>
+  <section class="bcls-section">
+    <h2 id="activate-channel">Einen Kanal aktivieren</h2>
+      <aside class="bcls-aside bcls-aside--warning language-editable">Hinweis: Stellen Sie sicher, dass der Kanalplaylist mindestens ein Inhaltselement hinzugefügt wurde, bevor Sie den Kanal aktivieren!</aside>
+      <p>Aktivieren Sie einen Kanal, indem Sie die folgende Anfrage stellen. Es ist kein Anforderungstext erforderlich.</p>
+      <h3>Musteranfrage</h3>
+      <h4>Anfrage</h4>
+      <p>Mach ein <code translate="No">POST</code> Anfrage zu:</p>
+  <pre><code class="language-http" translate="No">https://cm.cloudplayout.brightcove.com/accounts/<span class="bc-input">{account_id}</span>/cp_channels/<span class="bc-input">{channel_id}</span>/create</code></pre>
+      <h4>Überschriften</h4>
+  <pre class="line-numbers"><code class="language-bash" translate="No">Content-Type: application/json
+  Authorization: Bearer <span class="bc-input">{token}</span></code></pre>
+      <details>
+        <summary>Beispielantwort</summary>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "message":"Channel activation initiated"
+}</code></pre>
+      </details>
+      <p>Um den Status des Kanals zu überprüfen, siehe <a href="#get-channel">Kanalabschnitt abrufen</a> Oben.</p>
+    </section>
+  <section class="bcls-section">
+    <h2 id="start-channel">Starten Sie einen Kanal</h2>
+      <aside class="bcls-aside bcls-aside--warning language-editable">Hinweis: Stellen Sie sicher, dass der Kanal <strong>bereits aktiviert</strong> und ist dabei <strong>GEPLANT</strong> Zustand vor dem Starten des Kanals!</aside>
+      <p>Starten Sie einen Kanal, indem Sie die folgende Anfrage stellen. Es ist kein Anforderungstext erforderlich.</p>
+      <h3>Musteranfrage</h3>
+      <h4>Anfrage</h4>
+      <p>Mach ein <code translate="No">POST</code> Anfrage zu:</p>
+  <pre><code class="language-http" translate="No">https://cm.cloudplayout.brightcove.com/accounts/<span class="bc-input">{account_id}</span>/cp_channels/<span class="bc-input">{channel_id}</span>/start</code></pre>
+      <h4>Überschriften</h4>
+  <pre class="line-numbers"><code class="language-bash" translate="No">Content-Type: application/json
+  Authorization: Bearer <span class="bc-input">{token}</span></code></pre>
+      <details>
+        <summary>Beispielantwort</summary>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "message":"Channel start initiated"
+}</code></pre>
+      </details>
+      <p>Um den Status des Kanals zu überprüfen, siehe <a href="#get-channel">Kanalabschnitt abrufen</a> Oben.</p>
+    </section>
+  <section class="bcls-section">
+    <h2 id="stop-channel">Einen Kanal stoppen</h2>
+      <aside class="bcls-aside bcls-aside--warning language-editable">Hinweis: Stellen Sie sicher, dass der Kanal eingeschaltet ist <strong>LAUFEN</strong> Zustand vor dem Stoppen des Kanals!</aside>
+      <p>Stoppen Sie einen Kanal, indem Sie die folgende Anfrage stellen. Es ist kein Anforderungstext erforderlich.</p>
+      <h3>Musteranfrage</h3>
+      <h4>Anfrage</h4>
+      <p>Mach ein <code translate="No">POST</code> Anfrage zu:</p>
+  <pre><code class="language-http" translate="No">https://cm.cloudplayout.brightcove.com/accounts/<span class="bc-input">{account_id}</span>/cp_channels/<span class="bc-input">{channel_id}</span>/stop</code></pre>
+      <h4>Überschriften</h4>
+  <pre class="line-numbers"><code class="language-bash" translate="No">Content-Type: application/json
+  Authorization: Bearer <span class="bc-input">{token}</span></code></pre>
+      <details>
+        <summary>Beispielantwort</summary>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "message":"Channel stop initiated"
+}</code></pre>
+      </details>
+      <p>Um den Status des Kanals zu überprüfen, siehe <a href="#get-channel">Kanalabschnitt abrufen</a> Oben. Nach dem Stoppen befindet sich der Kanal im DRAFT-Zustand.</p>
+    </section>
+  <section class="bcls-section">
+    <h2 id="delete-channel">Einen Kanal löschen</h2>
+      <aside class="bcls-aside bcls-aside--warning language-editable">Hinweis: Stellen Sie sicher, dass der Kanal auch nicht in ist <strong>ERSTELLEN/STARTEN</strong> Zustand vor dem Löschen eines Kanals!</aside>
+      <p>Löschen Sie einen Kanal, indem Sie die folgende Anfrage stellen. Es ist kein Anforderungstext erforderlich.</p>
+      <h3>Musteranfrage</h3>
+      <h4>Anfrage</h4>
+      <p>Mach ein <code translate="No">DELETE</code> Anfrage zu:</p>
+  <pre><code class="language-http" translate="No">https://cm.cloudplayout.brightcove.com/accounts/<span class="bc-input">{account_id}</span>/cp_channels/<span class="bc-input">{channel_id}</span></code></pre>
+      <h4>Überschriften</h4>
+  <pre class="line-numbers"><code class="language-bash" translate="No">Content-Type: application/json
+  Authorization: Bearer <span class="bc-input">{token}</span></code></pre>
+      <details>
+        <summary>Beispielantwort</summary>
+<pre class="line-numbers"><code class="language-json" translate="No">{
+  "message":"Delete initiated"
+}</code></pre>
+      </details>
+      <p>Um den Status des Kanals zu überprüfen, siehe <a href="#get-channel">Kanalabschnitt abrufen</a> Oben. Sobald der Kanal gelöscht wurde, sollten Sie die Kanalinformationen von Kanal per ID-Anfrage abrufen nicht mehr sehen.</p>
+    </section>
+</article>

@@ -1,0 +1,245 @@
+---
+title: "Beschränken gleichzeitiger Streams pro Betrachter"
+description: "In diesem Thema erfahren Sie, wie Sie gleichzeitige Streams einschränken, wenn Sie Brightcove-Wiedergabeeinschränkungen verwenden."
+parent: Guides 
+grandparent: Playback Restrictions
+---
+ <h1>{{ page.title }}</h1>
+<article class="bcls-article">
+  <summary>{{ page.description }}</summary>
+  
+  <!-- <br/>
+  <aside class="bcls-aside bcls-aside--tip">This feature is available for a specific set of customers with access to the Limited Availability phase of Brightcove Playback Restrictions.</aside> -->
+
+  <section class="bcls-section">
+    <h2 id="Introduction">Einführung</h2>
+
+    <p>Mit Limits für gleichzeitige Streams definieren Sie die Anzahl der Videostreams, die ein bestimmter Benutzer zu einem bestimmten Zeitpunkt ansehen kann. Die Begrenzung gleichzeitiger Streams pro Benutzer hält Zuschauer davon ab, ihre Anmeldeinformationen mit Freunden zu teilen, die keine Konten haben.</p>
+    <p>
+      Wenn die maximale Anzahl gleichzeitiger Streams erreicht ist und der Betrachter oder jemand mit seinen Kontoanmeldeinformationen versucht, einen zusätzlichen Stream zu öffnen, wird entweder die älteste Sitzung beendet oder die neueste Anfrage blockiert. Sie steuern dieses Verhalten.
+    </p>
+    <p>
+      Diese Funktion wird in den DRM-Workflow eingebunden, ist also sicher und kann mit minimaler Integration verwendet werden.
+    </p>
+
+    <p>Wenn Sie diese Funktion noch nicht kennen, lesen Sie die <a href="/playback-restrictions/getting-started/overview-playback-restrictions.html">Überblick: Brightcove-Wiedergabebeschränkungen</a> dokumentieren.</p>
+
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="Account_setup">Kontoeinrichtung</h2>
+
+    <p>Wenden Sie sich an Ihren Account Manager, um Ihr Konto für die parallele Streaming-Funktion zu aktivieren.</p>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="Implementation">Implementierung</h2>
+    <p>
+      Für diese Funktion muss der Inhalt mit DRM verschlüsselt werden. Gehen Sie zur Implementierung wie folgt vor:
+    </p>
+    <ol class="bcls-tasklist">
+      <li>
+        <p>Bestimmen Sie die Schadenwerte:</p>
+        <ul>
+          <li>Die <code translate="No">climit</code> Claim gibt an, wie viele Zuschauer oder Streams gleichzeitig spielen können. </li>
+          <li>
+            Die <code translate="No">cbeh</code> Anspruch definiert, wie die Parallelität blockiert wird. Wenn das Stream-Limit erreicht ist, können Sie entweder einen neuen Viewer blockieren (d. h. eine andere IP-Adresse und ein anderes Gerät) oder eine neue Stream-Anfrage (Sitzung) blockieren.
+            <ul>
+              <li><code translate="No">cbeh</code> Wert <code translate="No">BLOCK_NEW_USER</code> - Blockiere neue Zuschauer</li>
+              <li><code translate="No">cbeh</code> Wert <code translate="No">BLOCK_NEW</code> - Blockiere neue Streams</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Erstellen Sie ein JSON Web Tokent (JWT) mit Ansprüchen, die Ihren gewünschten Limits für gleichzeitige Streams zugeordnet sind. Für Details siehe die <a href="https://general.support.brightcove.com/developer/create-jwt.html">Ein ... Erstellen <span translate="No">JSON-Webtoken</span> (JWT)</a> dokumentieren.
+      </li>
+      <li>
+        Konfigurieren Sie Ihren Player so, dass er Wiedergabebeschränkungen verwendet und die <span translate="No">JSON-Webtoken</span> (JWT) beim Abrufen Ihrer Videoinhalte. Einzelheiten finden Sie im <a href="/playback-rights/getting-started/implementing-epa.html#Configure_your_player">Konfigurieren Sie Ihren Player</a> Abschnitt des Dokuments Implementieren des Playback Rights Management Service.
+      </li>
+    </ol>
+
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="Renewal_interval">Erneuerungsintervall</h2>
+    <p>
+      Um sicherzustellen, dass das Limit für gleichzeitige Streams erzwungen wird, wird während der Wiedergabe eine DRM-Lizenzverlängerungsanforderung basierend auf einem definierten Verlängerungsintervall gesendet. Bei der Einrichtung müssen Sie dieses Erneuerungsintervall definieren.
+    </p>
+    <p>
+      Autorisierungsanfragen für die Mid-Stream-Wiedergabe müssen ein Parallelitätslimit im JWT-Token zusammen mit einer öffentlichen Schlüssel-ID angeben.
+    </p>
+
+    <p>Heute zählt jede Verlängerungsanfrage als zusätzliche Lizenz, die auf die Anzahl Ihrer erworbenen Lizenzen angerechnet wird. Dies sollte bei der Entscheidung für ein Intervall berücksichtigt werden.</p>
+    <table class="bcls-table">
+      <thead class="bcls-table__head">
+        <tr>
+          <th>Erneuerungsintervall</th>
+          <th>Pro Stream bereitgestellte Lizenzen für 2-Stunden-Inhalte</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td>Keiner</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>15 Minuten</td>
+          <td>8</td>
+        </tr>
+        <tr>
+          <td>5 Minuten</td>
+          <td>24</td>
+        </tr>
+        <tr>
+          <td>2 Minuten</td>
+          <td>60</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="Understanding_behavior">Verhalten verstehen</h2>
+    <p>
+      Mit dieser Funktion können Sie das Verhalten zum Blockieren von Streams auswählen.
+    </p>
+    <h3>Ältesten Stream blockieren</h3>
+    <p>
+      Brightcove unterstützt die Begrenzung von Wiedergabestreams für DRM-geschützte Inhalte. Wenn eine neue Verlängerungsanfrage verarbeitet wird, wird die älteste Sitzung beendet. Dadurch kann neuen Benutzeranforderungen der Zugriff gewährt werden, während die ältesten Anforderungen, die möglicherweise nicht mehr gültig sind, blockiert werden und eine Meldung über Netzwerk- oder Gerätefehler angezeigt wird.
+    </p>
+    <p>
+      Dies ist das Standardverhalten.
+    </p>
+    <figure class="bcls-figure">
+      <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/pas/concurrency-general.png" alt="Block oldest stream">
+      <figcaption class="bcls-caption--image">Ältesten Stream blockieren</figcaption>
+    </figure>
+
+    <p>
+      <strong>Benutzeraktivität:</strong>
+    </p>
+    <ol>
+      <li>
+        Ben, Jason und Sarah beginnen sich einen Film anzusehen.
+      </li>
+      <li>
+        Jamie beschließt, ebenfalls zuzusehen, was dazu führt, dass Bens bevorstehende Verlängerungsanfrage abgelehnt wird.
+      </li>
+      <li>
+        Ben startet den Film neu, was nun dazu führt, dass Jasons Verlängerungsanfrage fehlschlägt.
+      </li>
+      <li>
+        Jason fängt einige Zeit später an, einen anderen Film anzuschauen, was dazu führt, dass Sarahs Film stoppt.
+      </li>
+    </ol>
+
+    <h3>Neue Anfrage blockieren</h3>
+    <p>
+      Alternativ können Sie jede neue Lizenzanforderung blockieren, wenn die maximale Anzahl gleichzeitiger Streams erreicht ist. Auf diese Weise können alle aktuellen Benutzer weiter zuschauen und gleichzeitig eine Nachricht für alle neuen Benutzeranfragen anzeigen.
+    </p>
+    <p>
+      Um dieses Verhalten zu aktivieren, müssen Sie die <code translate="No">cbeh</code> Anspruch in deinem <a href="https://general.support.brightcove.com/developer/create-jwt.html">JSON-Webtoken (JWT)</a> wie folgt:
+    </p>
+    <pre><code class="language-json" translate="No">&quot;cbeh&quot;: &quot;BLOCK_NEW&quot;</code></pre>
+    <br />
+    <p>
+      Hier ist ein Beispiel:
+    </p>
+    <figure class="bcls-figure">
+      <img class="bcls-image--no-border" src="//learning-services-media.brightcove.com/doc-assets/pas/block-new-request.png" alt="Block new request">
+      <figcaption class="bcls-caption--image">Neue Anfrage blockieren</figcaption>
+    </figure>
+
+    <p>
+      <strong>Benutzeraktivität:</strong>
+    </p>
+    <ol>
+      <li>
+        Ben, Jason und Sarah beginnen sich einen Film anzusehen.
+      </li>
+      <li>
+        Jamie versucht mit dem Zuschauen zu beginnen, aber ihre Anfrage wird aufgrund der Höchstgrenze blockiert.
+      </li>
+      <li>
+        Jason hört auf zu gucken und erlaubt einem anderen Zuschauer, mit dem Anschauen zu beginnen. Jamie beginnt sich einen Film anzusehen.
+      </li>
+    </ol>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="PlayReady">Spielbereit</h2>
+    <p>PlayReady unterstützt keine Mid-Stream-Lizenzprüfungen.</p>
+    <h3>Aktueller Brightcove-Player</h3>
+    <p>Wenn Sie Brightcove Player v6.48.x oder neuer verwenden, legt der Player die bevorzugte Reihenfolge für Edge-Browser fest, um Widevine anstelle von PlayReady zu verwenden. PlayReady sollte also kein Problem sein.</p>
+    <p>Sie finden den Fix für die EPA DRM-Quellenauswahl in Chromium Edge-Browsern im <a href="https://player.support.brightcove.com/release-notes/brightcove-player-release-notes.html">Versionshinweise für Brightcove-Player</a>.</p>
+    <h3>ältere Versionen</h3>
+    <p>Ältere Versionen von Brightcove Player verwenden zuerst den Chromium Edge-Browserstandard von PlayReady. In diesem Fall müssen Sie die Midstream-Lizenzprüfungen manuell durchführen.</p>
+    <p>
+      Informationen zum Implementieren einer manuellen Lizenzverlängerung in Ihren Playern finden Sie unter <a href="https://docs.microsoft.com/en-us/playready/features/concurrency-limiting">Parallelitätsbeschränkung von Microsoft</a> dokumentieren.
+    </p>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="Safari">Safari</h2>
+    <p>
+      Das Parallelitätslimit wird im Safari-Browser unterstützt, aber Verlängerungsanfragen werden nicht gesendet. Dies bedeutet, dass neue Sessions/Streams für längere Zeiträume blockiert werden als bei anderen Browsern.
+    </p>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="Notes">Anmerkungen</h2>
+    <p>
+      Für diese Funktion gelten die folgenden Hinweise:
+    </p>
+    <ul>
+      <li>
+        Eine manuelle Lizenzverlängerungsanforderung sollte in den folgenden Fällen implementiert werden:
+        <ul>
+          <li>
+            Gleichzeitigkeitslimit bei Nicht-Brightcove-Spielern, außer wenn durch Widevine geschützt
+          </li>
+          <li>
+            Gleichzeitigkeitslimit für PlayReady auf allen Geräten, außer bei Verwendung von Brightcove Player v6.48.x oder höher
+          </li>
+        </ul>
+      </li>
+      <li>
+        Die manuelle Lizenzverlängerung sollte zu einem kürzeren Zeitraum als dem festgelegten Verlängerungsintervall angefordert werden.
+      </li>
+    </ul>
+
+  </section>
+
+  <!-- <section class="bcls-section">
+<h2 id="Limitations">Limitations</h2>
+<p>
+  The following limitations apply to this feature:
+</p>
+
+<ul>
+  <li>
+    Concurrency limit is not yet supported in Safari due to the browser's limitations.
+  </li>
+</ul>
+</section> -->
+
+  <!-- <section class="bcls-section">
+    <h2 id="Related_topics">Related topics</h2>
+
+    <ul>
+      <li>
+        <a href="/playback-rights/getting-started/overview-epa.html">Overview: Managing Playback Rights</a>
+      </li>
+      <li>
+        <a href="/playback-rights/getting-started/implementing-epa.html">Implementing Playback Rights</a>
+      </li>
+      <li>
+        <a href="/playback-rights/guides/using-epa-with-bcp.html">Using Playback Rights with Brightcove Player</a>
+      </li>
+      <li>
+        <a href="/playback-rights/guides/using-epa-with-sdks.html">Using Playback Rights with the Native SDKs</a>
+      </li>
+    </ul>
+  </section> -->
+
+</article>

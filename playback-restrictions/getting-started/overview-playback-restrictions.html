@@ -1,0 +1,714 @@
+---
+title: "Überblick: Brightcove-Wiedergabeeinschränkungen"
+description: "In diesem Thema lernen Sie verschiedene Strategien zum Verwalten der Videowiedergabe mithilfe von Brightcove-Wiedergabeeinschränkungen kennen."
+parent: Getting Started 
+grandparent: Playback Restrictions
+---
+ <h1>{{ page.title }}</h1>
+<article class="bcls-article">
+  <summary>{{ page.description }}</summary>
+
+  <!-- <br/>
+  <aside class="bcls-aside bcls-aside--tip">This feature is available for a specific set of customers with access to the Limited Availability phase of Brightcove Playback Restrictions.</aside> -->
+
+  <section class="bcls-section">
+    <h2 id="Introduction">Einführung</h2>
+    <p>Unabhängig davon, ob Ihre Inhalte für ein internes oder externes Publikum bestimmt sind, kostenlos oder monetarisiert sind, Brightcove Playback Restrictions bietet das richtige Maß an Inhaltssicherheit für Ihren Anwendungsfall und ermöglicht es den Zuschauern dennoch, von jedem Gerät und überall auf die Inhalte zuzugreifen.</p>
+    <p>Mit dieser Funktion können Sie verschiedene Szenarien für das Streaming Ihrer Inhalte definieren, darunter:</p>
+    <ul>
+      <li>Wo Ihre Inhalte verfügbar sind</li>
+      <li>Wie Inhalte gestreamt werden</li>
+      <li>Wenn Inhalte angezeigt werden können</li>
+      <li>Wer kann deine Inhalte ansehen</li>
+    </ul>
+    <p>Schau dir den Blogpost an: <a href="https://www.brightcove.com/en/blog/more-than-just-security/">Es geht um mehr als nur Sicherheit – es geht um Markenintegrität und Ihre Kundenbindung</a></p>
+
+    <h3>Merkmale</h3>
+    <p>Die Flexibilität dieser Funktion bietet die Möglichkeit, sich an eine Reihe verschiedener Anwendungsfälle anzupassen.</p>
+
+    <table class="bcls-table">
+      <caption class="bcls-caption--table">Tastenfunktionen für die Wiedergabebeschränkung</caption>
+      <thead class="bcls-table__head">
+        <tr>
+          <th>Besonderheit</th>
+          <!-- <th>VOD</th>
+                <th>Live</th> -->
+          <th>DRM erforderlich</th>
+          <th>JWT erforderlich</th>
+          <th>Wiedergaberecht erforderlich</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td>IP-Beschränkungen</td>
+          <!-- <td>Yes</td>
+              <td>Yes</td> -->
+          <td style="text-align: center;">Nein</td>
+          <td style="background-color:#ededed;"></td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <tr>
+          <td>Länderbeschränkungen</td>
+          <!-- <td>Yes</td>
+                <td>Yes</td> -->
+          <td style="text-align: center;">Nein</td>
+          <td style="background-color:#ededed;"></td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <tr>
+          <td>Einschränkungen bei Postleitzahlen</td>
+          <!-- <td>Yes</td>
+                <td>Yes</td> -->
+          <td style="text-align: center;">Nein</td>
+          <td style="background-color:#ededed;"></td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <tr>
+          <td>Designated Market Area (DMA)</td>
+          <!-- <td>Yes</td>
+                <td>Yes</td> -->
+          <td style="text-align: center;">Nein</td>
+          <td style="background-color:#ededed;"></td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <tr>
+          <td>Domaineinschränkungen</td>
+          <!-- <td>Yes</td>
+              <td>Yes</td> -->
+          <td style="text-align: center;">Nein</td>
+          <td style="background-color:#ededed;"></td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <tr>
+          <td>Datum/Uhrzeitplanung</td>
+          <!-- <td>Yes</td>
+                <td>Yes</td> -->
+          <td style="text-align: center;">Nein</td>
+          <td style="background-color:#ededed;"></td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <tr>
+          <td>Wiederkehrende Fahrpläne</td>
+          <!-- <td>Yes</td>
+                <td>Yes</td> -->
+          <td style="text-align: center;">Nein</td>
+          <td style="background-color:#ededed;"></td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <tr>
+          <td>Proxy-Einschränkungen</td>
+          <!-- <td>Yes</td>
+              <td>Yes</td> -->
+          <td style="text-align: center;">Nein</td>
+          <td style="background-color:#ededed;"></td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <!-- <tr>
+                <td>Token TTL</td>
+                <td>Yes</td>
+                <td>Yes</td>
+                <td>Yes</td>
+                <td style="background-color:#ededed;"></td>
+                <td>No</td>
+            </tr> -->
+        <tr>
+          <td>Berechtigungsprüfung</td>
+          <!-- <td>Yes</td>
+                <td>Yes</td> -->
+          <td style="text-align: center;">Nein</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color:#ededed;"></td>
+        </tr>
+        <tr>
+          <td>Lizenzschlüsselschutz</td>
+          <!-- <td>Yes</td>
+                <td>Yes</td> -->
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color:#ededed;"></td>
+        </tr>
+        <tr>
+          <td>Gleichzeitige Streams</td>
+          <!-- <td>Yes</td>
+                <td>Yes</td> -->
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color:#ededed;"></td>
+        </tr>
+        <tr>
+          <td>Geräteregistrierung</td>
+          <!-- <td>Yes</td>
+                <td>Yes</td> -->
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color:#ededed;"></td>
+        </tr>
+        <tr>
+          <td>Überprüfung der Mid-Stream-Einschränkungen</td>
+          <!-- <td>Yes</td>
+              <td>Yes</td> -->
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color:#ededed;"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Pakete</h3>
+    <p>Für Wiedergabebeschränkungen stehen mehrere Sicherheitspakete zur Verfügung.</p>
+    <table class="bcls-table">
+      <caption class="bcls-caption--table">Funktionspakete für Wiedergabebeschränkungen</caption>
+      <thead class="bcls-table__head">
+        <tr>
+          <th colspan="2">Besonderheit</th>
+          <th>Sicherheitsstufe 1</th>
+          <th>Sicherheitsstufe 2</th>
+          <th>Sicherheitsstufe 3</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td rowspan="4">Geografische Einschränkungen</td>
+          <td>IP-Beschränkungen</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <tr>
+          <td>Land</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <tr>
+          <td>US-Postleitzahlen</td>
+          <td style="text-align: center;">Nein</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <tr>
+          <td>US-DMA</td>
+          <td style="text-align: center;">Nein</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <tr>
+          <td colspan="2">Domaineinschränkungen</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <tr>
+          <td rowspan="2">Datum/Uhrzeitplanung</td>
+          <td>Basis (Start-End-Datum)</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <tr>
+          <td>Wiederkehrend</td>
+          <td style="text-align: center;">Nein</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <tr>
+          <td colspan="2">Proxy-Einschränkungen</td>
+          <td style="text-align: center;">Nein</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <tr>
+          <td colspan="2">Berechtigungsprüfung</td>
+          <td style="text-align: center;">Nein</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <tr>
+          <td colspan="2">Lizenzschlüsselschutz</td>
+          <td style="text-align: center;">Nein</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <!-- <tr>
+              <td colspan="2">Basic encryption (HLSe)</td>
+              <td style="text-align: center;">No</td>
+              <td style="background-color: #D7F6E6;text-align: center;">Yes</td>
+              <td style="background-color: #D7F6E6;text-align: center;">Yes</td>
+            </tr>
+            <tr>
+              <td colspan="2">DRM platform access</td>
+              <td style="text-align: center;">No</td>
+              <td style="background-color: #D7F6E6;text-align: center;">Yes</td>
+              <td style="background-color: #D7F6E6;text-align: center;">Yes</td>
+            </tr> -->
+        <tr>
+          <td colspan="2">Gleichzeitige Streams</td>
+          <td style="text-align: center;">Nein</td>
+          <td style="text-align: center;">Nein</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <tr>
+          <td colspan="2">Geräteregistrierung</td>
+          <td style="text-align: center;">Nein</td>
+          <td style="text-align: center;">Nein</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+        <tr>
+          <td colspan="2">Überprüfung der Mid-Stream-Einschränkungen</td>
+          <td style="text-align: center;">Nein</td>
+          <td style="text-align: center;">Nein</td>
+          <td style="background-color: #D7F6E6;text-align: center;">Jawohl</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="Which_products_support_Playback_Restrictions">Welche Produkte unterstützen Wiedergabebeschränkungen?</h2>
+    <p>Die folgenden Brightcove-Produkte unterstützen Wiedergabeeinschränkungen:</p>
+    <ul>
+      <!-- <li><strong>Brightcove Beacon</strong> - Full Playback Restrictions support and Viewer Entitlements are coming (roll-out date TBD)</li> -->
+      <li><strong>Video-Cloud: VOD und Live</strong></li>
+      <li><strong>Virtuelle Veranstaltungen</strong></li>
+      <li><strong>Kampagne</strong></li>
+      <li><strong>Anheuern</strong></li>
+      <li><strong>Galerie</strong></li>
+    </ul>
+    <aside class="bcls-aside bcls-aside--information">Für Brightcove Beacon sind derzeit keine Wiedergabebeschränkungen verfügbar.</aside>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="How_are_Playback_Restrictions_applied">Wie werden Wiedergabebeschränkungen angewendet?</h2>
+    <p>Wiedergabebeschränkungen können wie folgt angewendet werden:</p>
+    <ul>
+      <li><a href="#Asset_level_restrictions">Einschränkungen auf Asset-Ebene</a></li>
+      <li><a href="#Runtime_restrictions">Laufzeitbeschränkungen</a></li>
+      <li><a href="#License_Keys_Protection">Lizenzschlüsselschutz</a></li>
+    </ul>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="Asset_level_restrictions">Einschränkungen auf Asset-Ebene</h2>
+    <p>Einschränkungen auf Asset-Ebene werden in den Wiedergaberechten definiert.</p>
+
+    <p>Sie können Wiedergabebeschränkungen auf Asset-Ebene verwenden, wenn Sie das Streaming für Folgendes einschränken möchten:</p>
+    <ul>
+      <li>Region (Geo-Einschränkungen)</li>
+      <li>Zeit (Planung)</li>
+      <li>Domain</li>
+      <li>Proxy-Typ</li>
+    </ul>
+    <aside class="bcls-aside bcls-aside--information">Standardmäßig verfügen alle neuen, aufgenommenen Assets über ein Wiedergaberecht, das das Streamen an alle, überall und jederzeit ermöglicht.</aside>
+
+    <h3>Region</h3>
+    <p>Geo-Einschränkungen schränken ein, wo deine Stream-Inhalte weltweit angesehen werden können. Zu den Optionen gehören:</p>
+    <ul>
+      <li>IP-Adressen</li>
+      <li>CIDRs</li>
+      <li>Postleitzahlen (nur für US-Postleitzahlen verfügbar)</li>
+      <li>DMAs (nur für US-DMAs verfügbar)</li>
+      <li>Länder</li>
+    </ul>
+    <p>TBD - Geo-Restrictions haben eine globale Regel, die das Gesamtverhalten wie folgt definiert:</p>
+    <ul>
+      <li>Wenn die globale Regel auf eingestellt ist <strong>Alles erlauben</strong> , wird die gesamte Wiedergabe zugelassen und Sie können Regionen auf die schwarze Liste setzen.</li>
+      <li>Wenn die globale Regel auf eingestellt ist <strong>Alles blockieren</strong> , wird die gesamte Wiedergabe blockiert und Sie können Regionen auf die Whitelist setzen.</li>
+    </ul>
+
+    <h3>Zeit</h3>
+    <p>Mit der Planung können Sie ein Verfügbarkeitsfenster festlegen, um Ihre Inhalte mit zwei Optionen zu streamen:</p>
+    <ul>
+      <li>Spezifische Daten</li>
+      <li>Wiederkehrend für bestimmte Tage und Stunden</li>
+    </ul>
+
+    <h3>Domain</h3>
+    <p>Mit Domäneneinschränkungen können Sie Domänen festlegen, in denen Sie Streaming zulassen oder blockieren möchten.</p>
+
+    <h3>Stellvertreter</h3>
+    <p>Proxy-Einschränkungen verhindern das Streaming von Inhalten, wenn ein Proxy vorhanden ist. Es gibt fünf verfügbare Proxy-Typen:</p>
+    <ul>
+      <li>Anonym - IP-Adresse des Clients ist nicht verfügbar</li>
+      <li>Öffentlich – Mehrere Benutzer, die von einem Standort aus über einen Proxy verfügen, der den öffentlichen Internetzugang ermöglicht</li>
+      <li>Unternehmen – Identifizieren Sie, ob mehrere Benutzer über einen oder mehrere zentrale Standorte als Proxy geleitet werden und eine einzige netzwerkoffene IP-Adresse gemeinsam nutzen können</li>
+      <li>Transparent - Die IP-Adresse des Clients ist über HTTP-Header verfügbar, obwohl der Wert nicht unbedingt zuverlässig ist</li>
+      <li>Hosting</li>
+    </ul>
+    <aside class="bcls-aside bcls-aside--information">Da VPN-Anbieter ihre Dienste weiter verbessern, kann sich die Auflösung von IP-Adressen von dem unterscheiden, was Sie für blockierte IP-Adressen definiert haben. Aus diesem Grund ist die Proxy-Blockierung nicht zu 100 % garantiert.</aside>
+
+    <h3>Anwendungsfälle auf Asset-Ebene</h3>
+    <details>
+      <summary>
+        <h3 id="Use_cases1">Anwendungsfälle</h3>
+      </summary>
+      <p>Hier sind einige mögliche Anwendungsfälle:</p>
+      <h4>Inhalte nach Postleitzahl begrenzen</h4>
+      <ul>
+        <li>
+          <p>Ziel</p>
+          <p>Shari (Web Producer bei Sports League) möchte den Inhaltszugriff nach Postleitzahl einschränken, damit Zuschauer innerhalb der Postleitzahl des Sportereignisses das Ereignis nicht streamen können</p>
+        </li>
+        <li>
+          <p>Lösung</p>
+          <p>Shari kann Wiedergaberechte definieren, um Postleitzahlen pro Region in den USA auf die schwarze Liste zu setzen. Da der Inhalt öffentlich ist (es gibt keine Berechtigungen für die Verarbeitung von Middleware-Anwendungen), müssen die Wiedergaberechte als unsicher festgelegt werden. Wenn die Wiedergaberechte definiert sind, weist Shari diese jedem Medien-Asset zu.</p>
+        </li>
+      </ul>
+
+      <h4>Inhalte nach Land/IP-Adresse einschränken</h4>
+      <ul>
+        <li>
+          <p>Ziel</p>
+          <p>Dylan (CMO) möchte den Zugriff auf Inhalte nach Ländern beschränken, damit die Zuschauer von überall außer der Ukraine und Korea streamen können. Da sich das Entwicklungsteam in Korea befindet, muss Dylan das Streaming von einer bestimmten IP-Adresse innerhalb Koreas zulassen.</p>
+        </li>
+        <li>
+          <p>Lösung</p>
+          <p>Dylan kann ein Wiedergaberecht definieren, um die Ukraine und Korea zu blockieren und eine IP-Adresse aus Korea zuzulassen. Da Dylans Inhalte öffentlich sind, muss jedes Wiedergaberecht einen unsicheren Zugriff ermöglichen. Wenn die Wiedergaberechte definiert sind, weist Dylan diese jedem Medien-Asset zu.</p>
+        </li>
+      </ul>
+    </details>
+
+    <h3>Beschränkungen auf Asset-Ebene festlegen</h3>
+    <p>
+      Mit den Wiedergaberechten können Sie Einschränkungen für die Videowiedergabe festlegen. Diese Rechte werden in der <a href="/playback-restrictions/references/playback-rights/reference.html">API für Wiedergaberechte</a> und jedem Set wird eine eindeutige ID zugewiesen (<code translate="No">playback_right_id</code>). Ein Satz von Rechten kann null oder mehr Videos zugeordnet werden.
+    </p>
+    <p>
+      Wenn ein Video ein hat <code translate="No">playback_right_id</code> , werden die im Playback Rights-Objekt angegebenen Einschränkungen auf ALLE Anfragen für dieses Video angewendet.
+    </p>
+    <p>
+      Dieses Diagramm zeigt den Ablauf von der Video- und Lizenzanfrage des Benutzers bis zur Wiedergabe.
+    </p>
+    <figure class="bcls-figure">
+      <img class="bcls-image--no-border" src="/assets/images/playback-restrictions/overview/overview.png" alt="Playback Rights">
+      <figcaption class="bcls-caption--image">Wiedergaberechte</figcaption>
+    </figure>
+
+    <p>Einschränkungen auf Asset-Ebene können folgendermaßen definiert werden:</p>
+    <ul>
+      <li><a href="#Using_Brightcove_APIs">Verwenden von Brightcove-APIs</a></li>
+      <li><a href="#Using_Video_Cloud_Studio">Verwenden von Video Cloud Studio</a></li>
+    </ul>
+
+    <h4 id="Using_Brightcove_APIs">Verwenden von Brightcove-APIs</h4>
+    <p>Sie können die APIs von Brightcove verwenden, um Einschränkungen auf Asset-Ebene zu definieren. Diese Schritte können mit Brightcove Player, den nativen SDKs oder Ihrem eigenen Player verwendet werden.</p>
+    <ol class="bcls-tasklist-restart">
+      <li>
+        <p>Verwenden Sie zuerst die <a href="/playback-restrictions/references/playback-rights/reference.html">API für Wiedergaberechte</a> eine Einschränkung zu schaffen.</p>
+      </li>
+      <li>
+        <p>Verwenden Sie dann die <a href="/cms/index.html">CMS-API</a> um die Einschränkung mit Ihren Video-Assets zu verknüpfen.</p>
+      </li>
+      <li>
+        <p>Einzelheiten finden Sie im <a href="/playback-restrictions/getting-started/implementing-playback-rights.html">Implementieren von Wiedergaberechten</a> dokumentieren.</p>
+      </li>
+    </ol>
+
+    <h4 id="Using_Video_Cloud_Studio">Verwenden von Video Cloud Studio</h4>
+    <p>Sie können auch Video Cloud Studio verwenden, um Beschränkungen auf Asset-Ebene zu definieren. Diese Schritte können mit Brightcove Player oder den nativen SDKs verwendet werden.</p>
+    <ol class="bcls-tasklist-restart">
+      <li>
+        <p>Erweitere die <strong>ADMINISTRATOR</strong> Dropdown-Menü und wählen Sie <strong>Wiedergaberechte</strong>.</p>
+        <figure class="bcls-figure">
+          <img class="bcls-image--no-border" src="/assets/images/playback-restrictions/overview/admin.png" alt="Video Cloud Studio Admin" />
+          <figcaption class="bcls-caption--image">Video Cloud Studio-Administrator</figcaption>
+        </figure>
+      </li>
+      <li>
+        <p>Einzelheiten finden Sie im <a href="https://studio.support.brightcove.com/admin/managing-playback-rights.html">Wiedergaberechte verwalten</a> dokumentieren.</p>
+      </li>
+      <li>
+        <p>Navigieren Sie zum <strong>Medien</strong> Modul und wählen Sie das <strong>Name</strong> Link für Ihr Video, um die Details anzuzeigen.</p>
+      </li>
+      <li>
+        <p>Scrollen Sie nach unten zum <strong>Wiedergabebeschränkungen</strong> Abschnitt und klicken Sie auf das <strong>Bearbeiten</strong> Taste.</p>
+      </li>
+      <li>
+        <p>Erweitern Sie das Dropdown-Menü und wählen Sie die Einschränkung aus, die mit diesem Video verknüpft werden soll.</p>
+        <figure class="bcls-figure">
+          <img class="bcls-image--no-border" src="/assets/images/playback-restrictions/overview/media-module-restrictions.png" alt="Media module restriction assignment" />
+          <figcaption class="bcls-caption--image">Restriktionszuordnung des Medienmoduls</figcaption>
+        </figure>
+      </li>
+      <li>Auswählen <strong>Speichern</strong>.</li>
+      <li>
+        <p>Nachdem Sie Ihre Wiedergabebeschränkungen definiert und mit Videos verknüpft haben, können Sie Ihren Player konfigurieren.</p>
+        <p> Einzelheiten finden Sie im <a href="/playback-restrictions/getting-started/implementing-playback-rights.html#Configure_your_player">Konfigurieren Sie Ihren Player</a> Abschnitt des Dokuments Implementieren von Wiedergaberechten.</p>
+      </li>
+    </ol>
+
+    <h3>Anmerkungen</h3>
+    <ul>
+      <li>Mit Wiedergaberechten müssen Inhalte nicht verschlüsselt werden</li>
+      <li>Standardmäßig ist ein gültiges Token erforderlich, um ein Asset mit Wiedergaberechten zu streamen. Sie können jedoch die Wiedergaberechte so einstellen, dass kein Token erforderlich ist. </li>
+      <li>Standardmäßig verfügen alle Assets über ein Wiedergaberecht, das das Streamen an alle, überall und jederzeit ermöglicht</li>
+      <li>Jedes Video Cloud-Konto verfügt über bis zu 100 Wiedergaberechte</li>
+      <li>Wiedergaberechte funktionieren mit den Einschränkungen der Video Cloud/CMS-API (Land und Planung). CMS-Einschränkungen für ein Asset werden vor den Wiedergaberechten validiert</li>
+      <li>Wiedergaberechte funktionieren nicht mit Richtlinienschlüsseleinschränkungen (Domain und Geo). Bei Verwendung von Wiedergaberechten mit dem Webplayer oder den nativen SDKs wird der Richtlinienschlüssel entfernt. Das bedeutet, dass Einschränkungen, die mit dem Richtlinienschlüssel festgelegt wurden, ignoriert werden.</li>
+      <li>Wiedergaberechte können nicht gelöscht werden; nur aktiviert oder deaktiviert</li>
+    </ul>
+
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="Runtime_restrictions">Laufzeitbeschränkungen</h2>
+    <p>Um das Streaming zur Laufzeit einzuschränken, benötigen Sie ein JSON Web Token (JWT) mit bestimmten Berechtigungen (Ansprüchen). Dieses Token wird über jede Stream-Anforderung gesendet.</p>
+    <p>Diese Funktion erfordert, dass Sie eine Middleware-Lösung zwischen Ihrem User Management System (UMS) und dem Wiedergabedienst von Brightcove implementieren.</p>
+
+    <p>Zur Laufzeit können folgende Einschränkungen eingestellt werden:</p>
+    <ul>
+      <li>Wiedergaberechte</li>
+      <li>Stichworte</li>
+      <li>Inhaltsangabe</li>
+      <li>Spezifischer User-Agent</li>
+      <li>Gleichzeitiges Stream-Limit</li>
+      <li>Gerätelimit</li>
+    </ul>
+
+    <h3>Wiedergaberechte</h3>
+    <p>Sie können einem Asset entweder Wiedergaberechte zuweisen (siehe <a href="#Asset_level_restrictions">Einschränkungen auf Asset-Ebene</a>), oder Sie können sie zur Laufzeit mit dem <code translate="No">prid</code> Anspruch.</p>
+    <aside class="bcls-aside bcls-aside--information">Laufzeitbeschränkungen überschreiben alle Wiedergaberechte auf Asset-Ebene.</aside>
+
+    <h3>Stichworte</h3>
+    <p>Zur Laufzeit können Sie Assets mit bestimmten Tag-Werten identifizieren, die für das Streaming zugelassen werden sollen. Diese Tags werden mit dem <code translate="No">tags</code> Anspruch. Sie können Videos mit Tags gruppieren, indem Sie die <strong>Medienmodul</strong> im Video Cloud Studio von Brightcove.</p>
+    <p>
+      Der Dienst für Wiedergabebeschränkungen überprüft die mit jedem Video verknüpften Tags. Wenn mindestens eines der Tags mit der Liste im JWT-Token übereinstimmt, ist das Video sichtbar.
+    </p>
+    <p>
+      Tags im JWT-Token werden als ein Array von Tags aufgelistet.
+    </p>
+    <aside class="bcls-aside bcls-aside--information">Sie sind auf ein Array von 40 Tags im JWT-Token beschränkt.</aside>
+
+    <h3>Inhaltsangabe</h3>
+    <p>Verwendung der <code translate="No">vids</code> Claim können Sie zur Laufzeit eine Liste von Assets angeben, die für das Streaming zugelassen werden sollen.</p>
+
+    <h3>Berechtigungsprüfungen</h3>
+    <p>Eine Berechtigungsprüfung legt Endbenutzer-Zugriffsrechte zur Laufzeit basierend auf Video-IDs und/oder Tags fest. Dies beinhaltet das Festlegen der folgenden Ansprüche im JWT:</p>
+    <ul>
+      <li><code translate="No">prid</code></li>
+      <li><code translate="No">vids</code></li>
+      <li><code translate="No">tags</code></li>
+    </ul>
+    <p>Wenn eine <code translate="No">prid</code> (Playback Rights ID) im JWT gesetzt ist, wird das Wiedergaberecht für das Asset überschrieben.</p>
+
+    <h3>Spezifischer User-Agent</h3>
+    <p>Um das Streaming von einem bestimmten User-Agent zuzulassen, verwenden Sie die <code translate="No">ua</code> Anspruch. Um dies zu verwenden, müssen Ihre Inhalte verschlüsselt werden und Sie müssen ein Konto-Flag setzen, das ein JWT für Lizenzen erfordert. Wenden Sie sich an Ihren Account Manager, um dieses Kontokennzeichen zu aktivieren.</p>
+    <aside class="bcls-aside bcls-aside--information">Der Lizenzschlüsselschutz muss aktiviert sein, wenn Sie den spezifischen Benutzeragenten verwenden.</aside>
+
+    <h3>Gleichzeitiges Stream-Limit</h3>
+    <p>Die Begrenzung gleichzeitiger Streams pro Benutzer hält Zuschauer davon ab, ihre Anmeldeinformationen mit Freunden zu teilen, die keine Konten haben. Mit Limits für gleichzeitige Streams definieren Sie die Anzahl der Videostreams, die ein bestimmter Benutzer zu einem bestimmten Zeitpunkt ansehen kann.</p>
+    <p>Für diese Funktion muss der Inhalt DRM- oder HLSe-verschlüsselt sein.</p>
+    <p>Einzelheiten finden Sie im <a href="/playback-restrictions/guides/stream-concurrency.html">Begrenzung gleichzeitiger Streams pro Betrachter</a> dokumentieren.</p>
+    <aside class="bcls-aside bcls-aside--information">Der Schutz von Lizenzschlüsseln muss aktiviert werden, wenn das Concurrent-Stream-Limit mit HLSe verwendet wird.</aside>
+
+    <h3>Gerätelimit</h3>
+    <p>Zur Laufzeit ist es möglich, die Anzahl der Streaming-Geräte für einen Benutzer zu begrenzen. Dazu muss der Inhalt DRM- oder HLSe-verschlüsselt sein.</p>
+    <p>Die Geräteregistrierung erfolgt, wenn eine DRM-Lizenzanfrage gestellt wird, wobei jedem Gerät eine eindeutige ID zugewiesen wird. Bei jeder Lizenzanfrage wird das Gerätelimit überprüft und durchgesetzt.</p>
+    <p>Ein Beispiel könnte sein, wenn der Publisher die Anforderungen der Rechteinhaber erfüllen muss, um die Anzahl der Geräte, die einem einzelnen Betrachter zugeordnet sind, auf 2 Geräte zu begrenzen. Wenn dieses Limit erreicht ist und der Zuschauer versucht, den Inhalt auf ein drittes Gerät wie einen angeschlossenen Fernseher zu streamen, wird die Wiedergabe verweigert. Mit dieser Funktion können Content-Publisher Monetarisierungsziele erreichen und unbefugten Zugriff minimieren.</p>
+
+    <p>Einzelheiten finden Sie im <a href="/playback-restrictions/guides/device-limits.html">Implementieren von Gerätelimits</a> dokumentieren.</p>
+    <aside class="bcls-aside bcls-aside--information">Der Lizenzschlüsselschutz muss aktiviert werden, wenn das Gerätelimit mit HLSe verwendet wird.</aside>
+
+    <h3>Anwendungsfälle zur Laufzeit</h3>
+    <details>
+      <summary>
+        <h3 id="Use_cases1">Anwendungsfälle</h3>
+      </summary>
+      <p>Hier sind einige mögliche Anwendungsfälle:</p>
+      <h4>Bezahlten Zugang zulassen</h4>
+      <ul>
+        <li>
+          <p>Ziel</p>
+          <p>Liz (Event Planner) möchte nur zahlenden Nutzern den Zugriff auf die Live- und VOD-Inhalte einer Veranstaltung ermöglichen. Sie möchte auch das Link-Sharing verhindern.</p>
+        </li>
+        <li>
+          <p>Lösung</p>
+          <p>Für diesen Anwendungsfall benötigt jeder angemeldete Benutzer, der Inhalte von der Plattform anfordert, ein Token mit den folgenden Ansprüchen:</p>
+          <ul>
+            <li><code translate="No">uid</code> = <code translate="No">"{unique user-id}"</code></li>
+            <li><code translate="No">climit</code> = <code translate="No">1</code></li>
+            <li><code translate="No">cbeh</code> = <code translate="No">“BLOCK_NEW_USER”</code></li>
+          </ul>
+          <p>Alle Inhalte (Live oder VOD) müssen mit DRM verschlüsselt werden.</p>
+          <p>Mit diesen Berechtigungen kann jeder angemeldete Benutzer Live- oder VOD-Inhalte streamen, solange er sich auf demselben Gerät und Netzwerk befindet. Wenn der Benutzer seine Plattformanmeldeinformationen innerhalb des Gültigkeitszeitraums des Tokens teilt, kann ein anderer Benutzer, der versucht, Inhalte zu streamen, dies nicht tun. Mit den Mid-Stream-Checks des Features kann Liz dieses Verhalten für den gesamten Content-Stream sicherstellen.</p>
+        </li>
+      </ul>
+
+      <h4>Neue Streams blockieren</h4>
+      <ul>
+        <li>
+          <p>Ziel</p>
+          <p>Harry (OTT-Kunde) möchte sicherstellen, dass seine Plattformnutzer die Inhalte sehen können, aber immer nur ein Asset gleichzeitig.</p>
+        </li>
+        <li>
+          <p>Lösung</p>
+          <p>Für Harrys Anwendungsfall benötigt jeder angemeldete Benutzer, der Inhalte von seiner Plattform anfordert, ein gültiges Token mit den folgenden Ansprüchen</p>
+          <ul>
+            <li><code translate="No">uid</code> = <code translate="No">"{unique user-id}"</code></li>
+            <li><code translate="No">climit</code> = <code translate="No">1</code></li>
+            <li><code translate="No">cbeh</code> = <code translate="No">“BLOCK_NEW”</code></li>
+          </ul>
+          <p>Alle Inhalte (Live oder VOD) müssen mit DRM verschlüsselt werden.</p>
+          <p>Das Verhalten in diesem Fall ähnelt dem von Liz' Anwendungsfall. Der Hauptunterschied besteht darin, dass Harrys Benutzer nicht in der Lage sind, verschiedene Assets gleichzeitig zu sehen, solange das Token gültig ist. Mit den Mid-Stream-Checks des Features alle 5 Minuten kann Harry dieses Verhalten sicherstellen.</p>
+        </li>
+      </ul>
+
+      <h4>Gleichzeitige Streams einschränken</h4>
+      <ul>
+        <li>
+          <p>Ziel</p>
+          <p>Shari (Web Producer bei Sports League) möchte die gleichzeitigen Streams für bestimmte Inhalte auf 1 begrenzen.</p>
+        </li>
+        <li>
+          <p>Lösung</p>
+          <p>Für diesen Fall benötigt jeder angemeldete Benutzer ein Token mit den folgenden Ansprüchen:</p>
+          <ul>
+            <li><code translate="No">uid</code> = <code translate="No">"{unique user-id}"</code></li>
+            <li><code translate="No">vids</code> = <code translate="No">["asset 1","asset 2","asset 3"]</code></li>
+            <li><code translate="No">climit</code> = <code translate="No">1</code></li>
+            <li><code translate="No">cbeh</code> = <code translate="No">“BLOCK_NEW”</code></li>
+          </ul>
+        </li>
+      </ul>
+    </details>
+
+    <h3>Laufzeitbeschränkungen festlegen</h3>
+    <p>Gehen Sie wie folgt vor, um Laufzeitbeschränkungen zu verwenden:</p>
+    <ol class="bcls-tasklist-restart">
+      <li>
+        <p>Middleware implementieren</p>
+        <p>Diese Funktion erfordert, dass Sie eine Middleware-Lösung zwischen Ihrem User Management System (UMS) und dem Wiedergabedienst von Brightcove implementieren.</p>
+      </li>
+      <li>
+        <p>Erstellen Sie ein JWT</p>
+        <p>Erstellen Sie ein gültiges JSON Web Token (JWT signiert mit Ihrem privaten Schlüssel) mit bestimmten Berechtigungen (Ansprüchen). Einzelheiten finden Sie im <a href="https://general.support.brightcove.com/developer/create-json-web-token.html">Ein ... Erstellen <span translate="No">JSON-Webtoken</span> (JWT)</a> dokumentieren.</p>
+      </li>
+      <li>
+        <p>Konfigurieren Sie den Player</p>
+        <p>Der Token wird mit der Wiedergabeanforderung übergeben. Wenn das Token ungültig oder abgelaufen ist, wird der Zugriff auf den Inhalt eingeschränkt. Der Spieler muss für die Verwendung des Tokens konfiguriert sein.</p>
+
+        <strong>Internet Spieler</strong>
+        <p>
+          Ausführliche Informationen zum Konfigurieren des Brightcove-Webplayers finden Sie im <a href="https://player.support.brightcove.com/playback/license-protection-with-bcp.html">Schlüssel-/Lizenzschutz mit Brightcove Player</a> dokumentieren.
+        </p>
+        <strong>Nativer Android- oder iOS-Player</strong>
+        <p>
+          Ausführliche Informationen zum Konfigurieren des nativen Players für Android oder iOS finden Sie im <a href="https://sdks.support.brightcove.com/features/license-protection-with-sdks.html">Schlüssel-/Lizenzschutz mit den nativen SDKs</a> dokumentieren.
+        </p>
+        <strong>Dein eigener Spieler</strong>
+        <p>
+          Wenn Sie das JWT nur mit Ihrem Player verwenden, ist keine zusätzliche Konfiguration erforderlich. Wenn Sie mit Ihrem Player Wiedergaberechte verwenden, lesen Sie die <a href="/playback-restrictions/getting-started/implementing-playback-rights.html#Configure_your_player">Konfigurieren Sie Ihren Player</a> Abschnitt des Dokuments Implementieren von Wiedergaberechten.
+        </p>
+      </li>
+    </ol>
+
+    <h3>Anmerkungen</h3>
+    <ul>
+      <li>Um die zu verwenden <code translate="No">ua</code> , <code translate="No">maxip</code> und <code translate="No">maxu</code> Ansprüche, benötigen Sie Folgendes:
+        <ul>
+          <li>Inhalte müssen verschlüsselt werden</li>
+          <li>Ihr Konto muss über JWTs verfügen, die für Lizenzanfragen erforderlich sind (Lizenzschlüsselschutz aktiviert). Weitere Informationen erhalten Sie von Ihrem Account Manager.</li>
+        </ul>
+      </li>
+      <li>Um die zu verwenden <code translate="No">climit</code> und <code translate="No">dlimit</code> Ansprüche, benötigen Sie Folgendes:
+        <ul>
+          <li>Inhalte müssen mit DRM verschlüsselt werden</li>
+          <li>Ihr Konto muss für CSL mit aktiviertem Flag „Rechte prüfen“ aktiviert sein. Weitere Informationen erhalten Sie von Ihrem Account Manager.</li>
+        </ul>
+      </li>
+      <li>Jedes Token hat ein Ablaufdatum und muss bei der Erstellung festgelegt werden. Ihre Integrationen sind dafür verantwortlich, den Erneuerungsprozess aufrechtzuerhalten.</li>
+      <li>Standardmäßig finden Mid-Stream-Prüfungen alle 5 Minuten statt.</li>
+    </ul>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="License_Keys_Protection">Lizenzschlüsselschutz</h2>
+    <p>License Keys Protection bietet ein zusätzliches Maß an Sicherheit bei der Bereitstellung von DRM-geschützten Inhalten mit Dynamic Delivery. Dies ist besonders nützlich für Kunden, die den Zugriff auf ihre Inhalte kontrollieren und das unbefugte Teilen von Inhalten verhindern möchten.</p>
+    <p>Der DRM- oder HLSe-Inhaltsschutz verwendet Lizenz-/Schlüsselanforderungen, die jede Stream-Anforderung mithilfe eines JSON Web Token (JWT) schützen können.</p>
+
+    <h3>Anwendungsfall</h3>
+    <p>Sie können diese Funktion verwenden, wenn Ihr Inhalt öffentlich sein muss, aber von einer vertrauenswürdigen Anforderung ausgeht. So wollen beispielsweise regionale Sender, deren exklusive Inhalte mit HLSe verschlüsselt sind, sicherstellen, dass nur Anfragen von ihrer Plattform auf die Inhalte zugreifen. Das bedeutet, dass Zuschauer nur Inhalte von Ihrer Plattform streamen können. Sie können es nicht außerhalb der Plattform streamen, auch nicht mit den Stream-URLs.</p>
+
+    <aside class="bcls-aside bcls-aside--information"> Beachten Sie, dass die Implementierung von Wiedergaberechten für Videos mit DRM- und/oder HLSe-Schutz verhindert, dass die Videos im Vorschauplayer im Medienmodul in Studio wiedergegeben werden. Um die Vorschau zu aktivieren, hat Brightcove implementiert <a href="/cms/references/reference.html#tag/Clear-Sources">klare Quellen</a> Endpunkte für die CMS-API.
+
+    <p>Diese Endpunkte können auch verwendet werden, um internen oder Drittanbietern die Vorschau der Videos zu ermöglichen, wenn sie über gültige API-Anmeldeinformationen zum Abrufen der ungeschützten URLs verfügen. Beachten Sie jedoch Folgendes:</p>
+    <ul>
+    <li>Sobald die ungeschützte URL verfügbar gemacht wurde, haben Brightcove und der Client keine Kontrolle mehr darüber, wer Zugriff auf den Inhalt hat oder wie er verwendet wird.</li>
+    <li>Beim Zugriff auf die Quellen werden Ihrem Konto Gebühren für die ausgehende Bandbreite berechnet.</li>
+    </ul>
+    </aside>
+
+    <h3>Aktivieren des Lizenzschlüsselschutzes</h3>
+    <p>Um Ihr Konto für den Lizenzschlüsselschutz zu konfigurieren, wenden Sie sich an Ihren Account Manager, um das Flag für den Lizenzschlüsselschutz zu aktivieren.</p>
+
+    <h3>Verwenden des Lizenzschlüsselschutzes</h3>
+    <p>Gehen Sie wie folgt vor, um den Lizenzschlüsselschutz zu verwenden:</p>
+    <ol class="bcls-tasklist-restart">
+      <li>
+        <p>Middleware implementieren</p>
+        <p>Diese Funktion erfordert, dass Sie eine Middleware-Lösung zwischen Ihrem User Management System (UMS) und dem Wiedergabedienst von Brightcove implementieren.</p>
+      </li>
+      <li>
+        <p>Erstellen Sie ein JWT</p>
+        <p>Wenn diese Funktion aktiviert ist, benötigt jede Schlüssel- oder Lizenzanforderung zum Entschlüsseln des Inhalts ein gültiges JSON Web Token (JWT signiert mit Ihrem privaten Schlüssel). Einzelheiten finden Sie im <a href="https://general.support.brightcove.com/developer/create-json-web-token.html">Ein ... Erstellen <span translate="No">JSON-Webtoken</span> (JWT)</a> dokumentieren.</p>
+      </li>
+      <li>
+        <p>Konfigurieren Sie den Player</p>
+        <p>Der Token wird mit der Wiedergabeanforderung übergeben. Wenn das Token ungültig oder abgelaufen ist, wird der Zugriff auf den Inhalt eingeschränkt. Der Spieler muss für die Verwendung des Tokens konfiguriert sein.</p>
+
+        <strong>Internet Spieler</strong>
+        <p>
+          Ausführliche Informationen zum Konfigurieren des Brightcove-Webplayers finden Sie im <a href="https://player.support.brightcove.com/playback/license-protection-with-bcp.html">Schlüssel-/Lizenzschutz mit Brightcove Player</a> dokumentieren.
+        </p>
+        <strong>Nativer Android- oder iOS-Player</strong>
+        <p>
+          Ausführliche Informationen zum Konfigurieren des nativen Players für Android oder iOS finden Sie im <a href="https://sdks.support.brightcove.com/features/license-protection-with-sdks.html">Schlüssel-/Lizenzschutz mit den nativen SDKs</a> dokumentieren.
+        </p>
+        <strong>Dein eigener Spieler</strong>
+        <p>
+          Um das JWT mit Ihrem Player zu verwenden, ist keine zusätzliche Konfiguration erforderlich.
+        </p>
+      </li>
+    </ol>
+
+    <h3>Anmerkungen</h3>
+    <ul>
+      <li>Diese Funktion kann ohne Verwendung von Wiedergaberechten verwendet werden.</li>
+      <li>Das JWT-Token erfordert keine spezifischen Berechtigungen (Ansprüche). Es muss lediglich mit dem privaten Schlüssel des Kunden signiert werden.</li>
+      <li>Ihre Inhalte müssen HLSe oder DRM verschlüsselt sein.</li>
+    </ul>
+
+    <h3 id="Limitations">Einschränkungen</h3>
+    <p>Für diese Funktion gelten die folgenden Einschränkungen:</p>
+    <ul>
+      <li>
+        Für HLSe (AES-128) wird das Token an die Master-Manifest-Anforderung angehängt und an die Verschlüsselungsschlüssel-URL weitergegeben. Da diese URLs an das Mastermanifest angehängt werden, sollten Kunden erwägen, die Anzahl der Verwendungen einzuschränken, um die Offenlegung ihrer Inhalte zu minimieren.
+      </li>
+      <li>
+        Bei HLSe (AES-128) stellen Spieler beim Abspielen eines Videos mehrere Anfragen, normalerweise eine pro Wiedergabe. Die <a href="https://general.support.brightcove.com/developer/create-json-web-token.html#Claims_for_Playback_Restrictions">maxu Anspruch</a> muss hoch genug eingestellt werden, um diese Anforderungen zu berücksichtigen. Sie sollten zusätzliche Ansprüche in Betracht ziehen, um die Offenlegung Ihrer Inhalte zu minimieren. Beim Wechseln der Wiedergabeversionen wird eine neue Lizenz angefordert.
+      </li>
+      <li>
+        Verfolgung der <a href="https://general.support.brightcove.com/developer/create-json-web-token.html#Claims_for_Playback_Restrictions">maxu- und maxip-Ansprüche</a> ist schließlich konsistent. Dies bedeutet, dass, wenn ein Token, das diese Ansprüche verwendet, viele Male in schneller Folge wiederverwendet wird, es möglich ist, dass dieses Token öfter akzeptiert wird, als diese Ansprüche angeben. Das Tracking wird innerhalb weniger Sekunden konsistent und nach diesem Fenster wird der Token wie erwartet gesperrt.
+      </li>
+    </ul>
+  </section>
+
+  <!-- <section class="bcls-section">
+    <h2 id="Related_topics">Related topics</h2>
+    <ul>
+      <li>
+        <a href="/playback-rights/getting-started/implementing-epa.html">Implementing Playback Rights Management Service</a>
+      </li>
+      <li>
+        <a href="/playback-rights/guides/using-epa-with-bcp.html">Using Playback Rights with Brightcove Player</a>
+      </li>
+      <li>
+        <a href="/playback-rights/guides/using-epa-with-sdks.html">Using Playback Rights with the Native SDKs</a>
+      </li>
+      <li>
+        <a href="/playback-authorization/guides/stream-concurrency.html">Implementing Stream Concurrency</a>
+      </li>
+      <li>
+        <a href="https://general.support.brightcove.com/developer/create-jwt-stage.html">Creating a JSON Web Token (JWT)</a>
+      </li>
+    </ul>
+  </section> -->
+</article>

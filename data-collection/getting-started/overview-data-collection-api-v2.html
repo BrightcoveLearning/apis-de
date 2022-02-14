@@ -1,0 +1,1055 @@
+---
+title: 'Überblick: Datenerfassungs-API v2'
+description: 'In diesem Thema erhalten Sie einen Überblick über die Analytics Data Collection API v2, mit der Sie Ihren Video Cloud Analytics-Daten in Situationen, in denen Brightcove die Ereignisse nicht direkt verfolgen kann, Ereignisse hinzufügen können.'
+parent: Data Collection API
+---
+ <h1>{{ page.title }}</h1>
+<article class="bcls-article">
+  <summary>{{ page.description }}</summary>
+  <aside class="bcls-aside bcls-aside--warning"><strong>Notiz:</strong> Sie sollten diese API NICHT verwenden, um Ereignisse für den Brightcove Player oder für die Android- und iOS-SDK-Player zu verfolgen, da dies bereits automatisch geschieht und Sie doppelte Daten hinzufügen würden.</aside>
+  <section class="bcls-section">
+    <h2 id="introduction">Einführung</h2>
+
+    <p>Analysedaten werden automatisch von den Brightcove-Playern gesendet, einschließlich der von den Native Player-SDKs bereitgestellten. Wenn du bist <strong>nicht</strong> Wenn Sie einen Brightcove-Player zum Bereitstellen von Video Cloud-Videos verwenden, müssen Sie den Player instrumentieren, den Sie verwenden, um die Daten an den Datenkollektor zu senden.</p>
+
+    <p>Data Collection API v2 ist der aktuelle Standard. Die Version v1 ist veraltet. Wenn Sie eine v1-Implementierung haben, lesen Sie die <a href="#changesFromV1">Änderungen von v1</a> Abschnitt unten.</p>
+
+    <p>Neben dieser Übersicht und den <a href="/data-collection/references/reference.html">API-Referenz</a> , siehe auch das <a href="/data-collection/getting-started/data-collection-api-sample.html">Beispielimplementierung</a>.</p>
+
+    <p>Die Analytics Data Collection API ist der Endpunkt für Echtzeitanalyseereignisse. Ereignisdaten werden über eine Reihe von Parametern, die über HTTP-Anforderungen übermittelt werden, an Brightcove gesendet, z. B.:</p>
+
+    <pre style="white-space:pre-wrap;padding-top:1em;padding-bottom:1em;">
+  <code class="language-http" translate="No">http://metrics.brightcove.com/v2/tracker?event=video_view&amp;amp;domain=videocloud&amp;account=123&amp;video=789
+  </code>
+  </pre>
+
+    <p>Diese Parameter beschreiben a <strong>Tatsache</strong> über den Zustand des Systems, wenn ein Ereignis aufgetreten ist. Das obige Beispiel beschreibt die Tatsache, dass a <code translate="No">video_view</code> Ereignis für Video aufgetreten <code translate="No">789</code> für Rechnung <code translate="No">123</code> (oder: ein Benutzer hat angefangen, ein Konto zu sehen <code translate="No">123</code>'s Video <code translate="No">789</code>. Sehen <a href="#video-cloud-events">unter</a> für eine Beschreibung der aktuell verfolgten Analytics-Ereignisse).</p>
+
+    <h3 id="dimensions">Maße</h3>
+
+    <p>Dimensionen sind qualitative Fakten über den Zustand des Systems, wenn ein Ereignis eintritt. Wenn die Anfrage beispielsweise lautet:</p>
+
+    <pre style="white-space:pre-wrap;padding-top:1em;padding-bottom:1em;">
+  <code class="language-http" translate="No">http://metrics.brightcove.com/tracker
+  ?event=video_view&amp;session=581136_2018-07-03T18:34:46.214Z
+  &amp;domain=videocloud&amp;account=123
+  &amp;video=789
+  </code>
+  </pre>
+
+    <p>Die Video-ID ( <code translate="No">789</code> ) und Konto-ID ( <code translate="No">123</code> und alle aus der Anfrage selbst gewonnenen Geräte- und Standortinformationen sind alle Dimensionen, die sich auf die <code translate="No">video_view</code> Veranstaltung. Das Analytics-System zeichnet auf, dass a <code translate="No">video_view</code> Ereignis trat ein, als diese Anfrage gestellt wurde, mit diesen Dimensionen.</p>
+
+    <h3 id="event-and-domain-parameters">Ereignis- und Domänenparameter</h3>
+
+    <p>Die <code translate="No">event</code> Parameter beschreibt, welches Ereignis aufgetreten ist. Die <code translate="No">domain</code> Parameter stellt einen Namensraum für Ereignisse bereit. Die <code translate="No">event</code> , <code translate="No">domain</code> , und <code translate="No">session</code> sind erforderliche Parameter (der Wert von <code translate="No">domain</code> ist immer <code translate="No">videocloud</code>).</p>
+
+    <h3 id="additional-parameters">Zusätzliche Parameter</h3>
+
+    <p>Bestimmte Parameter müssen in Ereignissen enthalten sein, damit das Analytics-System sie erfolgreich analysieren kann</p>
+
+    <aside class="bcls-aside bcls-aside--warning">Du solltest <strong>nicht</strong> senden <code translate="No">player</code> (Spieler-ID) oder <code translate="No">player_name</code> Informationen für Nicht-Brightcove-Spieler. Verwenden Sie stattdessen die <code translate="No">destination</code> Parameter, um zu verfolgen, wo das Video angesehen wurde.</aside>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="responseTypes">Antworttypen</h2>
+
+    <p>Die Antwort auf eine API-Anfrage zur Analysedatenerfassung enthält einen HTTP-Antwortcode und eine für Menschen lesbare Nachricht.</p>
+
+    <table class="bcls-table">
+      <thead class="bcls-table__head">
+        <tr>
+          <th>HTTP-Statuscode</th>
+          <th>Beschreibung</th>
+          <th>Beispiel</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td><code translate="No">200</code></td>
+          <td>Die Anfrage wurde erfolgreich vom Collector empfangen und wurde beibehalten.</td>
+          <td>(gibt ein transparentes 1x1-Pixel-GIF-Bild zurück)</td>
+        </tr>
+        <tr>
+          <td><code translate="No">400</code></td>
+          <td>In der vom Client gesendeten Anfrage fehlt ein erforderlicher Parameter: <code translate="No">domain</code> , <code translate="No">account</code> oder <code translate="No">event</code>. (Dieser Status wird nicht zurückgegeben, wenn domänenspezifische Parameter fehlen.)</td>
+          <td><code translate="No">"Invalid 'event' parameter"</code></td>
+        </tr>
+        <tr>
+          <td><code translate="No">50x</code></td>
+          <td>Dieser Fehlercode weist auf ein Problem auf der Serverseite hin. Ihre Veranstaltung kann vom Analysesystem erfolgreich aufgezeichnet worden sein oder nicht.</td>
+          <td><code translate="No">"Server-side failure, please retry."</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+	<section class="bcls-section">
+		<h2 id="VOD_and_Live_Events">VOD- und Live-Events</h2>
+		<h3>Live-Events</h3>
+		<p>Die folgenden Bedingungen müssen erfüllt sein, damit die Data Collection API ein Ereignis als . klassifizieren kann <strong>Live</strong>:</p>
+		<ul>
+			<li>Anfrage muss <strong>nicht</strong> haben den Parameter video_duration.</li>
+			<li>Die Anfrage muss einen Kontoparameter haben.</li>
+			<li>Anfrage muss Videoparameter haben.</li>
+			<li>
+				Der Ereignistyp muss einer der folgenden sein:
+				<ul>
+					<li>video_impression<code translate="no"></code></li>
+					<li>video_view<code translate="no"></code></li>
+					<li>video_engagement<code translate="no"></code></li>
+					<li><code translate="no">lebendig_ss_ad_start</code></li>
+				</ul>
+			</li>
+			<li>Das Konto muss vom Brightcove-Support für Live-Video-Streaming aktiviert werden.</li>
+		</ul>
+		<h3>VOD</h3>
+		<p>Jede Anfrage, die a . enthält <code translate="no">video_dauer</code> Parameter wird klassifiziert als <strong>VOD</strong>.</p>
+	</section>
+
+  <section class="bcls-section">
+    <h2 id="minimal">Minimale Daten</h2>
+
+    <p>Senden Sie mindestens eine <code translate="No">session</code> id und <code translate="No">video_view</code> Ereignis für jedes Video, das während einer Sitzung abgespielt wird. Die <code translate="No">video_view</code> sollte senden <em>nach</em> alle Pre-Roll-Anzeigen abgeschlossen.</p>
+
+    <h3><code translate="No">session</code></h3>
+
+    <p>Dies ist die Sitzungskennung. Die <code translate="No">session</code> ist im Wesentlichen eine Ansicht einer Seite oder App-Ansicht, die einen Player enthält, solange diese andauert. Der Wert sollte für die Dauer der Sitzung konstant sein und <strong>für alle Veranstaltungen gesendet</strong>. Es sollte so nah wie möglich an einem Global Unique Identifier (GUID) liegen. Bei Kollisionen können die beiden Sitzungen als ungültig verworfen werden, wenn sie nicht entwirrt werden können.</p>
+    <p>Es gibt verschiedene Schemata zum Erstellen von GUIDs in JavaScript. Ein Beispiel ist in <a href="https://github.com/dustinpoissant/GUIDJS">dieses GitHub-Repository</a>. Beachten Sie, dass Skripte von Drittanbietern von Brightcove nicht unterstützt werden.</p>
+
+    <h3>Minimale Daten für die Leistung (Spielrate und Engagement-Bewertung)</h3>
+    <h4>Veranstaltungen</h4>
+    <ul>
+      <li><code translate="No">video_impression</code></li>
+      <li><code translate="No">video_view</code></li>
+      <li><code translate="No">video_engagement</code></li>
+    </ul>
+    <h4>Attribute (alle Ereignisse)</h4>
+    <ul>
+      <li><code translate="No">account</code></li>
+      <li><code translate="No">video</code></li>
+    </ul>
+    <h4>Zusätzliche Attribute (<code translate="No">video_engagement</code> Nur Veranstaltung)</h4>
+    <h5>VOD</h5>
+    <ul>
+      <li><code translate="No">range</code></li>
+      <li><code translate="No">video_duration</code></li>
+    </ul>
+    <h5>Live</h5>
+    <ul>
+      <li><code translate="No">video_seconds_viewed</code></li>
+    </ul>
+    <h4>HTTP-Header</h4>
+    <ul>
+      <li><code translate="No">User-Agent</code>- Erforderlich für Geräteberichte</li>
+    </ul>
+
+    <aside class="bcls-aside bcls-aside--warning">Beachten Sie, dass das Analytics-System nur das zurückgeben kann, was Sie ihm geben. Wenn keine vollständigen Daten gesendet werden, fehlen Daten in der Video Cloud-Analyse.</aside>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="bestPractices">Empfohlene Vorgehensweise</h2>
+
+    <p>Um sicherzustellen, dass Sie die richtigen Daten an den Collector senden, sollten Sie Ihr Datenerfassungsskript testen, bevor Sie es allgemein bereitstellen. Wir empfehlen:</p>
+
+    <ol>
+      <li>Erstellen Sie das Datenerfassungsskript für Ihren Player.</li>
+      <li>Testen Sie mindestens einen Tag in einer kontrollierten Umgebung.</li>
+      <li>Überprüfen Sie die Analysedaten entweder über das Analysemodul oder das <span translate="No">Analytics-API</span> um sicherzustellen, dass das, was gesammelt wurde, Ihren Erwartungen entspricht.</li>
+    </ol>
+
+    <h3>Anfrage senden – CORS-Probleme vermeiden</h3>
+
+    <aside class="bcls-aside bcls-aside--tip">
+      <p>Beachten Sie, dass der beste Weg zum "Senden" an die Data Collection API darin besteht, die Anforderungs-URL als <code translate="No">src</code> Wert für ein neues Bild ( <code translate="No">img</code> )-Element und injizieren dieses Element dann in die Seite.</p>
+
+      <p>Sie sollten die gleiche Methode verwenden, anstatt <code translate="No">XMLHttpRequest</code> oder etwas anderes um zu vermeiden <a href="https://general.support.brightcove.com/developer/concepts-cors.html">CORS</a> Themen.</p>
+
+      <p>Eine Beispielimplementierung finden Sie im <a href="/data-collection/getting-started/data-collection-api-sample.html">Beispiel für die Datenerfassung</a>.</p>
+    </aside>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="junk-data">Junk-Daten</h2>
+
+    <p><strong>Im Allgemeinen werden Daten, die an den Collector gesendet werden, vom Analytics-System als wahr aufgezeichnet.</strong> Wenn ein Ereignis unangemessene oder falsche Informationen enthält, interpretiert das Analytics-System die Daten falsch.</p>
+
+    <p>Wenn Sie beispielsweise versehentlich den Zeitstempel als Video-ID senden, werden Ihre Analysedaten auf eine Weise verzerrt, die sich auf die Gesamtzusammenfassung auswirkt.</p>
+
+    <aside class="bcls-aside bcls-aside--tip">Überprüfen Sie die URLs, die Sie generieren, sorgfältig, bevor Sie mit dem Senden von Daten beginnen!</aside>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="encoding">URI-Codierung</h2>
+
+    <p>Alle Strings, die Sie an die Data Collection API senden, die Leerzeichen oder Sonderzeichen enthalten können <strong>muss URI-codiert sein</strong> damit die Anfrage erfolgreich ist. Wenn Sie die Anfrage über JavaScript senden, können Sie die <code class="language-javascript" translate="No">encodeURI()</code> -Methode, um die Anforderungszeichenfolge zu codieren. Zum Beispiel:</p>
+
+    <pre class="line-numbers">
+  <code class="language-javascript" translate="No">urlStr += "&amp;video=" + currentVideo.id + "&amp;video_name=" + encodeURI(currentVideo.video_name);
+  </code>
+  </pre>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="video-cloud-events">Veranstaltungen</h2>
+
+    <p>Die unten aufgeführten Ereignisse werden vom Analytics-System verarbeitet.</p>
+
+    <dl>
+      <dt><code translate="No">player_load</code></dt>
+      <dd>
+        <h5>Absicht/Bedeutung</h5>
+        <p>Eine Spielersitzung wurde von einem Endbenutzer initiiert. Dies markiert den Beginn der Analysesitzung und sollte vor allen anderen Ereignissen gesendet werden.</p>
+        <h5>Beispiel</h5>
+        <pre><code class="language-http" translate="No">http://metrics.brightcove.com/tracker
+  ?event=player_load
+  &amp;session=581136_2018-07-03T18:34:46.214Z
+  &amp;destination=http%3A-%2F%2Fsup-port.brightcove.com%2F
+  &amp;source=http%3A-%2F%2Fwww.google.com
+  %2Furl%3Fsa%3D-t%26rct%3Dj%26q%3D%26esrc%3Ds%26source
+  %253A-%252F%252Fsupport.brightcove.com%252F%26ei%3D
+  OdxWZSGdJ-pL7WJaEeUJVlnw%26bvm%3Dbv.51156542%2Cd.dmg
+  &amp;domain=videocloud
+  &amp;account=1749339200
+  &amp;time=1377191644796</code></pre>
+      </dd>
+      <dt><code translate="No">error</code></dt>
+      <dd>
+        <h5>Absicht/Bedeutung</h5>
+        <p>Wird gesendet, wenn schwerwiegende Fehler auftreten, die das Wiedergabeerlebnis stören.</p>
+        <h5>Beispiel</h5>
+        <pre><code class="language-http" translate="No">http://metrics.brightcove.com/tracker
+  ?event=error
+  &amp;error_code=MEDIA_ERR_SRC_NOT_SUPPORTED
+  &amp;session=581136_2018-07-03T18:34:46.214Z
+  &amp;destination=http%3A-%2F%2Fsup-port.brightcove.com%2F
+  &amp;source=http%3A-%2F%2Fwww.google.com
+  %3Dhttp%253A-%252F%252Fsupport.brightcove.com
+  %26usgWZSGdJ-pL7WJaEeUJVlnw%26bvm%3Dbv.51156542%2Cd.dmg
+  &amp;domain=videocloud
+  &amp;account=1749339200
+  &amp;time=1377191644796</code></pre>
+      </dd>
+      <dt><code translate="No">catalog_request</code></dt>
+      <dd>
+        <h5>Absicht/Bedeutung</h5>
+        <p>Wird gesendet, wenn eine Anfrage an die Video Cloud-Wiedergabe-API gestellt wird.</p>
+        <h5>Beispiel</h5>
+        <pre><code class="language-http" translate="No">http://metrics.brightcove.com/tracker
+  ?event=catalog_request
+  &amp;session=581136_2018-07-03T18:34:46.214Z
+  &amp;catalog_url=https%3A%2F%2Fedge.api.brightcove.com%2Fplayback
+  &amp;destination=http%3A-%2F%2Fsup-port.brightcove.com%2F
+  &amp;source=http%3A-%2F%2Fwww.google.com
+  %3Dhttp%253A-%252F%252Fsupport.brightcove.com
+  WZSGdJ-pL7WJaEeUJVlnw%26bvm%3Dbv.51156542%2Cd.dmg
+  &amp;domain=videocloud&amp;account=1749339200
+  &amp;time=1377191644796</code></pre>
+      </dd>
+      <dt><code translate="No">catalog_response</code></dt>
+      <dd>
+        <h5>Absicht/Bedeutung</h5>
+        <p>Wird gesendet, wenn eine Antwort auf eine vorherige <code translate="No">catalog_request</code> Ist angekommen.</p>
+        <h5>Beispiel</h5>
+        <pre><code class="language-http" translate="No">http://metrics.brightcove.com/tracker
+  ?event=catalog_response
+  &amp;session=581136_2018-07-03T18:34:46.
+  &amp;catalog_url=https%3A%2F%2Fedge.api.brightcove.com%2Fp2F23823423800
+  &amp;response_time_ms=243
+  &amp;destination=http%3A-%2F%2Fsup-port.brightcove.com%2F
+  &amp;source=http%3A-%2F%2Fwww.google.com
+  53A-%252F%252Fsupport.brightcove.com%252F%2Tzn-oCgCQ
+  AFQjCNJaEeUJVlnw%26bvm%3Dbv.51156542%2Cd.dmg
+  &amp;domain=videocloud
+  &amp;account=1749339200
+  &amp;time=1377191644796</code></pre>
+      </dd>
+      <dt><code translate="No">play_request</code></dt>
+      <dd>
+        <h5>Absicht/Bedeutung</h5>
+        <p>Wird gesendet, wenn die Wiedergabe initiiert wird, entweder durch den Benutzer, der ausdrücklich auf die Wiedergabeschaltfläche klickt, oder automatisch, wenn die Plattform die Wiedergabe in einem Auto-Play-Szenario auslöst. Beachten Sie, dass mehrere <code translate="No">play_request</code> Ereignisse können während einer einzelnen Betrachtungssitzung gesendet werden, wenn der Betrachter das Video anhält und fortsetzt.</p>
+        <h5>Beispiel</h5>
+        <pre><code class="language-http" translate="No">http://metrics.brightcove.com/tracker
+  ?event=play_request
+  &amp;session=581136_2018-07-03T18:34:46.214Z
+  &amp;destination=http%3A-%2F%2Fsup-port.brightcove.com%2F
+  &amp;source=http%3A-%2F%2Fwww.google.com
+  %3Dhttp%253A-%252F%252Fsupport.brightcove.com%252F%2
+  dJ-pL7WJaEeUJVlnw%26bvm%3Dbv.51156542%2Cd.dmg
+  &amp;domain=videocloud
+  &amp;account=1749339200
+  &amp;time=1377191644796</code></pre>
+      </dd>
+      <dt><code translate="No">ad_mode_begin</code></dt>
+      <dd>
+        <h5>Absicht/Bedeutung</h5>
+        <p>Wird gesendet, wenn die Kontrolle von der Wiedergabeplattform an einen Werbeagenten übergeben wird.</p>
+        <h5>Beispiel</h5>
+        <pre><code class="language-http" translate="No">http://metrics.brightcove.com/tracker
+  ?event=ad_mode_begin
+  &amp;session=581136_2018-07-03T18:34:46.214Z
+  &amp;destination=http%3A-%2F%2Fsup-port.brightcove.com%2F
+  &amp;source=http%3A-%2F%2Fwww.google.com
+  %3Dhttp%253A-%252F%252Fsupport.brightcove.com%252
+  %26usg%3DAFQjCNEtLod%3Dbv.51156542%2Cd.dmg
+  &amp;domain=videocloud
+  &amp;account=1749339200
+  &amp;time=1377191644796</code></pre>
+      </dd>
+      <dt><code translate="No">ad_mode_complete</code></dt>
+      <dd>
+        <h5>Absicht/Bedeutung</h5>
+        <p>Wird gesendet, wenn die Kontrolle von der Wiedergabeplattform an einen Werbeagenten übergeben wird.</p>
+        <h5>Beispiel</h5>
+        <pre><code class="language-http" translate="No">http://metrics.brightcove.com/tracker
+  ?event=ad_mode_complete
+  &amp;session=581136_2018-07-03T18:34:46.214Z
+  &amp;destination=http%3A-%2F%2Fsup-port.brightcove.com%2F
+  &amp;source=http%3A-%2F%2Fwww.google.com
+  %3Dhttp%253A-%252F%252Fsupport.brightcove.com%252F%2
+  WZSGdJ-pL7WJaEeUJVlnw%26bvm%3Dbv.51156542%2Cd.dmg
+  &amp;domain=videocloud
+  &amp;account=1749339200
+  &amp;time=1377191644796</code></pre>
+      </dd>
+      <dt><code translate="No">video_impression</code></dt>
+      <dd>
+        <h5>Absicht/Bedeutung</h5>
+        <p>Die Metadaten für ein Video, das dem Player hinzugefügt wurde, wurden geladen und der Player ist bereit, das Anzeigeereignis entweder über automatische Wiedergabe oder Benutzerinteraktion auszulösen.</p>
+        <h5>Beispiel</h5>
+        <pre><code class="language-http" translate="No">http://metrics.brightcove.com/tracker
+  ?event=video_impression
+  &amp;session=581136_2018-07-03T18:34:46.214Z
+  &amp;destination=http%3A%2F%2Fwww.current-times.com%2F
+  &amp;time=1377191644801
+  &amp;source=http%3A%2F%2Fwww.google.com
+  %252-F%26ei%3DoEYWUtCgEIXq9ATznoCgCQ
+  %26usg%3DAFQjCNEtLod-Odx6bvm%3Dbv.5115-6542%2Cd.dmg
+  &amp;video=2621468623001
+  &amp;video_name=Democratic-Rivals%20Target%20Bill
+  &amp;domain=videocloud
+  &amp;account=1749339200</code></pre>
+      </dd>
+      <dt><code translate="No">video_view</code></dt>
+      <dd>
+        <h5>Absicht/Bedeutung</h5>
+        <p>Die Wiedergabe eines Videos hat begonnen (entweder automatische Wiedergabe nach dem Laden oder aufgrund einer Benutzerinteraktion). Beachten Sie, dass nur eine <code translate="No">video_view</code> Ereignis wird während einer Betrachtungssitzung aufgezeichnet, selbst wenn der Betrachter stoppt und das Video neu startet oder wiedergibt.</p>
+        <aside class="bcls-aside bcls-aside--information">Notiz: Wenn Ihr Video eine Pre-Roll-Werbung enthält, sollte diese nach Abschluss der Anzeige gesendet werden.</aside>
+        <h5>Beispiel</h5>
+        <pre><code class="language-http" translate="No">http://metrics.brightcove.com/tracker
+  ?event=video_view
+  &amp;session=581136_2018-07-03T18:34:46.214Z
+  &amp;destination=http%3A%2F%2Fwww.current-times.com%2F
+  &amp;video=2621468623001
+  &amp;video_name=Debate-2
+  &amp;video_duration=189
+  &amp;time=1377191666432
+  &amp;source=http%3A%2F%2Fwww.google.com%2Furl%
+  %252F%26ei%3DoEYWUtCgEIXq9ATznoCgCQ%26us-g
+  %3DAFQjCNEtv.51156542%2Cd.dmg
+  &amp;domain=videocloud
+  &amp;account=1749339200</code></pre>
+      </dd>
+      <dt><code translate="No">video_engagement</code></dt>
+      <dd>
+        <h5>Absicht/Bedeutung</h5>
+        <p>Ein Nutzer hat sich eine Reihe von Sekunden der Timeline eines Videos angesehen. Dieses Ereignis ist ein Heartbeat zum Verfolgen des Video-Engagements und wird während der Wiedergabe wahrscheinlich viele Male gesendet, je nach Benutzerinteraktion und Länge des Videos. Die Brightcove-Player-Instrumentierung sendet dieses Ereignis alle 10 Sekunden, wenn die Wiedergabe nicht unterbrochen wird. <strong>Ereignisse, die Bereiche von mehr als 20 Sekunden beschreiben, werden vom Analytics-System verworfen.</strong></p>
+        <h5>Beispiel</h5>
+        <pre><code class="language-http" translate="No">http://metrics.brightcove.com/tracker
+  ?event=video_engagement
+  &amp;session=581136_2018-07-03T18:34:46.214Z
+  &amp;destination=http%3A%2F%2Fwww.current-times.com%2F
+  &amp;video=2621468623001
+  &amp;video_name=Debate-2
+  &amp;video_duration=189
+  &amp;time=1377191676589
+  &amp;range=0..9
+  &amp;source=http%3A%2F%2Fwww.google.com
+  %2Furl%3Fsa%3Dt-%26rct%3Dj%26q%3D%26esrc%3Ds
+  %26source%3Dweb%26cd%3D1%26ved%3D0CDYQFjAA
+  %26url%3Dhttp%253A%252F%252Fwww.current-times.com
+  %252F%26ei%3DoEYWUtC-gEIXq9ATznoCgCQ
+  %26usg%3DAFQjCNEtLodOdxWZSGdJpL7WJ.51156542%2Cd.dmg
+  &amp;domain=videocloud
+  &amp;account=1749339200</code></pre>
+      </dd>
+    </dl>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="all-event-parameters">Parameter für alle Ereignisse</h2>
+
+    <p>Parameter für diese Ereignisse sollten alle Informationen enthalten, die für den aktuellen Zustand des Systems zum Zeitpunkt des Ereignisses relevant sind, und so genau wie möglich sein. Dieser Abschnitt beschreibt Parameter, die mit allen Ereignissen gesendet werden können, und die folgenden Abschnitte zeigen Parameter für bestimmte Ereignisse.</p>
+
+    <table class="bcls-table">
+      <thead class="bcls-table__head">
+        <tr>
+          <th style="width:16em;">Gebiet</th>
+          <th>Typ</th>
+          <th>Beschreibung</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td><code translate="No">account</code></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Konto-ID</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">domain</code></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>immer gleich <code translate="No">videocloud</code></p>
+
+            <p class="type-size">Zulässige Werte: <code translate="No">"videocloud"</code></p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">session</code></td>
+          <td>Zeichenfolge</td>
+          <td>Eine möglichst universell eindeutige Sitzungs-ID - siehe die <a href="#minimal">Minimale Daten</a> Abschnitt oben für weitere Informationen</td>
+        </tr>
+        <tr>
+          <td><code translate="No">device_os</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Überschreiben, um das Betriebssystem des Geräts anzugeben, das das Ereignis verursacht hat, wenn der Benutzeragent unzuverlässig ist (wird ignoriert, es sei denn, sowohl das Gerätebetriebssystem als auch der Gerätetyp sind enthalten oder der übermittelte Wert ist nicht in der hier angezeigten Werteliste enthalten. <strong>Normalerweise nicht enthalten</strong>)</p>
+
+            <p class="type-size">Zulässige Werte: <code translate="No">"android"</code> , <code translate="No">"bada"</code> , <code translate="No">"ios"</code> , <code translate="No">"linux"</code> , <code translate="No">"mac"</code> , <code translate="No">"tv"</code> , <code translate="No">"os_x"</code> , <code translate="No">"rim"</code> , <code translate="No">"sybian"</code> , <code translate="No">"windows"</code> , <code translate="No">"other"</code></p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">device_os_version</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Die vom Gerät verwendete Betriebssystemversion. Wenn nicht angegeben, wird dies berechnet, indem der User-Agent-String für die Tracking-Anfrage analysiert wird</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">device_type</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Überschreiben, um den Typ des Geräts anzugeben, das das Ereignis ausgelöst hat, wenn der Benutzeragent unzuverlässig ist (wird ignoriert, es sei denn, sowohl das Gerätebetriebssystem als auch der Gerätetyp sind enthalten oder der übermittelte Wert ist nicht in der hier angezeigten Werteliste enthalten. <strong>Normalerweise nicht enthalten</strong>)</p>
+
+            <p class="type-size">Zulässige Werte: <code translate="No">"mobile"</code> , <code translate="No">"tablet"</code> , <code translate="No">"tv"</code> , <code translate="No">"desktop"</code> , <code translate="No">"other"</code></p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">event</code></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>der Veranstaltungstyp</p>
+
+            <p class="type-size">Zulässige Werte: <code translate="No">"player_load"</code> , <code translate="No">"catalog_request"</code> , <code translate="No">"catalog_response"</code> , <code translate="No">"play_request"</code> , <code translate="No">"ad_mode_begin"</code> , <code translate="No">"ad_mode_complete"</code> , <code translate="No">"video_impression"</code> , <code translate="No">"video_view"</code> , <code translate="No">"video_engagement"</code> , <code translate="No">"error"</code></p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">destination</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>URI, die das Ereignis verursacht hat</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">source</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>URI, die den Endbenutzer an die <code translate="No">destination</code> URI</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">time</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Nummer</td>
+          <td>
+            <p>der Zeitstempel für das Ereignis in Epochenzeit (Millisekunden)</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">country</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>ISO-3166 (Alpha 2) Region cISO-3166 (Alpha 2) Regionscode (überschreiben, falls das System keine geografischen Informationen von der IP-Adresse erkennen kann) <strong>Normalerweise nicht enthalten</strong></p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">country_name</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Für Menschen lesbarer Ländername (überschreiben, falls das System keine geografischen Informationen aus der IP-Adresse erkennen kann) <strong>Normalerweise nicht enthalten</strong></p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">region</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>ISO-3166 (Alpha 2)-Regionscode (überschreiben, falls das System keine geografischen Informationen aus der IP-Adresse erkennen kann) <strong>Normalerweise nicht enthalten</strong></p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">region_name</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Für Menschen lesbarer Regionsname (überschreiben, falls das System keine geografischen Informationen aus der IP-Adresse erkennen kann) <strong>Normalerweise nicht enthalten</strong></p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">city</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Stadtname <strong>Normalerweise nicht enthalten</strong></p>
+          </td>
+        </tr>
+        <tr id="userData">
+          <td><code translate="No">user</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Eine eindeutige Benutzerkennung – wenn sie nicht angegeben oder leer ist, verwendet Video Cloud die Fallback-Methode der Verwendung der <code translate="No">Source IP address + the User-Agent</code> String als eindeutiger Bezeichner; <strong>Beachten Sie, dass Brightcove diese Informationen nur verwendet, um eindeutige Benutzer zu berechnen. Die Nutzerdaten selbst können nicht über das API- oder Analytics-Modul abgerufen werden</strong></p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="user">Benutzerparameter</h3>
+
+    <ul>
+      <li>Wenn die Player-/Client-Anwendung den eindeutigen Viewer verfolgen möchte, sollte sie eine eindeutige ID für den Benutzer als Benutzerparameter an den Collector senden.</li>
+      <li>Wenn die <code translate="No">user</code> nicht angegeben oder leer ist, verwenden wir die Fallback-Methode der Verwendung der <code translate="No">Source IP address + the User-Agent String</code> als eindeutige Kennung.</li>
+      <li>Der Wert des Benutzerparameters wird nie in den Protokollen/Datenbanken gespeichert, nur ein Hash (mit SHA-256) wird gespeichert.</li>
+      <li>Es werden keine Cookies vom Kollektor gesetzt.</li>
+    </ul>
+
+    <h4 id="uniqueuser">Eindeutiger Benutzer</h4>
+
+    <p>Sie können die Plug-in-Funktion von Brightcove Player verwenden, um den gemeldeten Analysen eindeutige Videobetrachterdaten hinzuzufügen. Dazu fügen Sie dem . eine eindeutige Kennung hinzu <code translate="No">settings</code> Gegenstand der Analysefunktionalität.</p>
+
+    <p>Wie eine eindeutige Benutzer-ID erfasst wird, variiert natürlich von Anwendung zu Anwendung, aber zum Beispiel geht dieser Code davon aus, dass eine Anmelde-URL erfasst wird, die eindeutige Benutzerdaten enthält, wie z <strong>http://exampledomain.com/users/912389123</strong>. Diese eindeutige URL wird an das Plugin übergeben.</p>
+
+    <p>Der folgende Code des Plugins führt die folgenden Aufgaben aus:</p>
+
+    <ul>
+      <li>Verwendet die Standardsyntax zum Erstellen eines Brightcove Player-Plug-ins mit dem Plug-in-Namen definiert als <code translate="No">uniqueUserForAnalyticsPlugin</code>. Das Plugin akzeptiert auch ein <code translate="No">options</code> -Objekt, das an das Plugin übergebene Daten enthält.</li>
+      <li>Die <code translate="No">myPlayer</code> Variable wird eine Referenz auf den Player zugewiesen. Außerdem werden zwei weitere Variablen erstellt.</li>
+      <li>Die <code translate="No">userPath</code> Variable wird der Pfad zugewiesen, der über das Plugin an das Plugin übergeben wird <code translate="No">options</code> Objekt.</li>
+      <li>Die <code translate="No">uniqueViewer</code> Variable wird die geparste Version der <code translate="No">userPath</code> , sodass der Variablen nur die Ziffern der Benutzer-ID zugewiesen werden.</li>
+      <li>Dem Analytics-Plug-in wird eine Benutzereigenschaft hinzugefügt <code translate="No">settings</code> Objekt.</li>
+    </ul>
+
+    <pre class="line-numbers">
+  <code class="language-javascript" translate="No">videojs.registerPlugin('uniqueUserForAnalyticsPlugin', function(options) {
+  var myPlayer = this,
+  userPath = '',
+  uniqueViewer = '';
+  //Assign uniqueViewer a value according to your app and business rules
+  //In this example, parsing the path passed to the plugin in the options object
+  userPath = options.path;
+  uniqueViewer = userPath.substring( userPath.lastIndexOf('/') + 1 );
+  //Assign a user variable to Analytic's settings object
+  myPlayer.bcAnalytics.client.user(USER) = uniqueViewer;
+  });
+  </code>
+  </pre>
+
+    <p>Dieser Code müsste an Ihre Anwendungslogik angepasst und dann unter einer über das Internet zugänglichen URL gespeichert werden.</p>
+
+    <p>Verwenden Sie in Studio die <strong>Plugins</strong> Abschnitt, um das Plugin wie gezeigt in den Player zu laden.</p>
+
+    <figure class="bcls-figure"><img class="bcls-image" alt="Studio Plugin Section" src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/analytics-api/data-collection/data-collection-api-overview/unique-user-plugin-studio.png" />
+      <figcaption class="bcls-caption--image">Studio-Plug-in-Bereich</figcaption>
+    </figure>
+
+    <p>Anstelle des folgenden JSON würden Sie den String mit den Benutzerdaten an das Plugin übergeben. Natürlich müsste der Plugin-Code entsprechend aktualisiert werden, um die eindeutige Benutzer-ID zu extrahieren.</p>
+
+    <pre class="line-numbers">
+  <code class="language-json" translate="No">{
+  "path": "http://exampledomain.com/users/912389123"
+  }
+  </code>
+  </pre>
+
+    <p>Weitere Informationen zur Plugin-Entwicklung finden Sie im <a href="https://player.support.brightcove.com/coding-topics/step-step-plugin-development.html">Schritt für Schritt: Plugin-Entwicklung</a> dokumentieren.</p>
+
+    <h3 id="device_type-and-device_os-parameters"><code translate="No">device_type</code>, <code translate="No">device_os</code> , <code translate="No">device_os_version</code> , <code translate="No">device_manufacturer</code> , und <code translate="No">browser_type</code> Parameter</h3>
+
+    <p>Standardmäßig versucht das Analytics-System, Gerätetyp- und Betriebssysteminformationen aus dem User-Agent-Header zu erkennen. Wenn <strong>beide</strong> <code translate="No">device_type</code> und <code translate="No">device_os</code> gesendet werden, werden die Informationen aus dem User-Agent-Header zugunsten von . ignoriert <code translate="No">device_type</code> und <code translate="No">device_os</code>. <strong>In den meisten Fällen müssen Sie keine Geräte-, Betriebssystem- und Browserinformationen senden</strong> -- diese Überschreibung sollte nur verwendet werden, wenn der User-Agent unzuverlässig oder anderweitig nicht verfügbar ist.</p>
+
+    <p>Das Analytics-System zeichnet auf <code translate="No">other</code> wenn eine Anforderung unbekannte Werte für Geräteparameterüberschreibungen enthält.</p>
+
+    <h3 id="geographic-data-parameters">Geografische Daten Parameter</h3>
+
+    <p>Standardmäßig versucht das Analytics-System, geografische Informationen von der Remote-IP-Adresse zu erkennen. Dieses Verhalten kann durch Passieren überschrieben werden <code translate="No">country</code> , <code translate="No">country_name</code> , <code translate="No">region</code> , <code translate="No">region_name</code> , <code translate="No">city</code> und <code translate="No">dma</code> Parameter. <strong>In den meisten Fällen sind diese Parameter nicht erforderlich</strong> -- Diese Überschreibung sollte nur verwendet werden, wenn die Remote-IP-Adresse unzuverlässig oder anderweitig nicht verfügbar ist.</p>
+
+    <p>Das Analytics-System zeichnet auf <code translate="No">ZZ</code> oder <code translate="No">unknown</code> wenn eine Anforderung nicht erkannte Werte für Überschreibungen enthält.</p>
+
+    <h3 id="destination-and-source-parameters">Ziel- und Quellparameter</h3>
+
+    <p>Die <code translate="No">destination</code> und <code translate="No">source</code> Parameter stellen den URI bereit, der das Ereignis verursacht hat ( <code translate="No">destination</code> ) und die URI, die den Benutzer dorthin geschickt hat ( <code translate="No">source</code>).</p>
+
+    <p>Die <code translate="No">source</code> Parameter wird verwendet, um Informationen zur Verkehrsquelle zu bestimmen. Wenn <code translate="No">source</code> nicht angegeben ist, behandelt das Analytics-System Ereignisse als durch direkten Traffic initiiert.</p>
+
+    <p>Die <code translate="No">destination</code> Parameter wird verwendet, um Verkehrszielinformationen zu bestimmen, dh wo das Video angesehen wird. Wenn der URI keine Autorität enthält, zeichnet die API keine a . auf <code translate="No">destination_domain</code>. Die <code translate="No">destination_path</code> wird als Pfad in der URI aufgezeichnet.</p>
+
+    <p>Während der Webwiedergabe lautet die URL in der Adressleiste der Seite, auf der das Video abgespielt wird, die <code translate="No">destination</code> , und der <code translate="No">source</code> ist der Referrer ( <code translate="No">top.document.referrer</code>).</p>
+
+    <p>Wenn Sie beispielsweise auf der Brightcove-Support-Website nach "Live-Streaming-Wirecast" suchen und ein Video ansehen, das in den Ergebnissen angezeigt wird:</p>
+
+    <table class="bcls-table">
+      <thead class="bcls-table__head">
+        <tr>
+          <th>Parameter</th>
+          <th>Wert</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td><code translate="No">source</code></td>
+          <td>
+            <pre class="line-numbers" style="white-space:pre-wrap;padding-top:1em;padding-bottom:1em;">
+  <code class="language-http" translate="No">https://support.brightcove.com/en/video-cloud/search/live%20streaming%20wirecast
+  </code>
+  </pre>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">destination</code></td>
+          <td>
+            <pre class="line-numbers" style="white-space:pre-wrap;padding-top:1em;padding-bottom:1em;">
+  <code class="language-http" translate="No">https://support.brightcove.com/en/video-cloud/training-videos/live-streaming-wirecast
+  </code>
+  </pre>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Wenn keine URL vorhanden ist (wie zum Beispiel bei der nativen Wiedergabe), beide <code translate="No">destination</code> und <code translate="No">source</code> sollten gültige URIs sein, die angeben, wo das Video wiedergegeben wird bzw. wie der Benutzer dorthin gelangt ist.</p>
+
+    <p>Angenommen, die <code translate="No">destination</code> ist ein <a href="http://en.wikipedia.org/wiki/URI_scheme#Generic_syntax">gültige URI</a>:</p>
+
+    <pre>
+  <code translate="No">&lt;scheme name&gt; : &lt;hierarchical part&gt; [ ? &lt;query&gt; ] [ # &lt;fragment&gt; ]
+  ex. https://www.example.com/foo/bar/baz
+ 
+---
+-----------/----------/
+  |             |
+  authority        path
+ 
+---
+/   
+---
+----------------------/
+  |                |
+  scheme       hierarchical part
+  </code>
+  </pre>
+
+    <p>das Analytics-System wird es wie folgt handhaben:</p>
+
+    <p>Wenn der URI ein . enthält <strong>Behörde</strong> , verwendet die API-Antwort diese Autorität als <code translate="No">destination_domain</code> und jeder Pfad, der als bereitgestellt wird <code translate="No">destination_path</code>. Wenn der URI keine Autorität enthält, zeichnet die API keine a . auf <code translate="No">destination_domain</code>. Die <code translate="No">destination_path</code> wird als Pfad in der URI aufgezeichnet. EIN <code translate="No">destination</code> ohne einen hierarchischen Teil (zB nur ein Schema) gilt ebenso als ungültig, ebenso wie jeder Wert ohne Schema.</p>
+  </section>
+
+  <section class="bcls-section">
+    <h2 id="parameters_for_specific_events">Parameter für bestimmte Ereignisse</h2>
+
+    <h3 id="errorEvent">Fehlerereignisparameter</h3>
+
+    <p>Die folgenden Parameter sollten mit gesendet werden <code translate="No">error</code> Veranstaltungen.</p>
+
+    <table class="bcls-table">
+      <thead class="bcls-table__head">
+        <tr>
+          <th style="width: 30%">Gebiet</th>
+          <th style="width: 10%">Typ</th>
+          <th style="width: 70%">Beschreibung</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td><code translate="No">error_code</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Nummer</td>
+          <td>
+            <p>Ein plattformspezifischer Fehlercode, der mit dem Ereignis verknüpft ist</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="catalog_requestEvent">catalog_request Ereignisparameter</h3>
+
+    <p>Die folgenden Parameter sollten mit gesendet werden <code translate="No">catalog_request</code> Veranstaltungen.</p>
+
+    <table class="bcls-table">
+      <thead class="bcls-table__head">
+        <tr>
+          <th style="width: 30%">Gebiet</th>
+          <th style="width: 10%">Typ</th>
+          <th style="width: 70%">Beschreibung</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td><code translate="No">catalog_url</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Die mit dem Ereignis catalog_request verknüpfte Ziel-URL</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="catalog_responseEvent">catalog_response-Ereignisparameter</h3>
+
+    <p>Die folgenden Parameter sollten mit gesendet werden <code translate="No">catalog_response</code> Veranstaltungen.</p>
+
+    <table class="bcls-table">
+      <thead class="bcls-table__head">
+        <tr>
+          <th style="width: 30%">Gebiet</th>
+          <th style="width: 10%">Typ</th>
+          <th style="width: 70%">Beschreibung</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td><code translate="No">catalog_url</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Die Ziel-URL, die mit dem Ereignis catalog_request verknüpft ist, das diese Antwort initiiert hat</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">response_time_ms</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Nummer</td>
+          <td>
+            <p>Die Zeit in Millisekunden zwischen dem Ereignis catalog_request und dem Ereignis catalog_response</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="video_impressionEvent">video_impression-Ereignisparameter</h3>
+
+    <p>Die folgenden Parameter sollten mit gesendet werden <code translate="No">video_impression</code> Veranstaltungen.</p>
+
+    <table class="bcls-table">
+      <thead class="bcls-table__head">
+        <tr>
+          <th style="width: 30%">Gebiet</th>
+          <th style="width: 10%">Typ</th>
+          <th style="width: 70%">Beschreibung</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td><code translate="No">video</code> <span class="label label-optional" style="float:right;"> Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>die Video-ID</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">video_name</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>der Videoname</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="video_viewEvent">video_view-Ereignisparameter</h3>
+
+    <p>Die folgenden Parameter sollten mit gesendet werden <code translate="No">video_view</code> Veranstaltungen.</p>
+
+    <table class="bcls-table">
+      <thead class="bcls-table__head">
+        <tr>
+          <th style="width: 30%">Gebiet</th>
+          <th style="width: 10%">Typ</th>
+          <th style="width: 70%">Beschreibung</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td><code translate="No">video</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>die Video-ID</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">video_name</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>der Videoname</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">start_time_ms</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Die Zeit in Millisekunden zwischen dem Beginn der Wiedergabe und dem ersten Frame des gerenderten Videos. Dies kann je nach Erfahrung unterschiedlich sein. Wenn beispielsweise keine Pre-Roll-Anzeigen konfiguriert sind, ist diese Messung die Zeit zwischen den <code translate="No">play_request</code> und <code translate="No">video_view</code> Veranstaltungen. Wenn eine Preroll-Anzeige vorhanden ist, die Zeit zwischen <code translate="No">ad_mode_begin</code> und <code translate="No">ad_mode_complete</code> sollte nicht enthalten sein</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 id="engagementEventParams">video_engagement-Ereignisparameter</h3>
+
+    <p>Die folgenden Parameter sollten mit gesendet werden <code translate="No">video_engagement</code> Veranstaltungen.</p>
+
+    <table class="bcls-table">
+      <thead class="bcls-table__head">
+        <tr>
+          <th style="width: 30%">Gebiet</th>
+          <th style="width: 10%">Typ</th>
+          <th style="width: 70%">Beschreibung</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td><code translate="No">video</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>die Video-ID</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">video_name</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>der Videoname</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">range</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>die Reichweite des Videos, für das angesehen wird <code translate="No">video_engagement</code> Veranstaltungen im Format <code translate="No">StartSecond..EndSecond</code> (die Werte für StartSecond und EndSecond müssen ganze Zahlen [Ganzzahlen] sein) - Der Bereich kann aus einem Engagement-Ereignis herausgelassen werden, um anzuzeigen, dass während des vom Ereignis abgedeckten Zeitraums keine Anzeigeaktivität stattgefunden hat. (z. B. wenn nur eine erneute Pufferung stattfindet)</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">rendition_url</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Die URL zur zuletzt ausgewählten Wiedergabeversion. Bei einem HLS-Stream wäre dies beispielsweise die URL zur zuletzt ausgewählten Variante</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">rendition_indicated_bps</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Die angezeigte Bitrate in Bits pro Sekunde der zuletzt ausgewählten Wiedergabe</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">rendition_mime_type</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Der Mime-Typ der zuletzt ausgewählten Wiedergabe</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">rendition_height</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Die codierte Höhe der Videowiedergabe in Pixel</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">rendition_width</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Die codierte Breite der Videowiedergabe in Pixel</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">rebuffering_seconds</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Die Anzahl der Sekunden, die der Nutzer aufgrund einer nicht angeforderten Verzögerung während des Interaktionszeitraums auf die Wiedergabe des Videos gewartet hat</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">rebuffering_count</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Die Häufigkeit, mit der die Wiedergabe aufgrund von Neupufferung während der dargestellten Eingriffsperiodenverzögerung während der Eingriffsperiode angehalten wurde</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">forward_buffer_seconds</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Die Anzahl der Sekunden des Videos, die sich derzeit im Vorwärtspuffer befinden</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">measured_bps</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Das Verhältnis der Anzahl der im zuletzt heruntergeladenen Segment enthaltenen Bits zur Zeit, die für das Herunterladen dieses Segments aufgewendet wurde, in Bits pro Sekunde</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">player_width</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Die aktuelle Pixelbreite des Spielers am Ende des Eingriffsbereichs</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">player_height</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>Die aktuelle Pixelhöhe des Spielers am Ende des Eingriffsbereichs</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">dropped_frames</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Zeichenfolge</td>
+          <td>
+            <p>dropped_frames</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">video_duration</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Nummer</td>
+          <td>
+            <p>die Dauer des Videos in Sekunden</p>
+          </td>
+        </tr>
+        <tr>
+          <td><code translate="No">video_seconds_viewed</code> <span class="label label-optional" style="float:right;">Optional</span></td>
+          <td>Nummer</td>
+          <td>
+            <p>Anzahl der beobachteten Sekunden seit dem letzten Update für <code translate="No">video_engagement</code> Veranstaltungen</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Die <code translate="No">video_engagement</code> Ereignis ist ein Mittel zum Verfolgen von Videointeraktionen während der Wiedergabe eines Videos und wird während der Wiedergabe wahrscheinlich viele Male gesendet. (Die Flash-/HTML5-Player-Instrumentierung sendet dieses Ereignis alle 10 Sekunden, wenn die Wiedergabe nicht unterbrochen wird.) <strong>Derzeit werden Ereignisse, die Bereiche von mehr als 20 Sekunden beschreiben, vom Analytics-System verworfen, sodass diese Ereignisse häufiger gesendet werden müssen.</strong></p>
+
+    <p>Es gibt zwei Formen, die a <code translate="No">video_engagement</code> Event kann annehmen (andere Parameter aus Gründen der Kürze weggelassen):</p>
+
+    <table class="bcls-table">
+      <thead class="bcls-table__head">
+        <tr>
+          <th>Beispiel</th>
+          <th>Bedeutung</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td>
+            <pre class="line-numbers" style="white-space:pre-wrap;padding-top:1em;padding-bottom:1em;">
+  <code class="language-http" translate="No">event=video_engagement&amp;video=123&amp;video_duration=75&amp;range=0..9
+  </code>
+  </pre>
+          </td>
+          <td>Video <code translate="No">123</code> mit einer Dauer von 75 Sekunden gespielt Sekunden 0 bis 9 (für insgesamt 10 Sekunden angesehen).</td>
+        </tr>
+        <tr>
+          <td><code translate="No">event=video_engagement&amp;video=123&amp;video_seconds_viewed=10</code></td>
+          <td>10 Sekunden Video <code translate="No">123</code> wie haben überprüft.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Während beide Versionen die angezeigten Sekunden verfolgen, ist die Version mit <code translate="No">video_duration</code> und <code translate="No">range</code> enthält auch Informationen, die zur Berechnung zusätzlicher Engagement-Daten erforderlich sind, und ist <strong>der bevorzugte Weg</strong> senden <code translate="No">video_engagement</code> Ereignisdaten an das Analytics-System. Bei Livestreams oder in Fällen, in denen sich die Zeitachse des Videos während der Wiedergabe ständig ändert oder anderweitig unzuverlässig ist, <code translate="No">video_seconds_viewed</code> werden die einzigen verfügbaren Daten sein. Für VOD, es sei denn <code translate="No">duration</code> ist nicht verfügbar, die <code translate="No">video_engagement</code> Veranstaltung sollte beinhalten <code translate="No">video_duration</code> und <code translate="No">range</code>.</p>
+
+    <table class="bcls-table">
+      <thead class="bcls-table__head">
+        <tr>
+          <th>Parameter</th>
+          <th>Abgeleitete Engagement-Messwerte (API)</th>
+        </tr>
+      </thead>
+      <tbody class="bcls-table__body">
+        <tr>
+          <td><code translate="No">video_duration</code>, <code translate="No">range</code></td>
+          <td><code translate="No">video_seconds_viewed</code>, <code translate="No">video_percent_viewed</code> , <code translate="No">engagement_score</code> ; Daten zur Engagement-Kurve</td>
+        </tr>
+        <tr>
+          <td><code translate="No">video_seconds_viewed</code></td>
+          <td><code translate="No">video_seconds_viewed</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Wenn alle drei Parameter ( <code translate="No">video_duration</code> , <code translate="No">range</code> und <code translate="No">video_seconds_viewed</code> ) werden zusammen mit a . gesendet <code translate="No">video_engagement</code> Ereignis berechnet das Analytics-System Interaktionsmetriken aus den <code translate="No">video_duration</code>+ <code translate="No">range</code> Parameter.</p>
+
+    <h3 id="changesFromV1">V2-Änderungen</h3>
+
+    <p>Dieser Abschnitt bietet eine Zusammenfassung der Änderungen von v1 zu v2 des Datenkollektors für diejenigen, die v1 verwendet haben.</p>
+
+    <h3>Basis-URL für Tracker</h3>
+
+    <pre>
+  <code translate="No">http(s)://metrics.brightcove.com/v2
+  </code>
+  </pre>
+
+    <h3>Zusätzliche Felder, die bei allen Ereignissen unterstützt werden:</h3>
+
+    <p><strong>device_os_version</strong>: Die vom Gerät verwendete Betriebssystemversion. Wenn nicht angegeben, wird dies durch Analysieren der Benutzeragentenzeichenfolge für die Tracking-Anfrage berechnet.</p>
+
+    <p><strong>Plattformversion</strong>: Wird verwendet, um anzuzeigen, dass eine neue Version der angegebenen Plattform zum Senden der Ereignisse verwendet wird.</p>
+
+    <h3>Neue Ereignisse für V2</h3>
+
+    <p><strong>katalog_anfrage</strong>: Wird gesendet, wenn eine Anfrage an die videocloud-Katalog-API gestellt wird. Beachten Sie, dass dieses Ereignis für den internen Gebrauch bestimmt ist und nicht im Analytics-Modul oder über die Analytics-API angezeigt wird.</p>
+
+    <ul>
+      <li><strong>Katalog_URL</strong>: Die mit dem verknüpfte Ziel-URL <code translate="No">catalog_request</code> Ereignis - Beachten Sie, dass dieses Ereignis für den internen Gebrauch bestimmt ist und nicht im Analytics-Modul oder über die Analytics-API angezeigt wird.</li>
+    </ul>
+
+    <p><strong>Katalogantwort</strong>: Wird gesendet, wenn eine Antwort auf eine vorherige <code translate="No">catalog_request</code> wird empfangen - beachten Sie, dass dieses Ereignis für den internen Gebrauch bestimmt ist und nicht im Analytics-Modul oder über die Analytics-API verfügbar gemacht wird.</p>
+
+    <ul>
+      <li><strong>Katalog_URL</strong>: Die mit dem verknüpfte Ziel-URL <code translate="No">catalog_request</code> Ereignis, das diese Antwort ausgelöst hat. Beachten Sie, dass dieses Ereignis für den internen Gebrauch bestimmt ist und nicht im Analytics-Modul oder über die Analytics-API angezeigt wird.</li>
+      <li><strong>response_time_ms</strong>: Die Zeit in Millisekunden zwischen den <code translate="No">catalog_request</code> Veranstaltung und die <code translate="No">catalog_response</code> Ereignis - Beachten Sie, dass dieses Ereignis für den internen Gebrauch bestimmt ist und nicht im Analytics-Modul oder über die Analytics-API angezeigt wird.</li>
+    </ul>
+
+    <p><strong>play_request</strong>: Wird gesendet, wenn die Wiedergabe initiiert wird, entweder durch den Benutzer, der ausdrücklich auf die Wiedergabeschaltfläche klickt, oder automatisch, wenn die Plattform die Wiedergabe in einem Auto-Play-Szenario auslöst.</p>
+
+    <p><strong>ad_mode_begin</strong> : [Ersetzt <code translate="No">ad_start</code> ] Wird gesendet, wenn die Kontrolle von der Wiedergabeplattform an einen Werbeagenten übergeben wird.</p>
+
+    <p><strong>ad_mode_complete</strong> : [Ersetzt <code translate="No">ad_end</code>]Gesendet, wenn die Kontrolle vom Werbeagenten an die Wiedergabeplattform zurückgegeben wird.</p>
+
+    <p><strong>Error</strong>: Wird gesendet, wenn schwerwiegende Fehler auftreten, die das Wiedergabeerlebnis stören.</p>
+
+    <ul>
+      <li><strong>Fehlercode</strong>: Ein plattformspezifischer Fehlercode, der dem Ereignis zugeordnet ist.</li>
+    </ul>
+
+    <h3>Aktualisierte Ereignisse für V2</h3>
+
+    <p><strong>video_view</strong>: Enthält neue Latenzmessungen</p>
+
+    <ul>
+      <li><strong>load_time_ms</strong>: Die Zeit in Millisekunden zwischen dem Initiieren des Datenladens für das Video und dem Abspielen des Videos.</li>
+      <li><strong>start_time_ms</strong>: Die Zeit in Millisekunden zwischen dem Beginn der Wiedergabe und dem ersten Frame des gerenderten Videos. Dies kann je nach Erfahrung unterschiedlich sein. Wenn beispielsweise keine Pre-Roll-Anzeigen konfiguriert sind, ist diese Messung die Zeit zwischen dem "play_request"' und <code translate="No">video_view</code> Veranstaltungen. Wenn eine Preroll-Anzeige vorhanden ist, die Zeit zwischen <code translate="No">ad_mode_begin</code> und <code translate="No">ad_mode_complete</code> sollte nicht enthalten sein.</li>
+    </ul>
+
+    <p><strong>video_engagement</strong>: Enthält zusätzliche Wiedergabeauswahl, Bitratenmessungen und Pufferungsinformationen. Es wurde auch eine subtile Änderung am Video-Engagement vorgenommen, indem es regelmäßig gesendet werden sollte, auch wenn während des Engagement-Zeitraums keine Anzeige stattfand. Diese Änderung soll die Verfolgung von Verzögerungen und Zählungen beim erneuten Puffern ermöglichen, die dazu führen, dass Benutzer auf die Wiedergabe warten.</p>
+
+    <ul>
+      <li><strong>Bereich</strong>: Der Bereichsparameter ist jetzt optional. Der Bereich kann bei einem Engagement-Ereignis weggelassen werden, um anzuzeigen, dass während des vom Ereignis abgedeckten Zeitraums keine Anzeigeaktivität stattgefunden hat. (z. B. wenn nur eine erneute Pufferung stattfindet)</li>
+      <li><strong>rendition_url</strong>: Die URL zur zuletzt ausgewählten Wiedergabeversion. Bei einem HLS-Stream wäre dies beispielsweise die URL zur zuletzt ausgewählten Variante.</li>
+      <li><strong>rendition_indicated_bps</strong>: Die angegebene Bitrate in Bits pro Sekunde der zuletzt ausgewählten Wiedergabe.</li>
+      <li><strong>rendition_mime_type</strong>: Der Mime-Typ der zuletzt ausgewählten Wiedergabe.</li>
+      <li><strong>Wiedergabehöhe</strong>: Die codierte Höhe der Videowiedergabe in Pixel</li>
+      <li><strong>Wiedergabebreite</strong>: Die codierte Breite der Videowiedergabe in Pixel</li>
+      <li><strong>rebuffering_seconds</strong>: Die Anzahl der Sekunden, die der Nutzer aufgrund einer nicht angeforderten Verzögerung während des Interaktionszeitraums auf die Wiedergabe des Videos gewartet hat.</li>
+      <li><strong>rebuffering_count</strong>: Die Häufigkeit, mit der die Wiedergabe während des dargestellten Eingriffszeitraums aufgrund einer erneuten Pufferung angehalten wurde.</li>
+      <li><strong>forward_buffer_seconds</strong>: Die Anzahl der Sekunden des Videos, die sich derzeit im Vorwärtspuffer befinden.</li>
+      <li><strong>gemessen_bps</strong>: Das Verhältnis der Anzahl der im zuletzt heruntergeladenen Segment enthaltenen Bits zur Zeit, die für das Herunterladen dieses Segments aufgewendet wurde, in Bits pro Sekunde.</li>
+      <li><strong>Spielerbreite</strong> Die aktuelle Pixelbreite des Spielers am Ende des Eingriffsbereichs.</li>
+      <li><strong>Spielerhöhe</strong> Die aktuelle Pixelhöhe des Spielers am Ende des Eingriffsbereichs.</li>
+      <li><strong>dropped_frames</strong>: Die Anzahl der Frames, die während dieses Interaktionszeitraums bei der Videowiedergabe ausgelassen wurden</li>
+    </ul>
+  </section>
+</article>

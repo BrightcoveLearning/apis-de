@@ -1,0 +1,84 @@
+---
+title: 'Videobericht-Generator'
+description: 'Dies ist eine vereinfachte Version des <a href="/cms/code-samples/cms-api-sample-video-report-generator.html">Beispiel für einen Videoberichtsgenerator</a>. Dieser gibt weniger Informationen zurück, sodass er viel schneller ausgeführt wird. Es meldet auch die Gesamtdauer der Videobibliothek im Protokoll und bietet Ihnen die Möglichkeit, die Ergebnisse als CSV oder JSON zurückzugeben.'
+parent: 'Code Samples' 
+grandparent: CMS API
+---
+ <h1>{{ page.title }}</h1>
+<article class="bcls-article">
+  <summary>{{ page.description }}</summary>
+  <section class="bcls-section">
+    <h2 id="limitations">Einschränkungen</h2>
+
+    <aside class="bcls-aside bcls-aside--information">Dieses Beispiel und der zugehörige Code dienen als Leitfaden für Ihre Produktionsentwicklung. Der Code ist weder für den Produktionsgebrauch zertifiziert noch offiziell unterstützt.</aside>
+  </section>
+
+  <section class="bcls-section">
+    <details>
+      <summary>
+        <h2 id="getCredentials">Zugangsdaten abrufen</h2>
+      </summary>
+      <p>Um die zu verwenden <span translate="No">CMS-API</span> Sie benötigen die richtigen Anmeldeinformationen.</p>
+
+      <p>Die Anmeldeinformationen erhalten Sie in den meisten Fällen am einfachsten über den Abschnitt Authentifizierung der Studio-Admin-API (erfordert Administratorberechtigungen für Ihr Konto). Sehen <a href="/general/managing-api-authentication-credentials.html">Anmeldeinformationen für die API-Authentifizierung verwalten</a> für Details. In den meisten Fällen möchten Sie wahrscheinlich nur Berechtigungen für alle erhalten <span translate="No">CMS-API</span> Betrieb:</p>
+
+      <figure class="bcls-figure"><img class="bcls-image" alt="CMS API Permissions" src="//learning-services-media.brightcove.com/doc-assets/video-cloud-apis/cms-api/cms-permissions.png" />
+        <figcaption class="bcls-caption--image">CMS-API-Berechtigungen</figcaption>
+      </figure>
+
+      <p>Wenn die von Ihnen benötigten Berechtigungen in Studio nicht verfügbar sind oder Sie sie lieber direkt von der OAuth-API beziehen möchten, verwenden Sie Ihre Wahl der <strong>Kundenanmeldeinformationen abrufen</strong> unten aufgeführten Dokumente. Für welche Option Sie sich auch entscheiden, Sie müssen nach den richtigen Betriebsberechtigungen fragen. Folgendes kann mit cURL oder Postman verwendet werden, um alle Berechtigungen für die CMS-API zu erhalten:</p>
+
+      <pre class="line-numbers">
+            <code class="language-json" translate="No">"operations": [
+              "video-cloud/video/all",
+              "video-cloud/playlist/all",
+              "video-cloud/sharing-relationships/all",
+              "video-cloud/notifications/all"
+            ]</code></pre>
+
+      <ul>
+        <li>OAuth:<a href="/oauth/guides/oauth-create-client-credentials-using-curl.html"> Client-Anmeldeinformationen mit cURL abrufen</a></li>
+        <li>OAuth:<a href="/oauth/guides/oauth-create-client-credentials-using-postman.html"> Erhalten Sie Kundenanmeldeinformationen mit Postman</a></li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="bcls-section" id="workingSample">
+    <h2>Generator für Videoberichte</h2>
+    <h3>Quellcode</h3>
+    <p>
+      Hier finden Sie den gesamten Code, der mit diesem Beispiel verknüpft ist <a href="https://github.com/BrightcoveLearning/18032-video-report-generator">GitHub-Repository</a>.
+    </p>
+    <h3>Beispiel-App</h3>
+    <p data-height="1200" data-theme-id="34967" data-slug-hash="mxYYMR" data-default-tab="result" data-user="rcrooks1969" data-pen-title="CMS API Sample: Video Report Generator" class="codepen">Siehe den Stift <a href="https://codepen.io/team/rcrooks1969/pen/mxYYMR/">CMS-API-Beispiel: Videobericht-Generator</a> von Brightcove Learning Services (<a href="https://codepen.io/rcrooks1969">@rcroooks1969</a> ) An <a href="https://codepen.io">CodePen</a>.</p>
+    <script async src="https://static.codepen.io/assets/embed/ei.js"></script>
+  </section>
+
+  <section class="bcls-section">
+    <details>
+      <summary>
+        <h2 id="Using_the_CodePen">Verwenden des CodePens</h2>
+      </summary>
+      <p>Hier sind einige Tipps, um den obigen CodePen effektiv zu verwenden:</p>
+
+      <ul>
+        <li>Schalten Sie die aktuelle Anzeige des Players um, indem Sie auf klicken <strong>Ergebnis</strong> Taste.</li>
+        <li>Drücke den <strong>HTML/CSS/JS</strong> Tasten, um EINEN der Codetypen anzuzeigen.</li>
+        <li>Klicken <strong>Auf CodePen bearbeiten</strong> in der oberen rechten Ecke, um diesen CodePen Ihrem eigenen Konto zuzuordnen.</li>
+        <li>Hier finden Sie den gesamten Code, der mit diesem Beispiel verknüpft ist <a href="https://github.com/BrightcoveLearning/18032-video-report-generator">GitHub-Repository</a>.</li>
+      </ul>
+    </details>
+
+  </section>
+
+    <section class="bcls-section">
+    <details>
+      <summary>
+        <h2 id="proxy">Proxy-Code</h2>
+      </summary>
+
+      <p>Um Ihre eigene Version der Beispiel-App auf dieser Seite zu erstellen, müssen Sie Ihren eigenen Proxy erstellen und hosten. (Die von Brightcove Learning Services verwendeten Proxys akzeptieren nur Anfragen von Brightcove-Domänen.) Ein Beispielproxy, das dem von uns verwendeten sehr ähnlich ist, jedoch ohne die Überprüfungen, die Anfragen von Nicht-Brightcove-Domains blockieren, finden Sie in <a href="https://github.com/BrightcoveLearning/sample-proxy-apps">dieses GitHub-Repository</a>. Dort finden Sie auch grundlegende Anweisungen zur Verwendung und eine ausführlichere Anleitung zum Erstellen von Apps rund um den Proxy in <a href="/getting-started/learning-guide-using-rest-apis.html">Verwenden der REST-APIs</a>.</p>
+    </details>
+  </section>
+
+</article>
