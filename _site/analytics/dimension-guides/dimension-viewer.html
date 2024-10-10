@@ -3651,64 +3651,68 @@
       <p>Um eine Betrachter-ID an das Analysesystem zu senden, müssen Sie die Logik erstellen, um eine eindeutige ID zu konstruieren, die den Betrachter zur Laufzeit identifiziert, und diese dann vom Player an den Analysedatensammler senden. Der Brightcove-Webplayer und die iOS- und Android-SDK-Player können die Benutzer-ID an die Analysefunktion senden. In den folgenden Abschnitten erfahren Sie, wie Sie dies für den Web- und SDK-Player tun können.</p>
       <aside class="bcls-aside bcls-aside--information language-editable">Wenn der Spieler keine Betrachter-ID angibt, versucht die Analyse, eine ID auf der Grundlage des User-Agents und der IP-Adresse zu generieren. Die IP-Adresse wird nicht gespeichert.</aside>
     </section>
-
     <section class="bcls-section">
-  <h2 id="Send_viewer_id_web_player">Betrachter-ID senden - Brightcove-Player</h2>
-
-  <p>Zunächst müssen Sie die Benutzer-ID festlegen, um ihre Anzeigeaktivität zu speichern.</p>
-  <h3>Brightcove Spieler</h3>
-  <p>
-    Wenn Sie Brightcove Player verwenden, gehen Sie folgendermaßen vor:
-  </p>
-
-  <ol class="bcls-tasklist-restart">
-    <li>
+      <h2 id="Send_viewer_id_web_player">Viewer-id verzenden - Brightcove-speler</h2>
+      <aside class="bcls-aside bcls-aside--information language-editable">Opmerking: voor informatie over het instellen van de viewer-id in Native SDK-spelers, zie <a href="https://sdks.support.brightcove.com/features/cross-device-resume-sdks.html">Cross-Device Resume met de Native SDK's</a>.</aside>
+      <h2 id="Vereisten">Vereisten</h2>
+      <p>De volgende vereisten zijn nodig voor de Viewer ID Tracking:</p>
+      <ul>
+      <li>Brightcove Player v7.18.0 of nieuwer</li>
+      </ul>
+      <p>Eerst moet u de gebruikers-ID instellen om die op te slaan gebruikersactiviteit.</p>
+      <h3>Brightcove Player</h3>
       <p>
-        Obwohl Viewer-Daten automatisch an Brightcove Analytics gesendet werden, müssen Sie die Benutzer-ID festlegen. Verwenden Sie dazu die <code translate="No">setUser()</code> Methode. Zum Beispiel:
+      Als u Brightcove Player gebruikt, volgt u deze stappen:
       </p>
-      <pre class="line-numbers"><code class="language-javascript" translate="No">myPlayer.bcAnalytics.client.setUser('<span class="bcls-input">viewer id</span>');</code></pre>
-      <p>Auf Ihren Websites, auf denen Brightcove Player gehostet wird, können Sie ein Authentifizierungsgateway oder eine Identitätsverwaltungslösung verwenden, um den Überblick über die Betrachter zu behalten. Verwenden Sie diese Viewer-ID als Viewer-ID, um sie an Brightcove Analytics zu übergeben.</p>
-      <aside class="bcls-aside bcls-aside--warning">Der Wert der <span class="bcls-input">Betrachter-ID</span> muss eine eindeutige Zeichenfolge sein. Ein ungültiger Wert, z. B. eine Zahl, wird ignoriert. </aside>
-    </li>
-    <li>
+      <ol class="bcls-tasklist-restart">
+      <li>
       <p>
-        Es ist wichtig, die Viewer-ID festzulegen, bevor eine Quelle auf dem Player festgelegt wird. Es sollte sofort nach der Initialisierung des Players aufgerufen werden.
+      Hoewel viewer-gegevens automatisch naar Brightcove Analytics worden verzonden, moet u de gebruikers-ID instellen. Gebruik hiervoor de methode <code translate="No">user()</code>. Bijvoorbeeld:
       </p>
-      <pre class="line-numbers"><code class="language-javascript" translate="No">&lt;video-js
-  id="myPlayerID"
-  data-account="1752604059001"
-  data-player="hyQW6GByl"
-  data-embed="default"
-  controls=""
-  data-video-id="6156696074001"
-  data-playlist-id=""
-  data-application-id=""
-  width="640" height="360"&gt;&lt;/video-js&gt;
-&lt;script src="https://players.brightcove.net/1752604059001/hyQW6GByl_default/index.min.js"&gt;&lt;/script&gt;
-
-&lt;script&gt;
-  videojs.getPlayer('myPlayerID').ready(function() {
-    var myPlayer = this;
-
-    // Set the viewer id for Brightcove analytics
-    myPlayer.bcAnalytics.client.setUser('<span class="bcls-input">viewer id</span>');
-  });
-&lt;/script&gt;</code></pre>
-    </li>
-    <li>Wenn der <code translate="No">setUser()</code> Methode verwendet wird, wird der Wert nicht gehasht und wird mit allen nachfolgenden Beacons im Klartext gesendet.
+      <pre class="line-numbers"><code class="language-javascript" translate="No">myPlayer.bcAnalytics.client.user('<span class="bcls-input">viewer id</span>');</code></pre>
+      <p>Op uw websites die Brightcove Player hosten, kunt u een authenticatiegateway of een identiteitsbeheeroplossing gebruiken om de kijkers bij te houden. Gebruik deze viewer-id als viewer-ID om door te geven aan Brightcove Analytics.</p>
+      <aside class="bcls-aside bcls-aside--warning">De <span class="bcls-input">viewer-id</span>-waarde moet een unieke tekenreeks zijn. Een ongeldige waarde, zoals een getal, wordt genegeerd. </aside>
+      <p></p>
+      <aside class="bcls-aside bcls-aside--tip language-editable">De waarde die hier wordt toegevoegd, wordt in de Insights-rapporten aangeduid als <code translate="No">customerId</code>.</aside>
+      <p></p>
+      </li>
+      <li>
       <p>
-        Notiere dass der <code translate="No">player_init</code> Veranstaltung wird die nicht enthalten <code translate="No">user</code> Feld in diesem Fall, aber alle <code translate="No">video_*</code> Ereignisse sollten es enthalten.
+      Het is belangrijk om de viewer-id in te stellen voordat er een bron op de speler wordt ingesteld. Deze moet direct na het initialiseren van de speler worden aangeroepen. </p>
+      <pre class="line-numbers"><code class="language-javascript" translate="Nee">&lt;video-js
+      id=&quot;myPlayerID&quot;
+      data-account=&quot;1752604059001&quot;
+      data-player=&quot;hyQW6GByl&quot;
+      data-embed=&quot;default&quot;
+      controls=&quot;&quot;
+      data-video-id=&quot;6156696074001&quot;
+      data-playlist-id=&quot;&quot;
+      data-application-id=&quot;&quot;
+      width=&quot;640&quot; height=&quot;360&quot;&gt;&lt;/video-js&gt;
+      &lt;script src=&quot;https://players.brightcove.net/1752604059001/hyQW6GByl_default/index.min.js&quot;&gt;&lt;/script&gt;
+      
+      &lt;script&gt;
+      videojs.getPlayer('myPlayerID').ready(function() {
+      var myPlayer = this;
+      
+      // Stel de viewer-id in voor Brightcove Analytics
+      myPlayer.bcAnalytics.client.user('<span class="bcls-input">viewer-id</span>');
+      });
+      &lt;/script&gt;</code></pre>
+      </li>
+      <li>Wanneer de methode <code translate="No">user()</code> wordt gebruikt, wordt de waarde niet gehasht en wordt deze in de clear verzonden met alle volgende beacons.
+      <p>
+      Houd er rekening mee dat de gebeurtenis <code translate="No">player_init</code> in dit geval niet het veld <code translate="No">user</code> bevat, maar alle gebeurtenissen <code translate="No">video_*</code> moeten dit wel bevatten.
       </p>
-    </li>
-  </ol>
-  <h3>Benutzerdefinierter Webplayer</h3>
-  <p>
-    Wenn Sie eine benutzerdefinierte Implementierung erstellen, die Brightcove Player nicht verwendet, fügen Sie die hinzu <code translate="No">user</code> Parameter für Ihre Datenerfassungs-API-Anforderungen. Einzelheiten finden Sie im <a href="https://apis.support.brightcove.com/data-collection/overview-data-collection-api-v2.html#all-event-parameters">Überblick: Datenerfassungs-API v2</a> Dokument.
-  </p>
-  <p>Auf Ihren Websites, auf denen sich Ihr Player befindet, können Sie ein Authentifizierungsgateway oder eine Identitätsverwaltungslösung verwenden, um den Überblick über die Betrachter zu behalten. Verwenden Sie diese Viewer-ID als Viewer-ID, um sie an Brightcove Analytics zu übergeben.</p>
-  
-</section>
-
+      </li>
+      </ol>
+      <h3>Aangepaste speler</h3>
+      <p>
+      Als u een aangepaste implementatie bouwt die Brightcove Player niet gebruikt, voegt u de parameter <code translate="No">user</code> toe aan uw Data Collection API-aanvragen. Zie voor meer informatie het document <a href="https://apis.support.brightcove.com/data-collection/overview-data-collection-api-v2.html#all-event-parameters">Overzicht: Data Collection API v2</a>.
+      </p>
+      <p>U kunt een authenticatiegateway of een identiteitsbeheeroplossing gebruiken om kijkers te volgen op de sites die uw speler hosten. Gebruik deze viewer-ID als viewer-ID om door te geven aan Brightcove Analytics.</p>
+      </section>
+    
     <section class="bcls-section">
       <h2 id="send-viewer-id-sdk-players"></h2>
       <p>Für die nativen SDK-Player von Brightcove müssen Sie ebenfalls eine Betrachter-ID senden, sofern Sie nicht auf die von Brightcove generierte ID angewiesen sind.</p>
